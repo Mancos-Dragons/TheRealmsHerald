@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Realm's Herald - Suite</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Special+Elite&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css"> 
+    
+    <script type="module" src="./js/app.js"></script>
+</head>
+<body class="bg-[#0d0d0d] text-gray-200 h-screen overflow-hidden flex flex-col">
+
+    <header class="flex justify-between items-center p-4 border-b border-gray-800 bg-[#111]">
+        <div class="flex items-center gap-3">
+            <h1 class="text-xl medieval-font text-amber-600">The Realm's Herald</h1>
+        </div>
+        <nav id="main-nav" class="flex gap-4 text-sm text-gray-400">
+            <button class="hover:text-amber-500 transition">Prensa</button>
+            <button class="hover:text-amber-500 transition">Rumores</button>
+            <button class="hover:text-amber-500 transition">Mapa</button>
+        </nav>
+    </header>
+
+    <main id="app-container" class="flex-1 overflow-auto bg-[#0a0a0a] relative">
+
+    </main>
+
+    <div id="modal-layer"></div>
+
+</body>
+</html>
