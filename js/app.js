@@ -26,7 +26,7 @@ class AppOrchestrator {
 
         this.renderNavigation();
 
-        this.loadModule('newspaper');
+        this.loadModule('newspaper'); 
         
         EventBus.on('GLOBAL_ERROR', (msg) => console.error(msg));
     }
