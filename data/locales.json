@@ -1,0 +1,114 @@
+{
+  "es": {
+    "tools": {
+      "newspaper": {
+        "title": "La Voz del Conejo",
+        "desc": "Editor de gacetas, periódicos y panfletos con maquetación drag & drop."
+      },
+      "rumors": {
+        "title": "Susurros de Taberna",
+        "desc": "Generador de chismes y rumores procedurales."
+      },
+      "public_opinion": {
+        "title": "La Voz del Pueblo",
+        "desc": "Rastreador de reputación, fama e infamia."
+      },
+      "npcs": {
+        "title": "Caras en la Multitud",
+        "desc": "Generador de NPCs reactivos con memoria de eventos."
+      },
+      "timeline": {
+        "title": "Crónicas del Tiempo",
+        "desc": "Línea de tiempo viva para gestionar eras y eventos."
+      },
+      "documents": {
+        "title": "Escriba Real",
+        "desc": "Generador de decretos, cartas y carteles de 'Se Busca'."
+      },
+      "factions": {
+        "title": "Juego de Tronos",
+        "desc": "Matriz diplomática y monitor de facciones."
+      },
+      "secrets": {
+        "title": "Susurros Oscuros",
+        "desc": "Gestor de secretos y triggers de información."
+      },
+      "summary": {
+        "title": "Diario del Bardo",
+        "desc": "Generador de resúmenes de sesión diegéticos."
+      },
+      "chaos": {
+        "title": "Entropía Arcana",
+        "desc": "Modo caos para eventos aleatorios e improvisación."
+      },
+      "consequences": {
+        "title": "Efecto Mariposa",
+        "desc": "Árbol de decisiones y consecuencias lógicas."
+      },
+      "maps": {
+        "title": "Cartógrafo",
+        "desc": "Proyector de mapas tácticos y de mundo."
+      },
+      "labs": {
+        "title": "Laboratorio",
+        "desc": "Zona de pruebas para nuevas mecánicas."
+      }
+    }
+  },
+  "en": {
+    "tools": {
+      "newspaper": {
+        "title": "The Rabbit's Voice",
+        "desc": "Newspaper, gazette, and pamphlet editor with drag & drop layout."
+      },
+      "rumors": {
+        "title": "Tavern Whispers",
+        "desc": "Procedural gossip and rumor generator."
+      },
+      "public_opinion": {
+        "title": "Voice of the People",
+        "desc": "Reputation, fame, and infamy tracker."
+      },
+      "npcs": {
+        "title": "Faces in the Crowd",
+        "desc": "Reactive NPC generator with event memory."
+      },
+      "timeline": {
+        "title": "Time Chronicles",
+        "desc": "Living timeline to manage eras and events."
+      },
+      "documents": {
+        "title": "Royal Scribe",
+        "desc": "Generator for decrees, letters, and Wanted posters."
+      },
+      "factions": {
+        "title": "Game of Thrones",
+        "desc": "Diplomatic matrix and faction monitor."
+      },
+      "secrets": {
+        "title": "Dark Whispers",
+        "desc": "Secrets manager and information triggers."
+      },
+      "summary": {
+        "title": "Bard's Journal",
+        "desc": "Diegetic session summary generator."
+      },
+      "chaos": {
+        "title": "Arcane Entropy",
+        "desc": "Chaos mode for random events and improv."
+      },
+      "consequences": {
+        "title": "Butterfly Effect",
+        "desc": "Decision tree and logical consequences."
+      },
+      "maps": {
+        "title": "Cartographer",
+        "desc": "Tactical and world map projector."
+      },
+      "labs": {
+        "title": "Laboratory",
+        "desc": "Testing ground for new mechanics."
+      }
+    }
+  }
+}
