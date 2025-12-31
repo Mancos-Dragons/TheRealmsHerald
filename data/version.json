@@ -1,0 +1,75 @@
+{
+  "name": "The Realm's Herald",
+  "version": "0.1.0",
+  "codename": "Cimientos",
+  "releaseDate": "2025-12-31",
+  "status": "alpha",
+  "author": "Fernando Machado",
+  "description": "Suite de herramientas narrativas y generadores de documentos para Dungeon Masters.",
+  "changelog": [
+    {
+      "version": "0.1.0",
+      "date": "2025-12-31",
+      "changes": [
+        "Lanzamiento del Panel de Control Central: Ahora puedes navegar fácilmente entre las distintas herramientas y cambiar el idioma del sistema.",
+        "Estreno del Editor de Prensa 'La Voz del Conejo' con estas nuevas capacidades:",
+        "• Maquetación Inteligente: Las noticias se acomodan solas en la página como un rompecabezas perfecto, sin dejar huecos extraños.",
+        "• Flujo Automático: Si una noticia es muy larga y no cabe, el sistema te avisa y te permite moverla a la página siguiente con un solo clic.",
+        "• Arrastrar y Soltar Mejorado: Ahora es mucho más fácil reorganizar las noticias; puedes soltarlas justo donde quieres, incluso entre dos artículos.",
+        "• Ediciones Automáticas: El periódico calcula automáticamente qué número de edición es, basándose en la fecha actual de tu campaña.",
+        "• Personalización Total: Puedes elegir entre distintos tipos de papel (Real, Sucio, Mágico) y fuentes de letra para darle el tono exacto a tu partida.",
+        "• Publicidad y Anuncios: Añade vida a tu mundo insertando anuncios publicitarios o mensajes oficiales al pie de página.",
+        "• Guardar y Cargar: Puedes guardar todo tu trabajo en un archivo en tu computadora y volver a cargarlo cuando quieras continuar.",
+        "• Ajuste de Imágenes: Las imágenes se ajustan automáticamente al tamaño de la columna para que siempre se vean bien."
+      ]
+    }
+  ],
+  "roadmap": [
+    {
+      "phase": "Fase 1: La prensa del mundo",
+      "status": "en_progreso",
+      "description": "Herramienta viva para generar periodicos que se adapten a la campaña.",
+      "features": [
+        "Generador de Titulares: Una ayuda para crear títulos impactantes basados en quién hizo qué recientemente.",
+        "Sección 'Se busca': Una plantilla especial para crear carteles de recompensa con foto y descripción del delito.",
+        "Obituarios y Clasificados: Textos de relleno rápidos para cuando necesitas que el periódico parezca lleno de vida.",
+        "Filtro de Censura: Un botón para cambiar el tono de las noticias automáticamente (ej. a favor del Rey o a favor de los Rebeldes)."
+      ]
+    },
+    {
+      "phase": "Fase 2: Documentos y Entregables",
+      "status": "pendiente",
+      "description": "Herramientas para crear objetos físicos y digitales que puedes dar a tus jugadores.",
+      "features": [
+        "Generador de Decretos Reales: Crea leyes y anuncios formales con sellos de cera que puedes personalizar.",
+        "Cartas Escritas a Mano: Crea cartas de amor, amenazas o pistas con tipografías que parecen escritas con pluma.",
+        "Pósters de 'Se Busca' Individuales: Crea hojas completas para imprimir y pegar en tu tablero de juego.",
+        "Diario de Sesión: Una herramienta para escribir el resumen de la partida con distintos estilos (como un poema épico o un informe militar).",
+        "Firmas y Sellos: Añade marcas de agua y firmas oficiales para que tus documentos parezcan auténticos."
+      ]
+    },
+    {
+      "phase": "Fase 3: Gestión del Mundo Vivo",
+      "status": "pendiente",
+      "description": "Herramientas para controlar lo que pasa en tu mundo detrás de escena.",
+      "features": [
+        "Línea de Tiempo Viva: Un mapa visual de la historia de tu mundo y los eventos que están por ocurrir.",
+        "Monitor de Facciones: Un panel para ver quién es amigo de quién y qué recursos (oro, ejércitos) tienen las organizaciones.",
+        "Gestor de Secretos: Una lista para no olvidar qué NPC sabe qué secreto y cuándo debe ser revelado.",
+        "Consecuencias: Un árbol de decisiones para recordar las acciones de los jugadores y sus repercusiones futuras."
+      ]
+    },
+    {
+      "phase": "Fase 4: Vida y Azar",
+      "status": "pendiente",
+      "description": "Herramientas para ayudarte a improvisar y darle color a la partida.",
+      "features": [
+        "Generador de Rumores: Crea chismes creíbles (o no tanto) dependiendo de si se escuchan en una taberna o en la corte.",
+        "Opinión Pública: Un medidor de qué tan famosos (o infames) son tus jugadores y cómo eso afecta los precios en las tiendas.",
+        "Generador de NPCs: Crea personajes al instante con personalidad y posibles vínculos con tus jugadores.",
+        "Traductor Narrativo: Convierte números aburridos (como puntos de golpe) en descripciones emocionantes.",
+        "Modo Caos: Una tabla de eventos aleatorios para cuando necesitas que pase algo inesperado en la ciudad."
+      ]
+    }
+  ]
+}

@@ -1,71 +1,102 @@
-/**
- * @file app.js
- * @description Orquestador Central de The Realm's Herald.
- * Actúa como Router y Gestor de Estado Global.
- * @author The Realm's Herald
- */
-
 import { EventBus } from './core/EventBus.js';
 import { DataService } from './services/DataService.js';
+import { LanguageService } from './core/LanguageService.js';
 
 class AppOrchestrator {
     constructor() {
         this.currentModule = null;
+        this.currentModuleKey = 'home';
+        this.container = document.getElementById('app-container');
+        
         this.modules = {
+            'home': () => import('./modules/home/HomeController.js'),
             'newspaper': () => import('./modules/newspaper/NewspaperController.js'),
-            'rumors': () => import('./modules/rumors/RumorsController.js'),
         };
         
         this.init();
     }
 
     async init() {
-        console.log("📜 The Realm's Herald: Inicializando sistemas...");
-        
-        await DataService.init();
-
-        this.renderNavigation();
-
-        this.loadModule('newspaper'); 
-        
-        EventBus.on('GLOBAL_ERROR', (msg) => console.error(msg));
+        console.log("📜 The Realm's Herald: Iniciando sistemas...");
+        try {
+            await DataService.init();
+            
+            await LanguageService.loadResources();
+            
+            this.changeLanguage('es');
+            await this.loadModule('home');
+            
+        } catch (error) {
+            console.error("CRITICAL FAILURE:", error);
+            this.container.innerHTML = `<div class="alert alert-danger m-5">Error Crítico: ${error.message}</div>`;
+        }
     }
 
-    renderNavigation() {
-        const navContainer = document.getElementById('main-nav');
+    changeLanguage(lang) {
+        const changed = LanguageService.setLanguage(lang);
+        if(changed) {
+            const flagMap = { 'es': 'fi-es', 'en': 'fi-us' };
+            const flagEl = document.getElementById('current-lang-flag');
+            if(flagEl) {
+                flagEl.className = `fi ${flagMap[lang]}`;
+            }
+
+            if (this.currentModule) {
+                if(this.currentModuleKey === 'newspaper') {
+                    this.currentModule.view.renderWorkspace(this.currentModule.model.config);
+                    this.currentModule.refreshPaper();
+                    this.currentModule.attachEvents(); 
+                } else if (this.currentModuleKey === 'home') {
+                    this.currentModule.render();
+                }
+            }
+        }
     }
 
-    /**
-     * Carga dinámica de módulos (Lazy Loading)
-     * Descarga el módulo anterior y monta el nuevo.
-     * @param {string} moduleKey - Clave del módulo a cargar
-     */
     async loadModule(moduleKey) {
-        if (!this.modules[moduleKey]) {
-            console.error(`Módulo ${moduleKey} no encontrado.`);
-            return;
-        }
+        if (!this.modules[moduleKey]) return;
 
-        if (this.currentModule && typeof this.currentModule.destroy === 'function') {
-            this.currentModule.destroy();
+        if (this.currentModule) {
+            try {
+                if (typeof this.currentModule.destroy === 'function') {
+                    this.currentModule.destroy();
+                }
+            } catch (destroyError) {
+                console.warn("Error limpiando módulo anterior:", destroyError);
+            }
+            this.currentModule = null;
         }
-
-        const appContainer = document.getElementById('app-container');
-        appContainer.innerHTML = '<div class="loader">Cargando pergaminos...</div>';
+        
+        this.container.innerHTML = '';
+        this.currentModuleKey = moduleKey;
+        this.updateActiveNav(moduleKey);
+        
+        this.container.innerHTML = `
+            <div class="h-100 d-flex flex-column justify-content-center align-items-center">
+                <div class="spinner-border text-warning" role="status"></div>
+                <div class="text-secondary mt-2 small">Cargando pergaminos...</div>
+            </div>`;
 
         try {
             const moduleImport = await this.modules[moduleKey]();
-            const ModuleController = moduleImport.default;
-
-            this.currentModule = new ModuleController(appContainer);
+            const ModuleClass = moduleImport.default;
+            
+            this.currentModule = new ModuleClass(this.container);
             await this.currentModule.init();
             
-            console.log(`🏰 Módulo cargado: ${moduleKey}`);
-
         } catch (error) {
-            console.error(`Error cargando el módulo ${moduleKey}:`, error);
-            appContainer.innerHTML = '<div class="error">El escriba no pudo encontrar ese documento.</div>';
+            console.error(`Error cargando módulo ${moduleKey}:`, error);
+            this.container.innerHTML = `<div class="text-danger p-4">Error cargando el módulo: ${error.message}</div>`;
         }
+    }
+
+    updateActiveNav(key) {
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.remove('active', 'text-warning');
+            if(link.getAttribute('onclick') && link.getAttribute('onclick').includes(key)) {
+                link.classList.add('active', 'text-warning');
+            }
+        });
     }
 }
 

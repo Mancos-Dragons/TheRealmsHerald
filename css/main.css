@@ -1,0 +1,28 @@
+@import './variables.css';
+
+body {
+    background-color: #0d0d0d !important; 
+    color: #e5e5e5 !important;
+    margin: 0;
+    overflow: hidden; 
+}
+
+.medieval-font { font-family: 'Cinzel', serif; }
+.typewriter-font { font-family: 'Special Elite', cursive; }
+.serif-font { font-family: 'Old Standard TT', serif; }
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #111; }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #444; }
+
+.fade-in { animation: fadeIn 0.4s ease-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.hover-scale { transition: transform 0.2s, box-shadow 0.2s; }
+.hover-scale:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(217, 119, 6, 0.2) !important; border-color: var(--accent) !important; }
+
+.card { background-color: #111; }
+.text-warning { color: var(--accent) !important; }
+.btn-outline-warning { color: var(--accent); border-color: var(--accent); }
+.btn-outline-warning:hover { background-color: var(--accent); color: white; }
