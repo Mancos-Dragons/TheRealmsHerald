@@ -36,12 +36,13 @@ export default class NewspaperView {
                                 <div class="flex bg-[#1c1c1c] rounded p-1 border border-gray-700">
                                     <button type="button" class="flex-1 py-1 text-xs rounded bg-amber-700 text-white font-bold transition" id="type-news" data-i18n="news.type.news">${t('news.type.news')}</button>
                                     <button type="button" class="flex-1 py-1 text-xs rounded text-gray-400 hover:text-white transition" id="type-ad" data-i18n="news.type.ad">${t('news.type.ad')}</button>
+                                    <button type="button" class="flex-1 py-1 text-xs rounded text-gray-400 hover:text-white transition" id="type-special">★ ${t('news.type.special').substring(0,8)}</button>
                                 </div>
                                 <input type="hidden" id="inp-type" value="news">
                             </div>
 
                             <div>
-                                <label class="${labelClass}" data-i18n="news.headline">${t('news.headline')}</label>
+                                <label class="${labelClass}" id="lbl-title" data-i18n="news.headline">${t('news.headline')}</label>
                                 <input type="text" id="inp-title" class="${inputClass} font-bold" placeholder="${t('news.headline.placeholder')}" required>
                             </div>
 
@@ -70,25 +71,54 @@ export default class NewspaperView {
                                 </div>
                             </div>
 
-                            <div class="grid grid-cols-2 gap-3">
+                            <div id="opts-special" class="hidden space-y-4 bg-[#2a1a1a] p-3 rounded border border-amber-900/30">
+                                <p class="text-[10px] text-amber-500 mb-2 italic">⚠️ Ocupará toda la Pág. 1.</p>
                                 <div>
+                                    <label class="${labelClass}" data-i18n="news.special.format">${t('news.special.format')}</label>
+                                    <select id="inp-special-style" class="${inputClass}">
+                                        <option value="style-wanted" data-i18n="news.special.wanted">${t('news.special.wanted')}</option>
+                                        <option value="style-decree" data-i18n="news.special.decree">${t('news.special.decree')}</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="${labelClass}" id="lbl-extra" data-i18n="news.special.reward">${t('news.special.reward')}</label>
+                                    <input type="text" id="inp-extra" class="${inputClass}" placeholder="Ej: 5000 GP">
+                                </div>
+                                <div id="div-decree-settings" class="hidden space-y-3 pt-2 border-t border-gray-700">
+                                    <div>
+                                        <label class="${labelClass}" data-i18n="news.special.seal">${t('news.special.seal')}</label>
+                                        <input type="text" id="inp-decree-icon" class="${inputClass}" placeholder="Ej: ph-crown o 'A'">
+                                    </div>
+                                    <div>
+                                        <label class="${labelClass}" data-i18n="news.special.seal.img">${t('news.special.seal.img')}</label>
+                                        <input type="text" id="inp-decree-img" class="${inputClass}" placeholder="https://...">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <div id="page-selector-container">
                                     <label class="${labelClass}" data-i18n="news.page">${t('news.page')}</label>
                                     <select id="inp-page" class="${inputClass} cursor-pointer"></select>
                                 </div>
                                 <div>
-                                    <label class="${labelClass}" data-i18n="news.image">${t('news.image')}</label>
+                                    <label class="${labelClass}" id="lbl-image" data-i18n="news.image">${t('news.image')}</label>
                                     <input type="text" id="inp-img" class="${inputClass}" placeholder="https://...">
                                 </div>
                             </div>
 
                             <div>
-                                <label class="${labelClass}" data-i18n="news.body">${t('news.body')}</label>
+                                <label class="${labelClass}" id="lbl-body" data-i18n="news.body">${t('news.body')}</label>
                                 <textarea id="inp-body" rows="8" class="${inputClass} leading-relaxed" placeholder="${t('news.body.placeholder')}"></textarea>
                             </div>
 
                             <div class="flex gap-2 pt-2">
                                 <button type="submit" id="btn-submit" class="flex-1 bg-amber-700 hover:bg-amber-600 text-white py-3 rounded font-bold uppercase tracking-wide transition shadow-lg" data-i18n="news.btn.add">${t('news.btn.add')}</button>
-                                <button type="button" id="btn-cancel" class="hidden px-4 border border-red-900/50 text-red-400 bg-red-900/10 hover:bg-red-900/30 rounded transition"><i class="ph ph-x"></i></button>
+                                
+                                <div id="edit-actions" class="hidden flex gap-2">
+                                    <button type="button" id="btn-delete" class="px-4 border border-red-900 bg-red-900/20 text-red-500 hover:bg-red-900/40 rounded transition" title="Eliminar"><i class="ph ph-trash-simple text-lg"></i></button>
+                                    <button type="button" id="btn-cancel" class="px-4 border border-gray-600 bg-gray-800 text-gray-300 hover:bg-gray-700 rounded transition" title="Cancelar"><i class="ph ph-x text-lg"></i></button>
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -126,83 +156,142 @@ export default class NewspaperView {
             </div>
             
             <div id="config-modal-layer" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center fade-in">
-                <div class="bg-[#111] border border-gray-700 w-96 rounded-lg overflow-hidden shadow-2xl">
-                    <div class="bg-[#1a1a1a] p-4 border-b border-gray-800 flex justify-between items-center">
-                        <h3 class="text-amber-500 font-bold medieval-font" data-i18n="news.settings.title">${t('news.settings.title')}</h3>
-                        <button id="btn-close-modal" class="text-gray-400 hover:text-white"><i class="ph ph-x"></i></button>
-                    </div>
-                    <div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar">
-                        <div class="space-y-3 pb-4 border-b border-gray-800">
-                            <h4 class="text-xs text-gray-500 font-bold uppercase" data-i18n="conf.identity">${t('conf.identity')}</h4>
-                            <div><label class="${labelClass}" data-i18n="conf.name">${t('conf.name')}</label><input type="text" id="modal-name" class="${inputClass}" value="${config.name}"></div>
-                            <div><label class="${labelClass}" data-i18n="conf.sub">${t('conf.sub')}</label><input type="text" id="modal-subtitle" class="${inputClass}" value="${config.subtitle}"></div>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div><label class="${labelClass}" data-i18n="conf.price">${t('conf.price')}</label><input type="text" id="modal-price" class="${inputClass}" value="${config.price}"></div>
-                            </div>
-                        </div>
-                        <div class="space-y-3 pb-4 border-b border-gray-800">
-                            <h4 class="text-xs text-gray-500 font-bold uppercase" data-i18n="conf.aesthetics">${t('conf.aesthetics')}</h4>
-                            <div>
-                                <label class="${labelClass}" data-i18n="conf.paper">${t('conf.paper')}</label>
-                                <select id="modal-texture" class="${inputClass}">
-                                    <option value="texture-clean">Pergamino Real</option>
-                                    <option value="texture-gritty">Panfleto Sucio</option>
-                                    <option value="texture-magic">Hoja Arcana</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="${labelClass}" data-i18n="conf.font">${t('conf.font')}</label>
-                                <select id="modal-font" class="${inputClass}">
-                                    <option value="font-royal">Corte Real</option>
-                                    <option value="font-common">Imprenta Común</option>
-                                    <option value="font-arcane">Grimorio</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="space-y-3">
-                            <h4 class="text-xs text-gray-500 font-bold uppercase" data-i18n="conf.chrono">${t('conf.chrono')}</h4>
-                            <div><label class="${labelClass}" data-i18n="conf.date.base">${t('conf.date.base')}</label><input type="date" id="modal-base-date" class="${inputClass}" value="${config.baseDate}"></div>
-                            <div><label class="${labelClass}" data-i18n="conf.date.curr">${t('conf.date.curr')}</label><input type="date" id="modal-current-date" class="${inputClass}" value="${config.currentDate}"></div>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div><label class="${labelClass}" data-i18n="conf.freq">${t('conf.freq')}</label><input type="number" id="modal-freq" class="${inputClass}" value="${config.frequency}"></div>
-                                <div><label class="${labelClass}" data-i18n="conf.manual">${t('conf.manual')}</label><input type="number" id="modal-manual" class="${inputClass}" value="${config.manualEdition}" placeholder="0 = Auto"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="p-4 border-t border-gray-800 flex justify-end">
-                        <button id="btn-save-config" class="bg-amber-700 hover:bg-amber-600 text-white px-6 py-2 rounded font-bold transition" data-i18n="btn.save">${t('btn.save')}</button>
-                    </div>
-                </div>
             </div>
         `;
         
+        this.renderConfigModal();
         this.setupTypeToggle();
-        
-        document.getElementById('modal-texture').value = config.texture || 'texture-clean';
-        document.getElementById('modal-font').value = config.fontTheme || 'font-royal';
+    }
+
+    renderConfigModal() {
+        const t = (key) => LanguageService.get(key);
+        const modalHTML = `
+            <div class="bg-[#111] border border-gray-700 w-96 rounded-lg overflow-hidden shadow-2xl">
+                <div class="bg-[#1a1a1a] p-4 border-b border-gray-800 flex justify-between items-center">
+                    <h3 class="text-amber-500 font-bold medieval-font" data-i18n="news.settings.title">${t('news.settings.title')}</h3>
+                    <button id="btn-close-modal" class="text-gray-400 hover:text-white"><i class="ph ph-x"></i></button>
+                </div>
+                <div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar">
+                    <div class="space-y-3 pb-4 border-b border-gray-800">
+                        <h4 class="text-xs text-gray-500 font-bold uppercase" data-i18n="conf.identity">${t('conf.identity')}</h4>
+                        <div><label class="block text-xs text-amber-500 font-bold mb-1" data-i18n="conf.name">${t('conf.name')}</label><input type="text" id="modal-name" class="w-full bg-[#1c1c1c] border border-gray-700 text-gray-100 p-2 rounded"></div>
+                        <div><label class="block text-xs text-amber-500 font-bold mb-1" data-i18n="conf.sub">${t('conf.sub')}</label><input type="text" id="modal-subtitle" class="w-full bg-[#1c1c1c] border border-gray-700 text-gray-100 p-2 rounded"></div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div><label class="block text-xs text-amber-500 font-bold mb-1" data-i18n="conf.price">${t('conf.price')}</label><input type="text" id="modal-price" class="w-full bg-[#1c1c1c] border border-gray-700 text-gray-100 p-2 rounded"></div>
+                        </div>
+                    </div>
+                    <div class="space-y-3 pb-4 border-b border-gray-800">
+                        <h4 class="text-xs text-gray-500 font-bold uppercase" data-i18n="conf.aesthetics">${t('conf.aesthetics')}</h4>
+                        <div>
+                            <label class="block text-xs text-amber-500 font-bold mb-1" data-i18n="conf.paper">${t('conf.paper')}</label>
+                            <select id="modal-texture" class="w-full bg-[#1c1c1c] border border-gray-700 text-gray-100 p-2 rounded cursor-pointer">
+                                <option value="texture-clean">Pergamino Real</option>
+                                <option value="texture-gritty">Panfleto Sucio</option>
+                                <option value="texture-magic">Hoja Arcana</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-amber-500 font-bold mb-1" data-i18n="conf.font">${t('conf.font')}</label>
+                            <select id="modal-font" class="w-full bg-[#1c1c1c] border border-gray-700 text-gray-100 p-2 rounded cursor-pointer">
+                                <option value="font-royal">Corte Real</option>
+                                <option value="font-common">Imprenta Común</option>
+                                <option value="font-arcane">Grimorio</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <h4 class="text-xs text-gray-500 font-bold uppercase" data-i18n="conf.chrono">${t('conf.chrono')}</h4>
+                        <div><label class="block text-xs text-amber-500 font-bold mb-1" data-i18n="conf.date.base">${t('conf.date.base')}</label><input type="date" id="modal-base-date" class="w-full bg-[#1c1c1c] border border-gray-700 text-gray-100 p-2 rounded"></div>
+                        <div><label class="block text-xs text-amber-500 font-bold mb-1" data-i18n="conf.date.curr">${t('conf.date.curr')}</label><input type="date" id="modal-current-date" class="w-full bg-[#1c1c1c] border border-gray-700 text-gray-100 p-2 rounded"></div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div><label class="block text-xs text-amber-500 font-bold mb-1" data-i18n="conf.freq">${t('conf.freq')}</label><input type="number" id="modal-freq" class="w-full bg-[#1c1c1c] border border-gray-700 text-gray-100 p-2 rounded"></div>
+                            <div><label class="block text-xs text-amber-500 font-bold mb-1" data-i18n="conf.manual">${t('conf.manual')}</label><input type="number" id="modal-manual" class="w-full bg-[#1c1c1c] border border-gray-700 text-gray-100 p-2 rounded" placeholder="0 = Auto"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 border-t border-gray-800 flex justify-end">
+                    <button id="btn-save-config" class="bg-amber-700 hover:bg-amber-600 text-white px-6 py-2 rounded font-bold transition" data-i18n="btn.save">${t('btn.save')}</button>
+                </div>
+            </div>
+        `;
+        document.getElementById('config-modal-layer').innerHTML = modalHTML;
     }
 
     setupTypeToggle() {
-        const typeNewsBtn = document.getElementById('type-news');
-        const typeAdBtn = document.getElementById('type-ad');
-        const optsNews = document.getElementById('opts-news');
-        const optsAd = document.getElementById('opts-ad');
-
-        const setNews = () => {
-            document.getElementById('inp-type').value = 'news';
-            typeNewsBtn.classList.add('bg-amber-700','text-white'); typeNewsBtn.classList.remove('text-gray-400');
-            typeAdBtn.classList.remove('bg-amber-700','text-white'); typeAdBtn.classList.add('text-gray-400');
-            optsNews.classList.remove('hidden'); optsAd.classList.add('hidden');
+        const btns = {
+            news: document.getElementById('type-news'),
+            ad: document.getElementById('type-ad'),
+            special: document.getElementById('type-special')
         };
-        const setAd = () => {
-            document.getElementById('inp-type').value = 'ad';
-            typeAdBtn.classList.add('bg-amber-700','text-white'); typeAdBtn.classList.remove('text-gray-400');
-            typeNewsBtn.classList.remove('bg-amber-700','text-white'); typeNewsBtn.classList.add('text-gray-400');
-            optsNews.classList.add('hidden'); optsAd.classList.remove('hidden');
+        const panels = {
+            news: document.getElementById('opts-news'),
+            ad: document.getElementById('opts-ad'),
+            special: document.getElementById('opts-special')
+        };
+        const input = document.getElementById('inp-type');
+        const pageSelector = document.getElementById('page-selector-container');
+        
+        const lblTitle = document.getElementById('lbl-title');
+        const lblBody = document.getElementById('lbl-body');
+        const lblExtra = document.getElementById('lbl-extra');
+        const lblImage = document.getElementById('lbl-image');
+        
+        const selStyle = document.getElementById('inp-special-style');
+        const divDecreeSettings = document.getElementById('div-decree-settings');
+
+        const updateLabels = () => {
+            const type = input.value;
+            const t = LanguageService.get.bind(LanguageService);
+            
+            lblTitle.innerText = t('news.headline');
+            lblBody.innerText = t('news.body');
+            lblImage.innerText = t('news.image');
+            
+            if (type === 'special') {
+                const style = selStyle.value;
+                if (style === 'style-decree') {
+                    lblTitle.innerText = t('lbl.decree.title');
+                    lblBody.innerText = t('lbl.decree.body');
+                    lblExtra.innerText = t('lbl.decree.auth');
+                    lblImage.innerText = t('lbl.decree.image');
+                    divDecreeSettings.classList.remove('hidden');
+                } else {
+                    lblTitle.innerText = t('lbl.wanted.name');
+                    lblBody.innerText = t('lbl.wanted.desc');
+                    lblExtra.innerText = t('lbl.wanted.reward');
+                    lblImage.innerText = t('lbl.wanted.image');
+                    divDecreeSettings.classList.add('hidden');
+                }
+            } else {
+                divDecreeSettings.classList.add('hidden');
+            }
         };
 
-        typeNewsBtn.onclick = setNews;
-        typeAdBtn.onclick = setAd;
+        selStyle.addEventListener('change', updateLabels);
+
+        const activate = (type) => {
+            input.value = type;
+            Object.keys(btns).forEach(k => {
+                if(k === type) {
+                    btns[k].classList.add('bg-amber-700','text-white');
+                    btns[k].classList.remove('text-gray-400');
+                    panels[k].classList.remove('hidden');
+                } else {
+                    btns[k].classList.remove('bg-amber-700','text-white');
+                    btns[k].classList.add('text-gray-400');
+                    panels[k].classList.add('hidden');
+                }
+            });
+            
+            if(type === 'special') pageSelector.classList.add('opacity-50', 'pointer-events-none');
+            else pageSelector.classList.remove('opacity-50', 'pointer-events-none');
+            
+            updateLabels();
+        };
+
+        btns.news.onclick = () => activate('news');
+        btns.ad.onclick = () => activate('ad');
+        btns.special.onclick = () => activate('special');
     }
 
     renderPages(itemsByPage, config, maxPages, editionNumber) {
@@ -264,34 +353,71 @@ export default class NewspaperView {
     }
 
     createItemElement(item) {
-        const gridClass = item.size || 'span-6'; 
-
-        if (item.type === 'ad') {
+        if (item.type === 'special') {
             const el = document.createElement('div');
-            el.className = `ad-box ${gridClass}`; 
+            el.className = `news-item type-special ${item.specialStyle || 'style-wanted'}`;
             el.draggable = true;
             el.dataset.id = item.id;
-            el.innerHTML = `
-                <h4>${item.title}</h4>
-                ${item.image ? `<img src="${item.image}" class="news-img">` : ''}
-                <p>${item.body}</p>
-            `;
+            
+            let content = '';
+            
+            if (item.specialStyle === 'style-wanted') {
+                const titleText = LanguageService.get('news.special.wanted.title');
+                content = `
+                    <h2 class="headline">${titleText}</h2>
+                    ${item.image ? `<img src="${item.image}" class="news-img">` : ''}
+                    <div class="news-body">
+                        <h3>${item.title}</h3>
+                        <p>${item.body}</p>
+                    </div>
+                    <div class="wanted-reward">${item.extra || 'REWARD'}</div>
+                `;
+            } else {
+                let sealContent = '<i class="ph ph-crown"></i>';
+                if (item.decreeImg) {
+                    sealContent = `<img src="${item.decreeImg}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
+                } else if (item.decreeIcon) {
+                    if (item.decreeIcon.startsWith('ph-')) {
+                        sealContent = `<i class="ph ${item.decreeIcon}"></i>`;
+                    } else {
+                        sealContent = `<span>${item.decreeIcon}</span>`;
+                    }
+                }
+
+                let decorativeImg = '';
+                if (item.image) {
+                    decorativeImg = `<img src="${item.image}" class="news-img" style="max-height: 200px; margin: 20px auto; width:auto;">`;
+                }
+
+                content = `
+                    <div class="decree-seal">${sealContent}</div>
+                    <h2 class="headline">${item.title}</h2>
+                    ${decorativeImg}
+                    <div class="news-body">${item.body.replace(/\n/g, '<br>')}</div>
+                    <div class="mt-8 text-xl font-bold font-serif text-end w-full px-10">
+                        Fdo: ${item.extra || 'La Corona'}
+                    </div>
+                `;
+            }
+            
+            el.innerHTML = content;
             return el;
+        } 
+        
+        const gridClass = item.size || 'span-6'; 
+        const el = document.createElement('article');
+        
+        if(item.type === 'ad') {
+             el.className = `ad-box ${gridClass}`;
+             el.innerHTML = `<h4>${item.title}</h4>${item.image?`<img src="${item.image}" class="news-img">`:''}<p>${item.body}</p>`;
         } else {
-            const el = document.createElement('article');
-            el.className = `news-item ${gridClass}`; 
-            el.draggable = true;
-            el.dataset.id = item.id;
-
-            let formattedBody = item.body.replace(/\*(.*?)\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
-            let html = '';
-            if (item.title) html += `<h3 class="headline">${item.title}</h3>`;
-            if (item.image) html += `<img src="${item.image}" class="news-img" onerror="this.style.display='none'">`;
-            html += `<div class="news-body">${formattedBody}</div>`;
-
-            el.innerHTML = html;
-            return el;
+             el.className = `news-item ${gridClass}`; 
+             let body = item.body.replace(/\*(.*?)\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+             el.innerHTML = `${item.title?`<h3 class="headline">${item.title}</h3>`:''}${item.image?`<img src="${item.image}" class="news-img">`:''}<div class="news-body">${body}</div>`;
         }
+        el.draggable = true;
+        el.dataset.id = item.id;
+        return el;
     }
 
     createBannerElement(item) {
@@ -335,6 +461,11 @@ export default class NewspaperView {
 
     toggleConfigModal(show) {
         const modal = document.getElementById('config-modal-layer');
+        if(!modal) return;
+        
+        if(show) {
+        }
+
         if (show) modal.classList.remove('hidden');
         else modal.classList.add('hidden');
     }
@@ -353,22 +484,27 @@ export default class NewspaperView {
         document.getElementById('inp-img').value = item.image || '';
         document.getElementById('inp-page').value = page;
         
-        const type = item.type || 'news';
-        document.getElementById('inp-type').value = type;
-        
-        if(type === 'ad') document.getElementById('type-ad').click();
-        else document.getElementById('type-news').click();
-
-        if (type === 'news') {
-            document.getElementById('inp-size').value = item.size || 'span-6';
+        if(item.type === 'special') {
+            document.getElementById('type-special').click();
+            document.getElementById('inp-special-style').value = item.specialStyle || 'style-wanted';
+            document.getElementById('inp-extra').value = item.extra || '';
+            document.getElementById('inp-decree-icon').value = item.decreeIcon || '';
+            document.getElementById('inp-decree-img').value = item.decreeImg || '';
+            
+            document.getElementById('inp-special-style').dispatchEvent(new Event('change'));
+        } else if (item.type === 'ad') {
+            document.getElementById('type-ad').click();
+            document.getElementById('inp-ad-type').value = item.size;
         } else {
-            document.getElementById('inp-ad-type').value = item.size || 'span-4';
+            document.getElementById('type-news').click();
+            document.getElementById('inp-size').value = item.size;
         }
-
+        
         const btn = document.getElementById('btn-submit');
         btn.innerText = LanguageService.get('news.btn.save_edit'); 
         btn.classList.replace('bg-amber-700', 'bg-blue-700');
-        document.getElementById('btn-cancel').classList.remove('hidden');
+        
+        document.getElementById('edit-actions').classList.remove('hidden');
     }
 
     resetForm() {
@@ -378,6 +514,6 @@ export default class NewspaperView {
         const btn = document.getElementById('btn-submit');
         btn.innerText = LanguageService.get('news.btn.add');
         btn.classList.replace('bg-blue-700', 'bg-amber-700');
-        document.getElementById('btn-cancel').classList.add('hidden');
+        document.getElementById('edit-actions').classList.add('hidden');
     }
 }

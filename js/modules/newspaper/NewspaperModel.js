@@ -1,6 +1,6 @@
 /**
  * @file NewspaperModel.js
- * @description Gestión de datos v0.6.1 (Drag & Drop Fixed)
+ * @description Gestión de datos v0.8.3 (Fix Special Replacement & Delete)
  */
 import { DataService } from '../../services/DataService.js';
 
@@ -64,12 +64,38 @@ export default class NewspaperModel {
     }
 
     /**
-     * Mueve un item de una posición a otra, soportando índices específicos.
-     * @param {number} fromPage - Página origen
-     * @param {number} toPage - Página destino
-     * @param {string} itemId - ID del item
-     * @param {number|null} newIndex - Posición en el array destino (opcional)
+     * Añade item especial.
+     * CORRECCIÓN: Detecta si ya hay un especial para reemplazarlo en lugar de desplazarlo.
      */
+    addSpecialItem(item) {
+        if (!item.id) item.id = Date.now().toString();
+        item.type = 'special'; 
+        item.size = 'span-12'; 
+
+        const page1Items = this.itemsByPage[1] || [];
+        
+        const isReplacingSpecial = page1Items.length > 0 && page1Items[0].type === 'special';
+
+        if (isReplacingSpecial) {
+            this.itemsByPage[1] = [item];
+        } else {
+            if (page1Items.length > 0) {
+                const maxPage = this.getLastActivePage();
+                for (let i = maxPage; i >= 1; i--) {
+                    const contentToMove = this.itemsByPage[i];
+                    if (contentToMove && contentToMove.length > 0) {
+                        if (!this.itemsByPage[i + 1]) this.itemsByPage[i + 1] = [];
+                        this.itemsByPage[i + 1] = [...contentToMove, ...this.itemsByPage[i + 1]];
+                        this.itemsByPage[i] = []; 
+                    }
+                }
+            }
+            this.itemsByPage[1] = [item];
+        }
+        
+        this.save();
+    }
+
     moveItem(fromPage, toPage, itemId, newIndex = null) {
         if (!this.itemsByPage[fromPage]) return;
         const index = this.itemsByPage[fromPage].findIndex(i => i.id === itemId);
@@ -105,7 +131,7 @@ export default class NewspaperModel {
 
     toJSON() {
         return JSON.stringify({
-            meta: { version: "0.6.1", app: "The Realm's Herald" },
+            meta: { version: "0.8.3", app: "The Realm's Herald" },
             config: this.config,
             items: this.itemsByPage
         }, null, 2);

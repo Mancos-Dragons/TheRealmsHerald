@@ -21,6 +21,26 @@ export const LanguageService = {
             "news.type": "Tipo",
             "news.type.news": "Noticia",
             "news.type.ad": "Publicidad",
+            "news.type.special": "Especial (Portada)",
+            "news.special.format": "Tipo de Documento",
+            "news.special.wanted": "Se Busca (Wanted)",
+            "news.special.decree": "Decreto Oficial",
+            "news.special.reward": "Recompensa / Firma",
+            "news.special.seal": "Símbolo Sello (Texto/Icono)",
+            "news.special.seal.img": "Imagen Sello (URL/Vector)", 
+            "news.special.wanted.title": "SE BUSCA",
+            
+            "lbl.wanted.name": "Nombre del Fugitivo",
+            "lbl.wanted.desc": "Crímenes / Descripción",
+            "lbl.wanted.reward": "Recompensa",
+            "lbl.wanted.image": "Retrato del Fugitivo (URL)",
+            
+            "lbl.decree.title": "Título de la Ley",
+            "lbl.decree.body": "Texto del Decreto",
+            "lbl.decree.auth": "Firma / Autoridad",
+            "lbl.decree.seal": "Sello (Icono o Texto)",
+            "lbl.decree.image": "Imagen Decorativa (Opcional)",
+
             "news.headline": "Titular",
             "news.headline.placeholder": "Título principal...",
             "news.size": "Tamaño",
@@ -73,6 +93,26 @@ export const LanguageService = {
             "news.type": "Type",
             "news.type.news": "News",
             "news.type.ad": "Ad",
+            "news.type.special": "Special (Cover)",
+            "news.special.format": "Document Type",
+            "news.special.wanted": "Wanted Poster",
+            "news.special.decree": "Official Decree",
+            "news.special.reward": "Reward / Signature",
+            "news.special.seal": "Seal Symbol (Text/Icon)",
+            "news.special.seal.img": "Seal Image (URL/Vector)", 
+            "news.special.wanted.title": "WANTED",
+            
+            "lbl.wanted.name": "Fugitive Name",
+            "lbl.wanted.desc": "Crimes / Description",
+            "lbl.wanted.reward": "Reward",
+            "lbl.wanted.image": "Fugitive Portrait (URL)",
+            
+            "lbl.decree.title": "Decree Title",
+            "lbl.decree.body": "Decree Text",
+            "lbl.decree.auth": "Signature / Authority",
+            "lbl.decree.seal": "Seal (Icon or Text)",
+            "lbl.decree.image": "Decorative Image (Optional)",
+
             "news.headline": "Headline",
             "news.headline.placeholder": "Main title...",
             "news.size": "Size",
@@ -113,9 +153,6 @@ export const LanguageService = {
         }
     },
 
-    /**
-     * Carga el JSON externo y lo fusiona
-     */
     async loadResources() {
         try {
             const response = await fetch('./data/locales.json');
@@ -123,7 +160,6 @@ export const LanguageService = {
             
             for (const lang in externalData) {
                 if (!this.dictionary[lang]) this.dictionary[lang] = {};
-                
                 if (externalData[lang].tools) {
                     for (const toolKey in externalData[lang].tools) {
                         const tool = externalData[lang].tools[toolKey];
