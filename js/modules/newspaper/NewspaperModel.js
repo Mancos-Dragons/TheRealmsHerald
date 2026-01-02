@@ -1,6 +1,6 @@
 /**
  * @file NewspaperModel.js
- * @description Gestión de datos v0.6.1 (Drag & Drop Fixed)
+ * @description Gestión de datos v0.8.5 (Reverse Shift on Delete)
  */
 import { DataService } from '../../services/DataService.js';
 
@@ -63,13 +63,33 @@ export default class NewspaperModel {
         this.save();
     }
 
-    /**
-     * Mueve un item de una posición a otra, soportando índices específicos.
-     * @param {number} fromPage - Página origen
-     * @param {number} toPage - Página destino
-     * @param {string} itemId - ID del item
-     * @param {number|null} newIndex - Posición en el array destino (opcional)
-     */
+    addSpecialItem(item) {
+        if (!item.id) item.id = Date.now().toString();
+        item.type = 'special'; 
+        item.size = 'span-12'; 
+
+        const page1Items = this.itemsByPage[1] || [];
+        const isReplacingSpecial = page1Items.length > 0 && page1Items[0].type === 'special';
+
+        if (isReplacingSpecial) {
+            this.itemsByPage[1] = [item];
+        } else {
+            if (page1Items.length > 0) {
+                const maxPage = this.getLastActivePage();
+                for (let i = maxPage; i >= 1; i--) {
+                    const contentToMove = this.itemsByPage[i];
+                    if (contentToMove && contentToMove.length > 0) {
+                        if (!this.itemsByPage[i + 1]) this.itemsByPage[i + 1] = [];
+                        this.itemsByPage[i + 1] = [...contentToMove, ...this.itemsByPage[i + 1]];
+                        this.itemsByPage[i] = []; 
+                    }
+                }
+            }
+            this.itemsByPage[1] = [item];
+        }
+        this.save();
+    }
+
     moveItem(fromPage, toPage, itemId, newIndex = null) {
         if (!this.itemsByPage[fromPage]) return;
         const index = this.itemsByPage[fromPage].findIndex(i => i.id === itemId);
@@ -84,14 +104,38 @@ export default class NewspaperModel {
         } else {
             this.itemsByPage[toPage].push(item);
         }
+        this.save();
+    }
+
+    /**
+     * Elimina un item.
+     * MEJORA: Si se vacía la página 1, mueve todo el contenido hacia atrás.
+     */
+    deleteNewsItem(page, id) {
+        if (!this.itemsByPage[page]) return;
+        this.itemsByPage[page] = this.itemsByPage[page].filter(i => i.id !== id);
+        
+        if (parseInt(page) === 1 && this.itemsByPage[1].length === 0) {
+            this.shiftPagesBack();
+        }
         
         this.save();
     }
 
-    deleteNewsItem(page, id) {
-        if (!this.itemsByPage[page]) return;
-        this.itemsByPage[page] = this.itemsByPage[page].filter(i => i.id !== id);
-        this.save();
+    /**
+     * Mueve el contenido de Pág 2 -> Pág 1, Pág 3 -> Pág 2, etc.
+     */
+    shiftPagesBack() {
+        const pages = Object.keys(this.itemsByPage).map(Number);
+        const maxPage = Math.max(...pages, 1);
+
+        for (let i = 1; i < maxPage; i++) {
+            this.itemsByPage[i] = this.itemsByPage[i + 1] || [];
+        }
+        
+        delete this.itemsByPage[maxPage];
+        
+        if (!this.itemsByPage[1]) this.itemsByPage[1] = [];
     }
 
     setConfig(newConfig) {
@@ -105,7 +149,7 @@ export default class NewspaperModel {
 
     toJSON() {
         return JSON.stringify({
-            meta: { version: "0.6.1", app: "The Realm's Herald" },
+            meta: { version: "0.8.5", app: "The Realm's Herald" },
             config: this.config,
             items: this.itemsByPage
         }, null, 2);
