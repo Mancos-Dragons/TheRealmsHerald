@@ -7,7 +7,8 @@ export default class NewspaperView {
 
     renderWorkspace(config) {
         const t = (key) => LanguageService.get(key);
-        const inputClass = "w-full bg-[#1c1c1c] border border-gray-700 text-gray-100 p-2 rounded focus:border-amber-500 outline-none font-sans text-sm";
+        const baseInputClass = "w-full bg-[#1c1c1c] border border-gray-700 text-gray-100 p-2 focus:border-amber-500 outline-none font-sans text-sm";
+        const inputClass = `${baseInputClass} rounded`; 
         const labelClass = "block text-xs text-amber-500 font-bold uppercase tracking-wider mb-1";
         const btnClass = "p-2 rounded hover:bg-[#333] text-gray-400 hover:text-white transition flex flex-col items-center gap-1 text-[10px]";
 
@@ -43,7 +44,7 @@ export default class NewspaperView {
 
                             <div>
                                 <label class="${labelClass}" id="lbl-title" data-i18n="news.headline">${t('news.headline')}</label>
-                                <input type="text" id="inp-title" class="${inputClass} font-bold" placeholder="${t('news.headline.placeholder')}" required>
+                                <input type="text" id="inp-title" class="${inputClass}" placeholder="${t('news.headline.placeholder')}" required>
                             </div>
 
                             <div id="opts-news" class="space-y-4">
@@ -80,30 +81,47 @@ export default class NewspaperView {
                                         <option value="style-decree" data-i18n="news.special.decree">${t('news.special.decree')}</option>
                                     </select>
                                 </div>
+                                
                                 <div>
                                     <label class="${labelClass}" id="lbl-extra" data-i18n="news.special.reward">${t('news.special.reward')}</label>
                                     <input type="text" id="inp-extra" class="${inputClass}" placeholder="Ej: 5000 GP">
                                 </div>
+
                                 <div id="div-decree-settings" class="hidden space-y-3 pt-2 border-t border-gray-700">
                                     <div>
-                                        <label class="${labelClass}" data-i18n="news.special.seal">${t('news.special.seal')}</label>
-                                        <input type="text" id="inp-decree-icon" class="${inputClass}" placeholder="Ej: ph-crown o 'A'">
+                                        <div class="flex justify-between items-end mb-1">
+                                            <label class="${labelClass} mb-0" data-i18n="news.special.seal">${t('news.special.seal')}</label>
+                                            <i class="ph ph-info text-amber-500 cursor-help" title="Ejemplos: ph-crown, ph-scroll, ph-sword"></i>
+                                        </div>
+                                        <input type="text" id="inp-decree-icon" class="${inputClass}" placeholder="Ej: ph-crown">
                                     </div>
                                     <div>
                                         <label class="${labelClass}" data-i18n="news.special.seal.img">${t('news.special.seal.img')}</label>
-                                        <input type="text" id="inp-decree-img" class="${inputClass}" placeholder="https://...">
+                                        <div class="flex">
+                                            <input type="text" id="inp-decree-img" class="${baseInputClass} rounded-l flex-1" placeholder="https://...">
+                                            <button type="button" id="btn-upload-decree" class="px-3 bg-[#222] border border-l-0 border-gray-700 text-gray-400 hover:text-white rounded-r transition">
+                                                <i class="ph ph-upload-simple"></i>
+                                            </button>
+                                        </div>
+                                        <input type="file" id="file-upload-decree" class="hidden" accept="image/*">
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="grid grid-cols-2 gap-3">
+                            <div class="grid grid-cols-2 gap-3 items-end">
                                 <div id="page-selector-container">
                                     <label class="${labelClass}" data-i18n="news.page">${t('news.page')}</label>
-                                    <select id="inp-page" class="${inputClass} cursor-pointer"></select>
+                                    <select id="inp-page" class="${inputClass} cursor-pointer h-[38px]"></select>
                                 </div>
                                 <div>
                                     <label class="${labelClass}" id="lbl-image" data-i18n="news.image">${t('news.image')}</label>
-                                    <input type="text" id="inp-img" class="${inputClass}" placeholder="https://...">
+                                    <div class="flex h-[38px]">
+                                        <input type="text" id="inp-img" class="${baseInputClass} rounded-l flex-1 h-full" placeholder="https://...">
+                                        <button type="button" id="btn-upload-main" class="px-3 bg-[#222] border border-l-0 border-gray-700 text-gray-400 hover:text-white rounded-r transition h-full">
+                                            <i class="ph ph-upload-simple"></i>
+                                        </button>
+                                    </div>
+                                    <input type="file" id="file-upload-main" class="hidden" accept="image/*">
                                 </div>
                             </div>
 
@@ -114,10 +132,9 @@ export default class NewspaperView {
 
                             <div class="flex gap-2 pt-2">
                                 <button type="submit" id="btn-submit" class="flex-1 bg-amber-700 hover:bg-amber-600 text-white py-3 rounded font-bold uppercase tracking-wide transition shadow-lg" data-i18n="news.btn.add">${t('news.btn.add')}</button>
-                                
                                 <div id="edit-actions" class="hidden flex gap-2">
-                                    <button type="button" id="btn-delete" class="px-4 border border-red-900 bg-red-900/20 text-red-500 hover:bg-red-900/40 rounded transition" title="Eliminar"><i class="ph ph-trash-simple text-lg"></i></button>
-                                    <button type="button" id="btn-cancel" class="px-4 border border-gray-600 bg-gray-800 text-gray-300 hover:bg-gray-700 rounded transition" title="Cancelar"><i class="ph ph-x text-lg"></i></button>
+                                    <button type="button" id="btn-delete" class="px-4 border border-red-900 bg-red-900/20 text-red-500 hover:bg-red-900/40 rounded transition"><i class="ph ph-trash-simple text-lg"></i></button>
+                                    <button type="button" id="btn-cancel" class="px-4 border border-gray-600 bg-gray-800 text-gray-300 hover:bg-gray-700 rounded transition"><i class="ph ph-x text-lg"></i></button>
                                 </div>
                             </div>
                         </form>
@@ -155,8 +172,7 @@ export default class NewspaperView {
                 </main>
             </div>
             
-            <div id="config-modal-layer" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center fade-in">
-            </div>
+            <div id="config-modal-layer" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center fade-in"></div>
         `;
         
         this.renderConfigModal();
@@ -374,8 +390,18 @@ export default class NewspaperView {
                 `;
             } else {
                 let sealContent = '<i class="ph ph-crown"></i>';
+                
                 if (item.decreeImg) {
-                    sealContent = `<img src="${item.decreeImg}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
+                    sealContent = `
+                        <div style="width:100%; height:100%; border-radius:50%; overflow:hidden; position:relative;">
+                            <img src="${item.decreeImg}" style="
+                                width: 100%; 
+                                height: 100%; 
+                                object-fit: contain; 
+                                filter: grayscale(100%) brightness(0.6) sepia(1) hue-rotate(-50deg) saturate(5) contrast(1.5); 
+                                mix-blend-mode: multiply; 
+                                opacity: 0.9;">
+                        </div>`;
                 } else if (item.decreeIcon) {
                     if (item.decreeIcon.startsWith('ph-')) {
                         sealContent = `<i class="ph ${item.decreeIcon}"></i>`;
@@ -462,10 +488,6 @@ export default class NewspaperView {
     toggleConfigModal(show) {
         const modal = document.getElementById('config-modal-layer');
         if(!modal) return;
-        
-        if(show) {
-        }
-
         if (show) modal.classList.remove('hidden');
         else modal.classList.add('hidden');
     }
@@ -503,7 +525,6 @@ export default class NewspaperView {
         const btn = document.getElementById('btn-submit');
         btn.innerText = LanguageService.get('news.btn.save_edit'); 
         btn.classList.replace('bg-amber-700', 'bg-blue-700');
-        
         document.getElementById('edit-actions').classList.remove('hidden');
     }
 

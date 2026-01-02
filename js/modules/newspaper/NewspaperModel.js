@@ -1,6 +1,6 @@
 /**
  * @file NewspaperModel.js
- * @description Gestión de datos v0.8.3 (Fix Special Replacement & Delete)
+ * @description Gestión de datos v0.8.5 (Reverse Shift on Delete)
  */
 import { DataService } from '../../services/DataService.js';
 
@@ -63,17 +63,12 @@ export default class NewspaperModel {
         this.save();
     }
 
-    /**
-     * Añade item especial.
-     * CORRECCIÓN: Detecta si ya hay un especial para reemplazarlo en lugar de desplazarlo.
-     */
     addSpecialItem(item) {
         if (!item.id) item.id = Date.now().toString();
         item.type = 'special'; 
         item.size = 'span-12'; 
 
         const page1Items = this.itemsByPage[1] || [];
-        
         const isReplacingSpecial = page1Items.length > 0 && page1Items[0].type === 'special';
 
         if (isReplacingSpecial) {
@@ -92,7 +87,6 @@ export default class NewspaperModel {
             }
             this.itemsByPage[1] = [item];
         }
-        
         this.save();
     }
 
@@ -110,14 +104,38 @@ export default class NewspaperModel {
         } else {
             this.itemsByPage[toPage].push(item);
         }
+        this.save();
+    }
+
+    /**
+     * Elimina un item.
+     * MEJORA: Si se vacía la página 1, mueve todo el contenido hacia atrás.
+     */
+    deleteNewsItem(page, id) {
+        if (!this.itemsByPage[page]) return;
+        this.itemsByPage[page] = this.itemsByPage[page].filter(i => i.id !== id);
+        
+        if (parseInt(page) === 1 && this.itemsByPage[1].length === 0) {
+            this.shiftPagesBack();
+        }
         
         this.save();
     }
 
-    deleteNewsItem(page, id) {
-        if (!this.itemsByPage[page]) return;
-        this.itemsByPage[page] = this.itemsByPage[page].filter(i => i.id !== id);
-        this.save();
+    /**
+     * Mueve el contenido de Pág 2 -> Pág 1, Pág 3 -> Pág 2, etc.
+     */
+    shiftPagesBack() {
+        const pages = Object.keys(this.itemsByPage).map(Number);
+        const maxPage = Math.max(...pages, 1);
+
+        for (let i = 1; i < maxPage; i++) {
+            this.itemsByPage[i] = this.itemsByPage[i + 1] || [];
+        }
+        
+        delete this.itemsByPage[maxPage];
+        
+        if (!this.itemsByPage[1]) this.itemsByPage[1] = [];
     }
 
     setConfig(newConfig) {
@@ -131,7 +149,7 @@ export default class NewspaperModel {
 
     toJSON() {
         return JSON.stringify({
-            meta: { version: "0.8.3", app: "The Realm's Herald" },
+            meta: { version: "0.8.5", app: "The Realm's Herald" },
             config: this.config,
             items: this.itemsByPage
         }, null, 2);

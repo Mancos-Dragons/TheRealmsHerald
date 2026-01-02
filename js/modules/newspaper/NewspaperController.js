@@ -106,6 +106,24 @@ export default class NewspaperController {
         if(container) this.resizeObserver.observe(container);
     }
 
+    setupImageUpload(btnId, fileId, inputId) {
+        const btn = document.getElementById(btnId);
+        const file = document.getElementById(fileId);
+        const input = document.getElementById(inputId);
+        if(btn && file && input) {
+            btn.addEventListener('click', () => file.click());
+            file.addEventListener('change', (e) => {
+                if(e.target.files && e.target.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = (evt) => {
+                        input.value = evt.target.result;
+                    };
+                    reader.readAsDataURL(e.target.files[0]);
+                }
+            });
+        }
+    }
+
     attachEvents() {
         const form = document.getElementById('editor-form');
         if (form) form.addEventListener('submit', (e) => {
@@ -130,6 +148,9 @@ export default class NewspaperController {
         
         const btnSaveConfig = document.getElementById('btn-save-config');
         if (btnSaveConfig) btnSaveConfig.addEventListener('click', () => this.handleConfigSave());
+
+        this.setupImageUpload('btn-upload-main', 'file-upload-main', 'inp-img');
+        this.setupImageUpload('btn-upload-decree', 'file-upload-decree', 'inp-decree-img');
 
         document.getElementById('zoom-in')?.addEventListener('click', () => {
             this.zoomLevel = Math.min(this.zoomLevel + 0.1, 2.0);

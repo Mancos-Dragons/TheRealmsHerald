@@ -1,12 +1,24 @@
 {
   "name": "The Realm's Herald",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "codename": "Cimientos",
   "releaseDate": "2025-12-31",
   "status": "alpha",
   "author": "Fernando Machado",
   "description": "Suite de herramientas narrativas y generadores de documentos para Dungeon Masters.",
   "changelog": [
+    {
+      "version": "0.1.1",
+      "date": "2026-01-02",
+      "changes": [
+        "Portadas de Impacto: Crea carteles de 'Se Busca' y Decretos Reales que ocupan toda la portada.",
+        "Mejora en la Gestión de Portadas: Se corrigió el error que dejaba páginas vacías al eliminar o editar un 'Se Busca' o 'Decreto'. Ahora el contenido vuelve a su sitio automáticamente.",
+        "Carga de Imágenes Locales: Se añadió un botón para subir imágenes directamente desde tu PC (para noticias y sellos), eliminando la dependencia de enlaces de internet.",
+        "Efecto de Sello de Cera: Las imágenes subidas como sello en los Decretos ahora tienen un filtro visual especial para parecer que están grabadas en relieve sobre la cera.",
+        "Mejoras de Interfaz (UX): Se alinearon los campos del formulario para que se vea más ordenado y se añadieron ayudas visuales (tooltips) para saber qué códigos de iconos usar.",
+        "Botón de Eliminar: Se agregó un botón de basura explícito para borrar noticias o elementos seleccionados de forma rápida."
+      ]
+    },
     {
       "version": "0.1.0",
       "date": "2025-12-31",
