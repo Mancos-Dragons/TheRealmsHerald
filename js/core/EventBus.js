@@ -4,7 +4,7 @@
  * Permite que "Rumores" reaccione a cambios en "Facciones" sin importarse mutuamente.
  */
 
-class EventBusImpl {
+export class EventBusImpl {
     constructor() {
         this.events = {};
     }
