@@ -109,32 +109,49 @@ export default class NewspaperModel {
 
     /**
      * Elimina un item.
-     * MEJORA: Si se vacía la página 1, mueve todo el contenido hacia atrás.
+     * MEJORA: Si se vacía la página, mueve todo el contenido hacia atrás.
      */
     deleteNewsItem(page, id) {
-        if (!this.itemsByPage[page]) return;
-        this.itemsByPage[page] = this.itemsByPage[page].filter(i => i.id !== id);
+        const pageNum = parseInt(page);
+        if (!this.itemsByPage[pageNum]) return;
+        this.itemsByPage[pageNum] = this.itemsByPage[pageNum].filter(i => i.id !== id);
         
-        if (parseInt(page) === 1 && this.itemsByPage[1].length === 0) {
-            this.shiftPagesBack();
+        if (this.itemsByPage[pageNum].length === 0) {
+            this.shiftPagesBack(pageNum);
         }
         
         this.save();
     }
 
     /**
-     * Mueve el contenido de Pág 2 -> Pág 1, Pág 3 -> Pág 2, etc.
+     * Mueve el contenido de las páginas siguientes hacia atrás si una página queda vacía.
+     * @param {number} fromPage Página que quedó vacía.
      */
-    shiftPagesBack() {
-        const pages = Object.keys(this.itemsByPage).map(Number);
-        const maxPage = Math.max(...pages, 1);
+    shiftPagesBack(fromPage = 1) {
+        let from = parseInt(fromPage);
+        let pages = Object.keys(this.itemsByPage).map(Number);
+        let maxPage = Math.max(...pages, 1);
 
-        for (let i = 1; i < maxPage; i++) {
+        if (from >= maxPage) {
+            if (from > 1) delete this.itemsByPage[from];
+            if (!this.itemsByPage[1]) this.itemsByPage[1] = [];
+            return;
+        }
+
+        // Desplaza todo un paso hacia atrás desde 'from'
+        for (let i = from; i < maxPage; i++) {
             this.itemsByPage[i] = this.itemsByPage[i + 1] || [];
         }
-        
         delete this.itemsByPage[maxPage];
-        
+
+        // Si la página de inicio sigue vacía y hay más páginas, repite el desplazamiento.
+        // Esto gestiona huecos de múltiples páginas.
+        pages = Object.keys(this.itemsByPage).map(Number);
+        maxPage = Math.max(...pages, 1);
+        if (this.itemsByPage[from] && this.itemsByPage[from].length === 0 && maxPage > from) {
+            this.shiftPagesBack(from);
+        }
+
         if (!this.itemsByPage[1]) this.itemsByPage[1] = [];
     }
 
