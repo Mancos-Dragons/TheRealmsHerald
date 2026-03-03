@@ -1,6 +1,7 @@
 import { EventBus } from './core/EventBus.js';
 import { DataService } from './services/DataService.js';
 import { LanguageService } from './core/LanguageService.js';
+import { DOMHelper } from './core/DOMHelper.js';
 
 class AppOrchestrator {
     constructor() {
@@ -28,7 +29,8 @@ class AppOrchestrator {
             
         } catch (error) {
             console.error("CRITICAL FAILURE:", error);
-            this.container.innerHTML = `<div class="alert alert-danger m-5">Error Crítico: ${error.message}</div>`;
+            const safeError = DOMHelper.escapeHTML(error.message);
+            this.container.innerHTML = `<div class="alert alert-danger m-5">Error Crítico: ${safeError}</div>`;
         }
     }
 
@@ -86,7 +88,8 @@ class AppOrchestrator {
             
         } catch (error) {
             console.error(`Error cargando módulo ${moduleKey}:`, error);
-            this.container.innerHTML = `<div class="text-danger p-4">Error cargando el módulo: ${error.message}</div>`;
+            const safeError = DOMHelper.escapeHTML(error.message);
+            this.container.innerHTML = `<div class="text-danger p-4">Error cargando el módulo: ${safeError}</div>`;
         }
     }
 

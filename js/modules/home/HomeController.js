@@ -1,4 +1,5 @@
 import { LanguageService } from '../../core/LanguageService.js';
+import { DOMHelper } from '../../core/DOMHelper.js';
 
 export default class HomeController {
     constructor(container) {
@@ -102,17 +103,23 @@ export default class HomeController {
 
     renderChangelogModal() {
         const logs = this.versionData.changelog || [];
-        const content = logs.map(log => `
-            <div class="mb-4">
-                <div class="d-flex justify-content-between text-amber-500 border-bottom border-gray-700 pb-1 mb-2">
-                    <span class="font-bold">v${log.version}</span>
-                    <span class="text-xs text-gray-500">${log.date}</span>
+        const content = logs.map(log => {
+            const safeVersion = DOMHelper.escapeHTML(log.version);
+            const safeDate = DOMHelper.escapeHTML(log.date);
+            const safeChanges = log.changes.map(c => `<li class="list-disc">${DOMHelper.escapeHTML(c)}</li>`).join('');
+
+            return `
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between text-amber-500 border-bottom border-gray-700 pb-1 mb-2">
+                        <span class="font-bold">v${safeVersion}</span>
+                        <span class="text-xs text-gray-500">${safeDate}</span>
+                    </div>
+                    <ul class="text-gray-300 text-sm ps-3 space-y-1">
+                        ${safeChanges}
+                    </ul>
                 </div>
-                <ul class="text-gray-300 text-sm ps-3 space-y-1">
-                    ${log.changes.map(c => `<li class="list-disc">${c}</li>`).join('')}
-                </ul>
-            </div>
-        `).join('');
+            `;
+        }).join('');
 
         return `
             <div class="modal fade" id="changelogModal" tabindex="-1" aria-hidden="true">
@@ -132,14 +139,17 @@ export default class HomeController {
         const roadmap = this.versionData.roadmap || [];
         const content = roadmap.map(phase => {
             const statusColor = phase.status === 'completado' ? 'text-green-500' : (phase.status === 'en_progreso' ? 'text-amber-500' : 'text-gray-500');
+            const safePhase = DOMHelper.escapeHTML(phase.phase);
+            const safeFeatures = phase.features.map(f => `<span class="badge bg-[#222] border border-[#444] fw-normal text-gray-300">${DOMHelper.escapeHTML(f)}</span>`).join('');
+
             return `
                 <div class="mb-4 bg-[#1a1a1a] p-3 rounded border border-[#333]">
                     <h6 class="medieval-font ${statusColor} mb-2 flex justify-between">
-                        ${phase.phase}
+                        ${safePhase}
                         <i class="ph ${phase.status === 'completado' ? 'ph-check-circle' : 'ph-circle'}"></i>
                     </h6>
                     <div class="d-flex flex-wrap gap-2">
-                        ${phase.features.map(f => `<span class="badge bg-[#222] border border-[#444] fw-normal text-gray-300">${f}</span>`).join('')}
+                        ${safeFeatures}
                     </div>
                 </div>`;
         }).join('');

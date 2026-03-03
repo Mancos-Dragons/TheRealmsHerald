@@ -1,4 +1,5 @@
 import { LanguageService } from '../../core/LanguageService.js';
+import { DOMHelper } from '../../core/DOMHelper.js';
 
 export default class NewspaperView {
     constructor(container) {
@@ -328,20 +329,26 @@ export default class NewspaperView {
                 const dateObj = new Date(config.currentDate);
                 const dateStr = dateObj.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
                 
+                const safeName = DOMHelper.escapeHTML(config.name);
+                const safePrice = DOMHelper.escapeHTML(config.price);
+                const safeEdition = DOMHelper.escapeHTML(editionNumber);
+                const safeDate = DOMHelper.escapeHTML(dateStr);
+
                 header.innerHTML = `
                     <div class="newspaper-header">
-                        <h1 class="newspaper-name">${config.name}</h1>
+                        <h1 class="newspaper-name">${safeName}</h1>
                         <div class="newspaper-meta">
-                            <span>${config.price}</span>
-                            <span>Ed. ${editionNumber}</span>
-                            <span>${dateStr}</span>
+                            <span>${safePrice}</span>
+                            <span>Ed. ${safeEdition}</span>
+                            <span>${safeDate}</span>
                         </div>
                     </div>`;
                 pageDiv.appendChild(header);
             } else {
                 const miniHeader = document.createElement('div');
                 miniHeader.className = 'newspaper-meta mb-4 opacity-70';
-                miniHeader.innerHTML = `<span>Pág ${i}</span><span>Ed. ${editionNumber}</span>`;
+                const safeEdition = DOMHelper.escapeHTML(editionNumber);
+                miniHeader.innerHTML = `<span>Pág ${i}</span><span>Ed. ${safeEdition}</span>`;
                 pageDiv.appendChild(miniHeader);
             }
 
@@ -379,14 +386,18 @@ export default class NewspaperView {
             
             if (item.specialStyle === 'style-wanted') {
                 const titleText = LanguageService.get('news.special.wanted.title');
+                const safeTitle = DOMHelper.escapeHTML(item.title);
+                const safeBody = DOMHelper.escapeHTML(item.body);
+                const safeExtra = DOMHelper.escapeHTML(item.extra || 'REWARD');
+
                 content = `
                     <h2 class="headline">${titleText}</h2>
-                    ${item.image ? `<img src="${item.image}" class="news-img">` : ''}
+                    ${item.image ? `<img src="${DOMHelper.escapeHTML(item.image)}" class="news-img">` : ''}
                     <div class="news-body">
-                        <h3>${item.title}</h3>
-                        <p>${item.body}</p>
+                        <h3>${safeTitle}</h3>
+                        <p>${safeBody}</p>
                     </div>
-                    <div class="wanted-reward">${item.extra || 'REWARD'}</div>
+                    <div class="wanted-reward">${safeExtra}</div>
                 `;
             } else {
                 let sealContent = '<i class="ph ph-crown"></i>';
@@ -394,7 +405,7 @@ export default class NewspaperView {
                 if (item.decreeImg) {
                     sealContent = `
                         <div style="width:100%; height:100%; border-radius:50%; overflow:hidden; position:relative;">
-                            <img src="${item.decreeImg}" style="
+                            <img src="${DOMHelper.escapeHTML(item.decreeImg)}" style="
                                 width: 100%; 
                                 height: 100%; 
                                 object-fit: contain; 
@@ -404,24 +415,28 @@ export default class NewspaperView {
                         </div>`;
                 } else if (item.decreeIcon) {
                     if (item.decreeIcon.startsWith('ph-')) {
-                        sealContent = `<i class="ph ${item.decreeIcon}"></i>`;
+                        sealContent = `<i class="ph ${DOMHelper.escapeHTML(item.decreeIcon)}"></i>`;
                     } else {
-                        sealContent = `<span>${item.decreeIcon}</span>`;
+                        sealContent = `<span>${DOMHelper.escapeHTML(item.decreeIcon)}</span>`;
                     }
                 }
 
                 let decorativeImg = '';
                 if (item.image) {
-                    decorativeImg = `<img src="${item.image}" class="news-img" style="max-height: 200px; margin: 20px auto; width:auto;">`;
+                    decorativeImg = `<img src="${DOMHelper.escapeHTML(item.image)}" class="news-img" style="max-height: 200px; margin: 20px auto; width:auto;">`;
                 }
+
+                const safeTitle = DOMHelper.escapeHTML(item.title);
+                const safeBody = DOMHelper.escapeHTML(item.body).replace(/\n/g, '<br>');
+                const safeExtra = DOMHelper.escapeHTML(item.extra || 'La Corona');
 
                 content = `
                     <div class="decree-seal">${sealContent}</div>
-                    <h2 class="headline">${item.title}</h2>
+                    <h2 class="headline">${safeTitle}</h2>
                     ${decorativeImg}
-                    <div class="news-body">${item.body.replace(/\n/g, '<br>')}</div>
+                    <div class="news-body">${safeBody}</div>
                     <div class="mt-8 text-xl font-bold font-serif text-end w-full px-10">
-                        Fdo: ${item.extra || 'La Corona'}
+                        Fdo: ${safeExtra}
                     </div>
                 `;
             }
@@ -435,11 +450,14 @@ export default class NewspaperView {
         
         if(item.type === 'ad') {
              el.className = `ad-box ${gridClass}`;
-             el.innerHTML = `<h4>${item.title}</h4>${item.image?`<img src="${item.image}" class="news-img">`:''}<p>${item.body}</p>`;
+             const safeTitle = DOMHelper.escapeHTML(item.title);
+             const safeBody = DOMHelper.escapeHTML(item.body);
+             el.innerHTML = `<h4>${safeTitle}</h4>${item.image?`<img src="${DOMHelper.escapeHTML(item.image)}" class="news-img">`:''}<p>${safeBody}</p>`;
         } else {
              el.className = `news-item ${gridClass}`; 
-             let body = item.body.replace(/\*(.*?)\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
-             el.innerHTML = `${item.title?`<h3 class="headline">${item.title}</h3>`:''}${item.image?`<img src="${item.image}" class="news-img">`:''}<div class="news-body">${body}</div>`;
+             const safeTitle = DOMHelper.escapeHTML(item.title);
+             let body = DOMHelper.escapeHTML(item.body).replace(/\*(.*?)\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+             el.innerHTML = `${item.title?`<h3 class="headline">${safeTitle}</h3>`:''}${item.image?`<img src="${DOMHelper.escapeHTML(item.image)}" class="news-img">`:''}<div class="news-body">${body}</div>`;
         }
         el.draggable = true;
         el.dataset.id = item.id;
@@ -451,10 +469,12 @@ export default class NewspaperView {
         el.className = 'ad-banner-container';
         el.draggable = true;
         el.dataset.id = item.id;
+        const safeTitle = DOMHelper.escapeHTML(item.title);
+        const safeBody = DOMHelper.escapeHTML(item.body);
         el.innerHTML = `
             <div class="ad-banner-content">
-                <h3>${item.title}</h3>
-                <span>${item.body}</span>
+                <h3>${safeTitle}</h3>
+                <span>${safeBody}</span>
             </div>
         `;
         return el;
