@@ -84,16 +84,20 @@ export default class NewspaperController {
     }
 
     waitForImages() {
-        const imgs = document.querySelectorAll('.news-item img, .ad-box img');
-        imgs.forEach(img => {
-            if(img.complete) {
-                this.applyMasonryLayout();
-            } else {
-                img.onload = () => {
-                    this.applyMasonryLayout();
-                    this.checkOverflow();
-                };
+        const imgs = Array.from(document.querySelectorAll('.news-item img, .ad-box img'));
+        const promises = imgs.map(img => {
+            if (img.complete) {
+                return Promise.resolve();
             }
+            return new Promise(resolve => {
+                img.onload = resolve;
+                img.onerror = resolve; // Continue even if an image fails to load
+            });
+        });
+
+        Promise.all(promises).then(() => {
+            this.applyMasonryLayout();
+            this.checkOverflow();
         });
     }
 
