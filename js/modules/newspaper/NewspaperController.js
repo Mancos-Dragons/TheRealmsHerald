@@ -384,6 +384,25 @@ export default class NewspaperController {
 
     exportPDF() {
         const element = document.getElementById('paper-capture');
+
+        // Temporarily reset zoom for export to prevent misalignments
+        const originalTransform = element.style.transform;
+        element.style.transform = 'scale(1)';
+
+        // Remove margins, borders, and shadows that break A4 sizing
+        const pages = document.querySelectorAll('.paper-page');
+        const originalStyles = [];
+        pages.forEach(page => {
+            originalStyles.push({
+                marginBottom: page.style.marginBottom,
+                boxShadow: page.style.boxShadow,
+                border: page.style.border
+            });
+            page.style.marginBottom = '0';
+            page.style.boxShadow = 'none';
+            page.style.border = 'none';
+        });
+
         const opt = {
             margin: 0,
             filename: `${this.model.config.name}.pdf`,
@@ -392,7 +411,16 @@ export default class NewspaperController {
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
             pagebreak: { mode: 'css', after: '.paper-page' }
         };
-        html2pdf().set(opt).from(element).save();
+
+        html2pdf().set(opt).from(element).save().then(() => {
+            // Restore styles after export
+            element.style.transform = originalTransform;
+            pages.forEach((page, index) => {
+                page.style.marginBottom = originalStyles[index].marginBottom;
+                page.style.boxShadow = originalStyles[index].boxShadow;
+                page.style.border = originalStyles[index].border;
+            });
+        });
     }
 
     destroy() {
