@@ -1,5 +1,8 @@
 import NewspaperModel from './NewspaperModel.js';
 import NewspaperView from './NewspaperView.js';
+import { AIService } from '../../services/AIService.js';
+import { DataService } from '../../services/DataService.js';
+import { ExportService } from '../../core/ExportService.js';
 
 export default class NewspaperController {
     constructor(container) {
@@ -7,17 +10,18 @@ export default class NewspaperController {
         this.view = new NewspaperView(container);
         this.zoomLevel = 0.9;
         this.draggedItem = null;
-        this.draggedFromPage = null;
         this.resizeObserver = null;
     }
 
     async init() {
         this.loadStyles();
         await this.model.load();
+        
         this.view.renderWorkspace(this.model.config);
         this.refreshPaper();
         this.attachEvents();
         this.initResizeObserver();
+
         console.log("📰 Controlador de Prensa: Listo.");
     }
 
@@ -35,14 +39,19 @@ export default class NewspaperController {
         const lastPage = this.model.getLastActivePage();
         const maxPages = lastPage + 1;
         const editionNum = this.model.getEditionNumber();
+        
         this.view.renderPages(this.model.itemsByPage, this.model.config, maxPages, editionNum);
+        
         const currentSel = document.getElementById('inp-page')?.value || 1;
         this.view.updatePageSelect(maxPages, currentSel);
+        
         this.attachDynamicEvents();
+        
         setTimeout(() => {
             this.applyMasonryLayout();
             this.checkOverflow(); 
         }, 50);
+        
         this.waitForImages();
     }
 
@@ -64,6 +73,7 @@ export default class NewspaperController {
             const pageNum = parseInt(page.dataset.page);
             const contentBox = page.querySelector('.columns-container');
             if(!contentBox) return;
+
             const pageBottom = page.clientHeight;
             const items = contentBox.querySelectorAll('.news-item, .ad-box');
             items.forEach(item => {
@@ -116,7 +126,7 @@ export default class NewspaperController {
                 if(e.target.files && e.target.files[0]) {
                     const reader = new FileReader();
                     reader.onload = (evt) => {
-                        input.value = evt.target.result;
+                        input.value = evt.target.result; 
                     };
                     reader.readAsDataURL(e.target.files[0]);
                 }
@@ -149,9 +159,7 @@ export default class NewspaperController {
         const btnSaveConfig = document.getElementById('btn-save-config');
         if (btnSaveConfig) btnSaveConfig.addEventListener('click', () => this.handleConfigSave());
 
-        this.setupImageUpload('btn-upload-main', 'file-upload-main', 'inp-img');
-        this.setupImageUpload('btn-upload-decree', 'file-upload-decree', 'inp-decree-img');
-
+        // Zoom y Toolbar
         document.getElementById('zoom-in')?.addEventListener('click', () => {
             this.zoomLevel = Math.min(this.zoomLevel + 0.1, 2.0);
             this.view.setZoom(this.zoomLevel);
@@ -160,6 +168,8 @@ export default class NewspaperController {
             this.zoomLevel = Math.max(this.zoomLevel - 0.1, 0.4);
             this.view.setZoom(this.zoomLevel);
         });
+        
+        // Exportación PDF con nuevo método
         document.getElementById('btn-export-pdf')?.addEventListener('click', () => this.exportPDF());
         
         document.getElementById('btn-new')?.addEventListener('click', () => {
@@ -169,6 +179,7 @@ export default class NewspaperController {
                 this.refreshPaper();
             }
         });
+        
         document.getElementById('btn-save-json')?.addEventListener('click', () => this.downloadJSON());
         
         const btnImport = document.getElementById('btn-import');
@@ -176,6 +187,51 @@ export default class NewspaperController {
         if (btnImport && fileInput) {
             btnImport.addEventListener('click', () => fileInput.click());
             fileInput.addEventListener('change', (e) => this.uploadJSON(e));
+        }
+
+        this.setupImageUpload('btn-upload-main', 'file-upload-main', 'inp-img');
+        this.setupImageUpload('btn-upload-decree', 'file-upload-decree', 'inp-decree-img');
+
+        // EVENTOS IA
+        const btnAI = document.getElementById('btn-ai-gen');
+        if (btnAI) btnAI.addEventListener('click', () => this.handleAIGeneration('news'));
+
+        const btnObit = document.getElementById('btn-ai-obit');
+        if (btnObit) btnObit.addEventListener('click', () => this.handleAIGeneration('obituary'));
+    }
+
+    async handleAIGeneration(type) {
+        const promptInput = document.getElementById('ai-prompt');
+        const maxCharsInput = document.getElementById('ai-max-chars');
+        const prompt = promptInput.value;
+        const maxChars = maxCharsInput ? parseInt(maxCharsInput.value) : 280;
+        
+        const modelSelect = document.getElementById('ai-model-select');
+        const model = modelSelect ? modelSelect.value : 'gemini'; 
+        
+        if (!prompt && type === 'news') {
+            alert("Por favor, describe el suceso.");
+            return;
+        }
+
+        const btn = document.getElementById(type === 'news' ? 'btn-ai-gen' : 'btn-ai-obit');
+        const originalContent = btn.innerHTML;
+        
+        btn.innerHTML = '<i class="ph ph-spinner animate-spin"></i>';
+        btn.disabled = true;
+
+        try {
+            const generatedText = await AIService.generateText(prompt || "Generar obituario aleatorio", type, model, maxChars);
+            const { title, body } = AIService.parseResponse(generatedText);
+
+            document.getElementById('inp-title').value = title;
+            document.getElementById('inp-body').value = body;
+            
+        } catch (error) {
+            alert("Error IA: " + error.message);
+        } finally {
+            btn.innerHTML = originalContent;
+            btn.disabled = false;
         }
     }
 
@@ -252,28 +308,11 @@ export default class NewspaperController {
         }, { offset: Number.NEGATIVE_INFINITY }).element;
     }
 
-    fillConfigModal() {
-        const c = this.model.config;
-        const setVal = (id, val) => {
-            const el = document.getElementById(id);
-            if(el) el.value = val || '';
-        };
-        
-        setVal('modal-name', c.name);
-        setVal('modal-price', c.price);
-        setVal('modal-subtitle', c.subtitle);
-        setVal('modal-texture', c.texture);
-        setVal('modal-font', c.fontTheme);
-        setVal('modal-base-date', c.baseDate);
-        setVal('modal-current-date', c.currentDate);
-        setVal('modal-freq', c.frequency);
-        setVal('modal-manual', c.manualEdition);
-    }
-
     handleFormSubmit() {
         const title = document.getElementById('inp-title').value;
         const body = document.getElementById('inp-body').value;
         const type = document.getElementById('inp-type').value; 
+        
         const page = type === 'special' ? 1 : parseInt(document.getElementById('inp-page').value);
         const image = document.getElementById('inp-img').value;
         const id = document.getElementById('edit-id').value;
@@ -334,6 +373,26 @@ export default class NewspaperController {
         }
     }
 
+    fillConfigModal() {
+        const c = this.model.config;
+        const global = DataService.getGlobal() || {};
+        const setVal = (id, val) => {
+            const el = document.getElementById(id);
+            if(el) el.value = val || '';
+        };
+        setVal('modal-name', c.name);
+        setVal('modal-price', c.price);
+        setVal('modal-subtitle', c.subtitle);
+        setVal('modal-texture', c.texture);
+        setVal('modal-font', c.fontTheme);
+        setVal('modal-base-date', c.baseDate);
+        setVal('modal-current-date', c.currentDate);
+        setVal('modal-freq', c.frequency);
+        setVal('modal-manual', c.manualEdition);
+        setVal('modal-api-key', global.apiKey);
+        setVal('modal-gemini-key', global.geminiKey);
+    }
+
     handleConfigSave() {
         const name = document.getElementById('modal-name')?.value || "";
         const price = document.getElementById('modal-price')?.value || "";
@@ -350,6 +409,13 @@ export default class NewspaperController {
             name, price, subtitle, texture, fontTheme, 
             baseDate, currentDate, frequency, manualEdition
         });
+        
+        const global = DataService.getGlobal() || {};
+        const apiKey = document.getElementById('modal-api-key')?.value;
+        const geminiKey = document.getElementById('modal-gemini-key')?.value;
+        if (apiKey !== undefined) global.apiKey = apiKey;
+        if (geminiKey !== undefined) global.geminiKey = geminiKey;
+        DataService.saveGlobal(global);
         
         this.view.toggleConfigModal(false);
         this.refreshPaper();
@@ -382,17 +448,71 @@ export default class NewspaperController {
         reader.readAsText(file);
     }
 
+    // --- LÓGICA DE EXPORTACIÓN PÁGINA A PÁGINA (ESTRICTA) ---
     exportPDF() {
         const element = document.getElementById('paper-capture');
-        const opt = {
-            margin: 0,
-            filename: `${this.model.config.name}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-            pagebreak: { mode: 'css', after: '.paper-page' }
-        };
-        html2pdf().set(opt).from(element).save();
+        const originalTransform = element.style.transform;
+        const originalWidth = element.style.width;
+        
+        ExportService.exportToPDF('paper-capture', this.model.config.name, {
+            onBefore: (el) => {
+                // 1. Reset Zoom para asegurar renderizado 1:1
+                el.style.transform = 'scale(1)';
+                
+                // 2. FORZAR ANCHO FIJO: Esto es clave para que el Grid no se descalabre
+                // al renderizarse en el canvas invisible. Usamos el ancho de una página A4 aprox.
+                el.style.width = '210mm'; 
+                
+                // 3. Aplanar páginas (quitar margenes y sombras para evitar cortes y hojas extra)
+                const pages = el.querySelectorAll('.paper-page');
+                pages.forEach(p => {
+                    p.dataset.originalMb = p.style.marginBottom;
+                    p.dataset.originalShadow = p.style.boxShadow;
+                    p.dataset.originalBorder = p.style.border;
+                    
+                    // IMPORTANTE: Quitamos márgenes y bordes para la "foto"
+                    p.style.marginBottom = '0'; 
+                    p.style.boxShadow = 'none';
+                    // Borde transparente evita colapso de márgenes sin añadir pixeles visibles
+                    p.style.border = '1px solid transparent'; 
+                    
+                    // Limpiar bordes de error rojos si existen
+                    p.querySelectorAll('.error-overflow').forEach(err => {
+                        err.classList.remove('error-overflow');
+                    });
+                });
+
+                // 4. Limpiar rotaciones problemáticas (Se Busca)
+                const rotated = el.querySelectorAll('.style-wanted');
+                rotated.forEach(r => {
+                    r.dataset.originalTransform = r.style.transform;
+                    r.style.transform = 'none'; 
+                    r.style.border = '5px solid #2b0a0a'; 
+                });
+            },
+            onAfter: (el) => {
+                // Restaurar TODO al estado original
+                el.style.transform = originalTransform;
+                el.style.width = originalWidth;
+
+                const pages = el.querySelectorAll('.paper-page');
+                pages.forEach(p => {
+                    p.style.marginBottom = p.dataset.originalMb || '';
+                    p.style.boxShadow = p.dataset.originalShadow || '';
+                    p.style.border = p.dataset.originalBorder || '';
+                });
+
+                const rotated = el.querySelectorAll('.style-wanted');
+                rotated.forEach(r => {
+                    if (r.dataset.originalTransform) {
+                        r.style.transform = r.dataset.originalTransform;
+                    }
+                });
+                
+                // Refrescar para asegurar que el grid se recalcule visualmente
+                this.refreshPaper();
+            }
+        });
     }
 
     destroy() {

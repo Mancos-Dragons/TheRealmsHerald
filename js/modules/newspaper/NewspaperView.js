@@ -1,4 +1,5 @@
 import { LanguageService } from '../../core/LanguageService.js';
+import { DataService } from '../../services/DataService.js';
 
 export default class NewspaperView {
     constructor(container) {
@@ -7,14 +8,16 @@ export default class NewspaperView {
 
     renderWorkspace(config) {
         const t = (key) => LanguageService.get(key);
-        const baseInputClass = "w-full bg-[#1c1c1c] border border-gray-700 text-gray-100 p-2 focus:border-amber-500 outline-none font-sans text-sm";
-        const inputClass = `${baseInputClass} rounded`; 
+        const inputClass = "w-full bg-[#1c1c1c] border border-gray-700 text-gray-100 p-2 rounded focus:border-amber-500 outline-none font-sans text-sm";
         const labelClass = "block text-xs text-amber-500 font-bold uppercase tracking-wider mb-1";
+        const baseInputClass = "w-full bg-[#1c1c1c] border border-gray-700 text-gray-100 p-2 focus:border-amber-500 outline-none font-sans text-sm";
         const btnClass = "p-2 rounded hover:bg-[#333] text-gray-400 hover:text-white transition flex flex-col items-center gap-1 text-[10px]";
+
+        this.injectCustomStyles();
 
         this.container.innerHTML = `
             <div class="flex w-full h-full bg-[#0d0d0d] overflow-hidden fade-in font-sans">
-                
+                <!-- SIDEBAR -->
                 <aside class="w-96 bg-[#111] border-r border-[#222] flex flex-col z-20 shadow-2xl shrink-0">
                     <div class="p-4 border-b border-[#222] bg-[#161616] flex justify-between items-center">
                         <div>
@@ -23,15 +26,48 @@ export default class NewspaperView {
                             </h2>
                             <p class="text-xs text-gray-500 uppercase tracking-widest" data-i18n="news.editor.title">${t('news.editor.title')}</p>
                         </div>
-                        <button id="btn-config-toggle" class="text-gray-400 hover:text-white p-2 rounded hover:bg-[#222]">
-                            <i class="ph ph-gear text-xl"></i>
-                        </button>
+                        <button id="btn-config-toggle" class="text-gray-400 hover:text-white p-2 rounded hover:bg-[#222]"><i class="ph ph-gear text-xl"></i></button>
                     </div>
 
                     <div class="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-5">
                         <form id="editor-form" class="space-y-4">
                             <input type="hidden" id="edit-id">
                             
+                            <!-- AI GENERATOR (COLAPSABLE) -->
+                            <details class="bg-[#1a1a1a] rounded border border-purple-900/30 group">
+                                <summary class="p-3 cursor-pointer list-none flex justify-between items-center text-purple-400 font-bold text-xs uppercase hover:bg-[#222] transition">
+                                    <span class="flex items-center gap-2"><i class="ph ph-sparkle"></i> Generador IA</span>
+                                    <i class="ph ph-caret-down group-open:rotate-180 transition-transform"></i>
+                                </summary>
+                                <div class="p-3 pt-0 border-t border-purple-900/10 space-y-3">
+                                    <div class="flex gap-2 mt-3">
+                                        <div class="flex-1">
+                                            <label class="text-[10px] text-gray-500 mb-1 block">Modelo</label>
+                                            <select id="ai-model-select" class="w-full bg-[#111] border border-gray-700 text-gray-300 p-1 rounded text-xs">
+                                                <option value="gemini">Gemini (Google)</option>
+                                                <option value="gpt">ChatGPT (OpenAI)</option>
+                                            </select>
+                                        </div>
+                                        <div class="w-20">
+                                            <label class="text-[10px] text-gray-500 mb-1 block">Carácteres</label>
+                                            <input type="number" id="ai-max-chars" class="w-full bg-[#111] border border-gray-700 text-gray-300 p-1 rounded text-xs" value="400" min="50" step="50">
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <input type="text" id="ai-prompt" class="${inputClass} !bg-[#111] text-xs" placeholder="${t('news.ai.prompt')}">
+                                    </div>
+
+                                    <div class="flex justify-between items-center">
+                                        <button type="button" id="btn-ai-obit" class="text-[10px] text-gray-500 hover:text-purple-400 underline">${t('news.btn.obituary')}</button>
+                                        <button type="button" id="btn-ai-gen" class="px-3 py-1 bg-purple-800 hover:bg-purple-700 text-white rounded transition text-xs font-bold shadow-lg">
+                                            ${t('news.btn.generate')}
+                                        </button>
+                                    </div>
+                                </div>
+                            </details>
+
+                            <!-- TIPO -->
                             <div>
                                 <label class="${labelClass}" data-i18n="news.type">${t('news.type')}</label>
                                 <div class="flex bg-[#1c1c1c] rounded p-1 border border-gray-700">
@@ -42,11 +78,13 @@ export default class NewspaperView {
                                 <input type="hidden" id="inp-type" value="news">
                             </div>
 
+                            <!-- CAMPOS COMUNES -->
                             <div>
                                 <label class="${labelClass}" id="lbl-title" data-i18n="news.headline">${t('news.headline')}</label>
-                                <input type="text" id="inp-title" class="${inputClass}" placeholder="${t('news.headline.placeholder')}" required>
+                                <input type="text" id="inp-title" class="${inputClass} font-bold" placeholder="${t('news.headline.placeholder')}" required>
                             </div>
 
+                            <!-- OPCIONES NOTICIA -->
                             <div id="opts-news" class="space-y-4">
                                 <div>
                                     <label class="${labelClass}" data-i18n="news.size">${t('news.size')}</label>
@@ -60,6 +98,7 @@ export default class NewspaperView {
                                 </div>
                             </div>
                             
+                            <!-- OPCIONES AD -->
                             <div id="opts-ad" class="hidden space-y-4">
                                 <div>
                                     <label class="${labelClass}" data-i18n="news.ad.format">${t('news.ad.format')}</label>
@@ -72,6 +111,7 @@ export default class NewspaperView {
                                 </div>
                             </div>
 
+                            <!-- OPCIONES ESPECIALES -->
                             <div id="opts-special" class="hidden space-y-4 bg-[#2a1a1a] p-3 rounded border border-amber-900/30">
                                 <p class="text-[10px] text-amber-500 mb-2 italic">⚠️ Ocupará toda la Pág. 1.</p>
                                 <div>
@@ -81,12 +121,10 @@ export default class NewspaperView {
                                         <option value="style-decree" data-i18n="news.special.decree">${t('news.special.decree')}</option>
                                     </select>
                                 </div>
-                                
                                 <div>
                                     <label class="${labelClass}" id="lbl-extra" data-i18n="news.special.reward">${t('news.special.reward')}</label>
                                     <input type="text" id="inp-extra" class="${inputClass}" placeholder="Ej: 5000 GP">
                                 </div>
-
                                 <div id="div-decree-settings" class="hidden space-y-3 pt-2 border-t border-gray-700">
                                     <div>
                                         <div class="flex justify-between items-end mb-1">
@@ -108,6 +146,7 @@ export default class NewspaperView {
                                 </div>
                             </div>
 
+                            <!-- PÁGINA + IMAGEN PRINCIPAL -->
                             <div class="grid grid-cols-2 gap-3 items-end">
                                 <div id="page-selector-container">
                                     <label class="${labelClass}" data-i18n="news.page">${t('news.page')}</label>
@@ -133,30 +172,24 @@ export default class NewspaperView {
                             <div class="flex gap-2 pt-2">
                                 <button type="submit" id="btn-submit" class="flex-1 bg-amber-700 hover:bg-amber-600 text-white py-3 rounded font-bold uppercase tracking-wide transition shadow-lg" data-i18n="news.btn.add">${t('news.btn.add')}</button>
                                 <div id="edit-actions" class="hidden flex gap-2">
-                                    <button type="button" id="btn-delete" class="px-4 border border-red-900 bg-red-900/20 text-red-500 hover:bg-red-900/40 rounded transition"><i class="ph ph-trash-simple text-lg"></i></button>
-                                    <button type="button" id="btn-cancel" class="px-4 border border-gray-600 bg-gray-800 text-gray-300 hover:bg-gray-700 rounded transition"><i class="ph ph-x text-lg"></i></button>
+                                    <button type="button" id="btn-delete" class="px-4 border border-red-900 bg-red-900/20 text-red-500 hover:bg-red-900/40 rounded transition" title="Eliminar"><i class="ph ph-trash-simple text-lg"></i></button>
+                                    <button type="button" id="btn-cancel" class="px-4 border border-gray-600 bg-gray-800 text-gray-300 hover:bg-gray-700 rounded transition" title="Cancelar"><i class="ph ph-x text-lg"></i></button>
                                 </div>
                             </div>
                         </form>
                     </div>
-
+                    
+                    <!-- Toolbar Inferior -->
                     <div class="p-2 border-t border-[#222] bg-[#161616] grid grid-cols-4 gap-1">
-                         <button id="btn-new" class="${btnClass}">
-                            <i class="ph ph-file-plus text-lg"></i> <span data-i18n="news.btn.new">${t('news.btn.new')}</span>
-                         </button>
-                         <button id="btn-import" class="${btnClass}">
-                            <i class="ph ph-upload-simple text-lg"></i> <span data-i18n="news.btn.load">${t('news.btn.load')}</span>
-                         </button>
-                         <button id="btn-save-json" class="${btnClass}">
-                            <i class="ph ph-floppy-disk text-lg"></i> <span data-i18n="news.btn.save">${t('news.btn.save')}</span>
-                         </button>
-                         <button id="btn-export-pdf" class="${btnClass} text-amber-500 hover:text-amber-400">
-                            <i class="ph ph-file-pdf text-lg"></i> <span data-i18n="news.btn.pdf">${t('news.btn.pdf')}</span>
-                         </button>
+                         <button id="btn-new" class="${btnClass}"><i class="ph ph-file-plus text-lg"></i> <span data-i18n="news.btn.new">${t('news.btn.new')}</span></button>
+                         <button id="btn-import" class="${btnClass}"><i class="ph ph-upload-simple text-lg"></i> <span data-i18n="news.btn.load">${t('news.btn.load')}</span></button>
+                         <button id="btn-save-json" class="${btnClass}"><i class="ph ph-floppy-disk text-lg"></i> <span data-i18n="news.btn.save">${t('news.btn.save')}</span></button>
+                         <button id="btn-export-pdf" class="${btnClass} text-amber-500"><i class="ph ph-file-pdf text-lg"></i> <span data-i18n="news.btn.pdf">${t('news.btn.pdf')}</span></button>
                     </div>
                     <input type="file" id="file-import" class="hidden" accept=".json">
                 </aside>
 
+                <!-- WORKSPACE -->
                 <main class="flex-1 bg-[#18181b] overflow-hidden relative flex flex-col">
                     <div class="h-12 bg-[#222] border-b border-[#333] flex items-center justify-between px-4 shrink-0 z-10 shadow-md">
                         <div class="text-gray-500 text-xs uppercase tracking-widest font-mono">Workspace</div>
@@ -179,8 +212,42 @@ export default class NewspaperView {
         this.setupTypeToggle();
     }
 
+    injectCustomStyles() {
+        const global = DataService.getGlobal();
+        if(!global?.customStyles) return;
+
+        let styleEl = document.getElementById('custom-styles-injection');
+        if(!styleEl) {
+            styleEl = document.createElement('style');
+            styleEl.id = 'custom-styles-injection';
+            document.head.appendChild(styleEl);
+        }
+
+        let css = '';
+        global.customStyles.fonts.forEach((font, idx) => {
+            const fontName = `CustomFont${idx}`;
+            css += `
+                @font-face { font-family: '${fontName}'; src: url('${font.url}'); }
+                .font-custom-${idx} .newspaper-name, .font-custom-${idx} .headline { font-family: '${fontName}', serif; }
+            `;
+        });
+        global.customStyles.papers.forEach((paper, idx) => {
+            css += `.texture-custom-${idx} { background-image: url('${paper.url}'); background-size: cover; }`;
+        });
+        
+        styleEl.innerHTML = css;
+    }
+
     renderConfigModal() {
         const t = (key) => LanguageService.get(key);
+        const global = DataService.getGlobal();
+        
+        let paperOpts = '';
+        global?.customStyles?.papers.forEach((p, i) => paperOpts += `<option value="texture-custom-${i}">Custom: ${p.name}</option>`);
+        
+        let fontOpts = '';
+        global?.customStyles?.fonts.forEach((f, i) => fontOpts += `<option value="font-custom-${i}">Custom: ${f.name}</option>`);
+
         const modalHTML = `
             <div class="bg-[#111] border border-gray-700 w-96 rounded-lg overflow-hidden shadow-2xl">
                 <div class="bg-[#1a1a1a] p-4 border-b border-gray-800 flex justify-between items-center">
@@ -204,6 +271,7 @@ export default class NewspaperView {
                                 <option value="texture-clean">Pergamino Real</option>
                                 <option value="texture-gritty">Panfleto Sucio</option>
                                 <option value="texture-magic">Hoja Arcana</option>
+                                ${paperOpts}
                             </select>
                         </div>
                         <div>
@@ -212,6 +280,7 @@ export default class NewspaperView {
                                 <option value="font-royal">Corte Real</option>
                                 <option value="font-common">Imprenta Común</option>
                                 <option value="font-arcane">Grimorio</option>
+                                ${fontOpts}
                             </select>
                         </div>
                     </div>
@@ -226,7 +295,7 @@ export default class NewspaperView {
                     </div>
                 </div>
                 <div class="p-4 border-t border-gray-800 flex justify-end">
-                    <button id="btn-save-config" class="bg-amber-700 hover:bg-amber-600 text-white px-6 py-2 rounded font-bold transition" data-i18n="btn.save">${t('btn.save')}</button>
+                    <button id="btn-save-config" class="bg-amber-700 hover:bg-amber-600 text-white px-6 py-2 rounded font-bold transition">${t('btn.save')}</button>
                 </div>
             </div>
         `;
@@ -390,7 +459,6 @@ export default class NewspaperView {
                 `;
             } else {
                 let sealContent = '<i class="ph ph-crown"></i>';
-                
                 if (item.decreeImg) {
                     sealContent = `
                         <div style="width:100%; height:100%; border-radius:50%; overflow:hidden; position:relative;">
