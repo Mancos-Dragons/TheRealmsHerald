@@ -386,137 +386,110 @@ export default class NewspaperController {
         const originalElement = document.getElementById('paper-capture');
         if (!originalElement) return;
 
-        // Temporarily reset zoom to calculate correct dimensions
-        const originalTransform = originalElement.style.transform;
-        originalElement.style.transform = 'scale(1)';
+        // Use print() approach to maintain absolute CSS fidelity (CSS Grid, filters, mix-blend-mode).
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) {
+            alert('Por favor, permite ventanas emergentes para exportar el PDF.');
+            return;
+        }
 
-        // Helper function to pre-process images with canvas filters since html2canvas drops mix-blend-mode and complex CSS filters
-        const bakeImageFilters = (clonedElement) => {
-            const images = clonedElement.querySelectorAll('.news-img, .decree-seal');
-            images.forEach(img => {
-                if (img.tagName.toLowerCase() !== 'img') return;
+        const clonedContent = originalElement.cloneNode(true);
+        // Remove interactive overlays from the clone before printing
+        clonedContent.querySelectorAll('.error-overflow, .drag-over').forEach(el => {
+            el.classList.remove('error-overflow', 'drag-over');
+        });
 
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                canvas.width = img.width || img.naturalWidth || 300;
-                canvas.height = img.height || img.naturalHeight || 300;
+        // Helper function to resolve relative paths for styles and images to absolute paths before printing
+        const basePath = window.location.origin + window.location.pathname.replace('index.html', '');
 
-                // Copy styles to canvas to replace the image entirely in the flow
-                canvas.style.cssText = img.style.cssText;
-                canvas.className = img.className;
+        clonedContent.querySelectorAll('img').forEach(img => {
+            if (img.src && !img.src.startsWith('data:') && !img.src.startsWith('http')) {
+                img.src = new URL(img.getAttribute('src'), basePath).href;
+            }
+        });
 
-                // Use DOM width/height for layout, natural width/height for drawing
-                const displayWidth = img.offsetWidth;
-                const displayHeight = img.offsetHeight;
+        const htmlContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>${this.model.config.name || 'Periódico'}</title>
+                <!-- Load required external styles -->
+                <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Special+Elite&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&family=Rye&display=swap" rel="stylesheet">
+                <link rel="stylesheet" href="${basePath}css/main.css">
+                <link rel="stylesheet" href="${basePath}css/modules/newspaper.css">
+                <style>
+                    /* Fix missing backgrounds by injecting inline URLs that point directly to the assets based on absolute path */
+                    .texture-clean { background-image: url('${basePath}assets/img/paper.png') !important; }
+                    .texture-gritty { background-image: url('${basePath}assets/img/ag-square.png') !important; }
+                    .texture-magic { background-image: url('${basePath}assets/img/stardust.png') !important; }
+                    .news-item.style-wanted { background-image: url('${basePath}assets/img/wood-pattern.png') !important; }
 
-                // Apply the newspaper CSS filter directly to the canvas context
-                // matches .news-img { filter: grayscale(100%) sepia(30%) contrast(1.2); }
-                ctx.filter = 'grayscale(100%) sepia(30%) contrast(120%)';
-
-                // Simulate multiply blend mode against a light parchment color
-                ctx.fillStyle = '#f4e4bc';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.globalCompositeOperation = 'multiply';
-
-                try {
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-                    // Replace img with a new img to preserve dimensions better than canvas sometimes does in flex/grid
-                    const newImg = document.createElement('img');
-                    newImg.src = canvas.toDataURL('image/jpeg', 0.9);
-                    newImg.style.cssText = img.style.cssText;
-                    newImg.className = img.className;
-                    if (displayWidth && displayHeight) {
-                        newImg.style.width = displayWidth + 'px';
-                        newImg.style.height = displayHeight + 'px';
+                    /* Print-specific overrides to guarantee A4 layout and background rendering */
+                    @page {
+                        size: A4;
+                        margin: 0;
+                    }
+                    body {
+                        margin: 0;
+                        padding: 0;
+                        background: #fff;
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
+                    #paper-capture {
+                        transform: none !important;
+                        margin: 0 !important;
+                        padding: 0 !important;
+                        display: block !important;
+                        width: 100% !important;
+                    }
+                    .paper-page {
+                        width: 210mm !important;
+                        height: 297mm !important;
+                        margin: 0 !important;
+                        padding: 12mm 15mm 15mm 15mm !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        page-break-after: always;
+                        page-break-inside: avoid;
+                        position: relative;
+                        box-sizing: border-box;
+                        overflow: hidden;
+                    }
+                    .paper-page:last-child {
+                        page-break-after: auto;
                     }
 
-                    // Remove CSS filters from the baked image so html2canvas doesn't try to apply them again or drop them
-                    newImg.style.filter = 'none';
-                    newImg.style.mixBlendMode = 'normal';
+                    /* Ensure backgrounds and filters print correctly */
+                    .texture-clean, .texture-gritty, .texture-magic {
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
+                    .news-img {
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
+                </style>
+            </head>
+            <body>
+                ${clonedContent.outerHTML}
+                <script>
+                    window.onload = () => {
+                        // Wait slightly to ensure fonts and backgrounds load, then trigger print
+                        setTimeout(() => {
+                            window.print();
+                            // Optional: auto-close after print dialogue is handled
+                            // window.close();
+                        }, 500);
+                    };
+                </script>
+            </body>
+            </html>
+        `;
 
-                    img.replaceWith(newImg);
-                } catch (e) {
-                    console.warn("Could not bake image filter:", e);
-                }
-            });
-
-            // Also force background color blending for paper pages if needed
-            const pages = clonedElement.querySelectorAll('.paper-page');
-            pages.forEach(page => {
-                if (page.classList.contains('texture-clean')) {
-                    // html2canvas struggles with `filter: contrast(1.1) brightness(1.1);` on backgrounds.
-                    // We can simulate it by darkening the background color slightly or just removing the filter
-                    // so it doesn't fail to render the background image completely.
-                    page.style.filter = 'none';
-                } else if (page.classList.contains('texture-gritty')) {
-                    page.style.filter = 'none';
-                }
-            });
-        };
-
-        // Using a setTimeout to ensure the browser has fully applied scale(1)
-        setTimeout(() => {
-            // Wait for fonts to be ready
-            document.fonts.ready.then(() => {
-                const opt = {
-                    margin: 0,
-                    filename: `${this.model.config.name}.pdf`,
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: {
-                        scale: 2,
-                        useCORS: true,
-                        backgroundColor: '#ffffff',
-                        scrollY: 0,
-                        onclone: (clonedDoc) => {
-                            const clonedElement = clonedDoc.getElementById('paper-capture');
-                            if (!clonedElement) return;
-
-                            bakeImageFilters(clonedElement);
-
-                            // Remove margins, borders, and shadows that break A4 sizing on the CLONE
-                            const clonePages = clonedElement.querySelectorAll('.paper-page');
-                            clonePages.forEach(page => {
-                                page.style.marginBottom = '0';
-                                page.style.boxShadow = 'none';
-                                page.style.border = 'none';
-                            });
-
-                            // DO NOT TOUCH THE GRID LAYOUT IN THE CLONE.
-                            // The custom masonry implementation uses css grid-row-end (span X)
-                            // and html2canvas supports this naturally in modern versions.
-                            // We only reset transform translations from drag-and-drop
-                            const containers = clonedElement.querySelectorAll('.columns-container');
-                            containers.forEach(container => {
-                                Array.from(container.children).forEach(child => {
-                                    child.style.transform = 'none';
-                                });
-                            });
-                        }
-                    },
-                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                    pagebreak: { mode: 'css', after: '.paper-page' }
-                };
-
-                // Remove 'after' pagebreak from the LAST page to prevent a trailing blank page
-                const pages = originalElement.querySelectorAll('.paper-page');
-                if (pages.length > 0) {
-                    pages[pages.length - 1].classList.add('no-page-break');
-                    opt.pagebreak = { mode: 'css', after: '.paper-page:not(.no-page-break)' };
-                }
-
-                html2pdf().set(opt).from(originalElement).save()
-                    .then(() => {
-                        originalElement.style.transform = originalTransform;
-                        if (pages.length > 0) pages[pages.length - 1].classList.remove('no-page-break');
-                    })
-                    .catch((err) => {
-                        console.error("PDF Export failed:", err);
-                        originalElement.style.transform = originalTransform;
-                        if (pages.length > 0) pages[pages.length - 1].classList.remove('no-page-break');
-                    });
-            });
-        }, 100);
+        printWindow.document.open();
+        printWindow.document.write(htmlContent);
+        printWindow.document.close();
     }
 
     destroy() {
