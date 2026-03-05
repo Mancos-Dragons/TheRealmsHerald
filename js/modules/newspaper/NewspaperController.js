@@ -390,6 +390,71 @@ export default class NewspaperController {
         const originalTransform = originalElement.style.transform;
         originalElement.style.transform = 'scale(1)';
 
+        // Helper function to pre-process images with canvas filters since html2canvas drops mix-blend-mode and complex CSS filters
+        const bakeImageFilters = (clonedElement) => {
+            const images = clonedElement.querySelectorAll('.news-img, .decree-seal');
+            images.forEach(img => {
+                if (img.tagName.toLowerCase() !== 'img') return;
+
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = img.width || img.naturalWidth || 300;
+                canvas.height = img.height || img.naturalHeight || 300;
+
+                // Copy styles to canvas to replace the image entirely in the flow
+                canvas.style.cssText = img.style.cssText;
+                canvas.className = img.className;
+
+                // Use DOM width/height for layout, natural width/height for drawing
+                const displayWidth = img.offsetWidth;
+                const displayHeight = img.offsetHeight;
+
+                // Apply the newspaper CSS filter directly to the canvas context
+                // matches .news-img { filter: grayscale(100%) sepia(30%) contrast(1.2); }
+                ctx.filter = 'grayscale(100%) sepia(30%) contrast(120%)';
+
+                // Simulate multiply blend mode against a light parchment color
+                ctx.fillStyle = '#f4e4bc';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.globalCompositeOperation = 'multiply';
+
+                try {
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                    // Replace img with a new img to preserve dimensions better than canvas sometimes does in flex/grid
+                    const newImg = document.createElement('img');
+                    newImg.src = canvas.toDataURL('image/jpeg', 0.9);
+                    newImg.style.cssText = img.style.cssText;
+                    newImg.className = img.className;
+                    if (displayWidth && displayHeight) {
+                        newImg.style.width = displayWidth + 'px';
+                        newImg.style.height = displayHeight + 'px';
+                    }
+
+                    // Remove CSS filters from the baked image so html2canvas doesn't try to apply them again or drop them
+                    newImg.style.filter = 'none';
+                    newImg.style.mixBlendMode = 'normal';
+
+                    img.replaceWith(newImg);
+                } catch (e) {
+                    console.warn("Could not bake image filter:", e);
+                }
+            });
+
+            // Also force background color blending for paper pages if needed
+            const pages = clonedElement.querySelectorAll('.paper-page');
+            pages.forEach(page => {
+                if (page.classList.contains('texture-clean')) {
+                    // html2canvas struggles with `filter: contrast(1.1) brightness(1.1);` on backgrounds.
+                    // We can simulate it by darkening the background color slightly or just removing the filter
+                    // so it doesn't fail to render the background image completely.
+                    page.style.filter = 'none';
+                } else if (page.classList.contains('texture-gritty')) {
+                    page.style.filter = 'none';
+                }
+            });
+        };
+
         // Using a setTimeout to ensure the browser has fully applied scale(1)
         setTimeout(() => {
             // Wait for fonts to be ready
@@ -406,6 +471,8 @@ export default class NewspaperController {
                         onclone: (clonedDoc) => {
                             const clonedElement = clonedDoc.getElementById('paper-capture');
                             if (!clonedElement) return;
+
+                            bakeImageFilters(clonedElement);
 
                             // Remove margins, borders, and shadows that break A4 sizing on the CLONE
                             const clonePages = clonedElement.querySelectorAll('.paper-page');
@@ -431,13 +498,22 @@ export default class NewspaperController {
                     pagebreak: { mode: 'css', after: '.paper-page' }
                 };
 
+                // Remove 'after' pagebreak from the LAST page to prevent a trailing blank page
+                const pages = originalElement.querySelectorAll('.paper-page');
+                if (pages.length > 0) {
+                    pages[pages.length - 1].classList.add('no-page-break');
+                    opt.pagebreak = { mode: 'css', after: '.paper-page:not(.no-page-break)' };
+                }
+
                 html2pdf().set(opt).from(originalElement).save()
                     .then(() => {
                         originalElement.style.transform = originalTransform;
+                        if (pages.length > 0) pages[pages.length - 1].classList.remove('no-page-break');
                     })
                     .catch((err) => {
                         console.error("PDF Export failed:", err);
                         originalElement.style.transform = originalTransform;
+                        if (pages.length > 0) pages[pages.length - 1].classList.remove('no-page-break');
                     });
             });
         }, 100);
