@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/Mancos-Dragons/TheRealmsHerald/issues"
   },
-  "homepage": "https://github.com/Mancos-Dragons/TheRealmsHerald#readme"
+  "homepage": "https://github.com/Mancos-Dragons/TheRealmsHerald#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.58.2"
+  }
 }
