@@ -389,6 +389,64 @@ export default class NewspaperController {
         const originalTransform = element.style.transform;
         element.style.transform = 'scale(1)';
 
+        // Store original container styles
+        const containers = document.querySelectorAll('.columns-container');
+        const containerStyles = [];
+
+        // Convert Grid layout to Absolute Positioning for html2canvas compatibility
+        containers.forEach(container => {
+            containerStyles.push({
+                el: container,
+                position: container.style.position,
+                height: container.style.height,
+                display: container.style.display
+            });
+
+            // First pass: collect dimensions and offsets while still in grid layout
+            const children = Array.from(container.children);
+            const childLayouts = children.map(child => {
+                return {
+                    el: child,
+                    top: child.offsetTop,
+                    left: child.offsetLeft,
+                    width: child.offsetWidth,
+                    height: child.offsetHeight,
+                    origPosition: child.style.position,
+                    origTop: child.style.top,
+                    origLeft: child.style.left,
+                    origWidth: child.style.width,
+                    origHeight: child.style.height,
+                    origMargin: child.style.margin
+                };
+            });
+
+            // Set fixed height to prevent collapsing when children become absolute
+            container.style.position = 'relative';
+            container.style.height = container.offsetHeight + 'px';
+            container.style.display = 'block'; // Remove grid
+
+            // Second pass: apply absolute positions
+            childLayouts.forEach(layout => {
+                const child = layout.el;
+
+                // Store original styles to data attributes
+                child.dataset.origPosition = layout.origPosition;
+                child.dataset.origTop = layout.origTop;
+                child.dataset.origLeft = layout.origLeft;
+                child.dataset.origWidth = layout.origWidth;
+                child.dataset.origHeight = layout.origHeight;
+                child.dataset.origMargin = layout.origMargin;
+
+                // Set absolute positioning
+                child.style.position = 'absolute';
+                child.style.top = layout.top + 'px';
+                child.style.left = layout.left + 'px';
+                child.style.width = layout.width + 'px';
+                child.style.height = layout.height + 'px';
+                child.style.margin = '0'; // Prevent margins from shifting absolute position
+            });
+        });
+
         // Remove margins, borders, and shadows that break A4 sizing
         const pages = document.querySelectorAll('.paper-page');
         const originalStyles = [];
@@ -415,10 +473,28 @@ export default class NewspaperController {
         html2pdf().set(opt).from(element).save().then(() => {
             // Restore styles after export
             element.style.transform = originalTransform;
+
             pages.forEach((page, index) => {
                 page.style.marginBottom = originalStyles[index].marginBottom;
                 page.style.boxShadow = originalStyles[index].boxShadow;
                 page.style.border = originalStyles[index].border;
+            });
+
+            containers.forEach((container, i) => {
+                const orig = containerStyles[i];
+                container.style.position = orig.position;
+                container.style.height = orig.height;
+                container.style.display = orig.display;
+
+                const children = Array.from(container.children);
+                children.forEach(child => {
+                    child.style.position = child.dataset.origPosition;
+                    child.style.top = child.dataset.origTop;
+                    child.style.left = child.dataset.origLeft;
+                    child.style.width = child.dataset.origWidth;
+                    child.style.height = child.dataset.origHeight;
+                    child.style.margin = child.dataset.origMargin;
+                });
             });
         });
     }
