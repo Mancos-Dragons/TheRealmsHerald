@@ -17,16 +17,16 @@
 }
 
 .texture-clean {
-    background-image: url('https://www.transparenttextures.com/patterns/paper.png');
+    background-image: url('../../assets/img/paper.png');
     filter: contrast(1.1) brightness(1.1);
 }
 .texture-gritty {
-    background-image: url('https://www.transparenttextures.com/patterns/ag-square.png');
+    background-image: url('../../assets/img/ag-square.png');
     background-color: #d6c698;
     filter: sepia(0.4);
 }
 .texture-magic {
-    background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
+    background-image: url('../../assets/img/stardust.png');
     background-color: #e0d8ff;
     color: #1a0f35;
     border-color: #8a7cba;
@@ -196,7 +196,7 @@
 }
 
 .news-item.style-wanted {
-    background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png');
+    background-image: url('../../assets/img/wood-pattern.png');
     background-color: #d4c49c;
     border: 5px solid #2b0a0a;
     box-shadow: inset 0 0 40px rgba(0,0,0,0.5);

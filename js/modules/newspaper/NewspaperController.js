@@ -383,44 +383,113 @@ export default class NewspaperController {
     }
 
     exportPDF() {
-        const element = document.getElementById('paper-capture');
+        const originalElement = document.getElementById('paper-capture');
+        if (!originalElement) return;
 
-        // Temporarily reset zoom for export to prevent misalignments
-        const originalTransform = element.style.transform;
-        element.style.transform = 'scale(1)';
+        // Use print() approach to maintain absolute CSS fidelity (CSS Grid, filters, mix-blend-mode).
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) {
+            alert('Por favor, permite ventanas emergentes para exportar el PDF.');
+            return;
+        }
 
-        // Remove margins, borders, and shadows that break A4 sizing
-        const pages = document.querySelectorAll('.paper-page');
-        const originalStyles = [];
-        pages.forEach(page => {
-            originalStyles.push({
-                marginBottom: page.style.marginBottom,
-                boxShadow: page.style.boxShadow,
-                border: page.style.border
-            });
-            page.style.marginBottom = '0';
-            page.style.boxShadow = 'none';
-            page.style.border = 'none';
+        const clonedContent = originalElement.cloneNode(true);
+        // Remove interactive overlays from the clone before printing
+        clonedContent.querySelectorAll('.error-overflow, .drag-over').forEach(el => {
+            el.classList.remove('error-overflow', 'drag-over');
         });
 
-        const opt = {
-            margin: 0,
-            filename: `${this.model.config.name}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-            pagebreak: { mode: 'css', after: '.paper-page' }
-        };
+        // Helper function to resolve relative paths for styles and images to absolute paths before printing
+        const basePath = window.location.origin + window.location.pathname.replace('index.html', '');
 
-        html2pdf().set(opt).from(element).save().then(() => {
-            // Restore styles after export
-            element.style.transform = originalTransform;
-            pages.forEach((page, index) => {
-                page.style.marginBottom = originalStyles[index].marginBottom;
-                page.style.boxShadow = originalStyles[index].boxShadow;
-                page.style.border = originalStyles[index].border;
-            });
+        clonedContent.querySelectorAll('img').forEach(img => {
+            if (img.src && !img.src.startsWith('data:') && !img.src.startsWith('http')) {
+                img.src = new URL(img.getAttribute('src'), basePath).href;
+            }
         });
+
+        const htmlContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>${this.model.config.name || 'Periódico'}</title>
+                <!-- Load required external styles -->
+                <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Special+Elite&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&family=Rye&display=swap" rel="stylesheet">
+                <link rel="stylesheet" href="${basePath}css/main.css">
+                <link rel="stylesheet" href="${basePath}css/modules/newspaper.css">
+                <style>
+                    /* Fix missing backgrounds by injecting inline URLs that point directly to the assets based on absolute path */
+                    .texture-clean { background-image: url('${basePath}assets/img/paper.png') !important; }
+                    .texture-gritty { background-image: url('${basePath}assets/img/ag-square.png') !important; }
+                    .texture-magic { background-image: url('${basePath}assets/img/stardust.png') !important; }
+                    .news-item.style-wanted { background-image: url('${basePath}assets/img/wood-pattern.png') !important; }
+
+                    /* Print-specific overrides to guarantee A4 layout and background rendering */
+                    @page {
+                        size: A4;
+                        margin: 0;
+                    }
+                    body {
+                        margin: 0;
+                        padding: 0;
+                        background: #fff;
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
+                    #paper-capture {
+                        transform: none !important;
+                        margin: 0 !important;
+                        padding: 0 !important;
+                        display: block !important;
+                        width: 100% !important;
+                    }
+                    .paper-page {
+                        width: 210mm !important;
+                        height: 297mm !important;
+                        margin: 0 !important;
+                        padding: 12mm 15mm 15mm 15mm !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        page-break-after: always;
+                        page-break-inside: avoid;
+                        position: relative;
+                        box-sizing: border-box;
+                        overflow: hidden;
+                    }
+                    .paper-page:last-child {
+                        page-break-after: auto;
+                    }
+
+                    /* Ensure backgrounds and filters print correctly */
+                    .texture-clean, .texture-gritty, .texture-magic {
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
+                    .news-img {
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
+                </style>
+            </head>
+            <body>
+                ${clonedContent.outerHTML}
+                <script>
+                    window.onload = () => {
+                        // Wait slightly to ensure fonts and backgrounds load, then trigger print
+                        setTimeout(() => {
+                            window.print();
+                            // Optional: auto-close after print dialogue is handled
+                            // window.close();
+                        }, 500);
+                    };
+                </script>
+            </body>
+            </html>
+        `;
+
+        printWindow.document.open();
+        printWindow.document.write(htmlContent);
+        printWindow.document.close();
     }
 
     destroy() {
