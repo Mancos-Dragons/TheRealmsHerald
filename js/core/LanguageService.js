@@ -160,13 +160,18 @@ export const LanguageService = {
             
             for (const lang in externalData) {
                 if (!this.dictionary[lang]) this.dictionary[lang] = {};
-                if (externalData[lang].tools) {
-                    for (const toolKey in externalData[lang].tools) {
-                        const tool = externalData[lang].tools[toolKey];
-                        this.dictionary[lang][`tools.${toolKey}.title`] = tool.title;
-                        this.dictionary[lang][`tools.${toolKey}.desc`] = tool.desc;
+
+                const processObject = (obj, prefix = '') => {
+                    for (const key in obj) {
+                        if (typeof obj[key] === 'object' && obj[key] !== null) {
+                            processObject(obj[key], `${prefix}${key}.`);
+                        } else {
+                            this.dictionary[lang][`${prefix}${key}`] = obj[key];
+                        }
                     }
-                }
+                };
+
+                processObject(externalData[lang]);
             }
             console.log("🌍 Idiomas externos cargados.");
         } catch (e) {

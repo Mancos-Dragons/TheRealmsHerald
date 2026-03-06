@@ -1,5 +1,104 @@
 {
   "es": {
+    "nav": {
+      "home": "Inicio",
+      "newspaper": "Prensa",
+      "rumors": "Susurros"
+    },
+    "rumors": {
+      "title": "Susurros de Taberna",
+      "subtitle": "Generador de chismes y rumores para alimentar tu mundo vivo.",
+      "context": "Contexto Específico",
+      "input": {
+        "character": "Personaje (Opcional)",
+        "location": "Lugar (Opcional)",
+        "object": "Objeto (Opcional)",
+        "creature": "Criatura (Opcional)"
+      },
+      "placeholder": {
+        "character": "Ej. El posadero",
+        "location": "Ej. El puerto",
+        "object": "Ej. Un cofre",
+        "creature": "Ej. Un dragón"
+      },
+      "btn": {
+        "generate": "Generar Rumor",
+        "clear": "Limpiar Mesa"
+      },
+      "empty": {
+        "title": "La Taberna Está Vacía",
+        "desc": "Genera un rumor para escuchar qué dice la gente."
+      },
+      "truth": {
+        "Mentira Absoluta": "Mentira Absoluta",
+        "Poco Probable": "Poco Probable",
+        "Dudoso": "Dudoso",
+        "Posiblemente Cierto": "Posiblemente Cierto",
+        "Verdad Innegable": "Verdad Innegable"
+      },
+      "gen": {
+        "template": {
+          "1": "Se dice que {character} fue visto cerca de {location} a altas horas de la noche con {object}.",
+          "2": "Escuché que {character} está buscando {object} en {location}.",
+          "3": "Un guardia jura que vio a {character} hablando con {creature} en {location}.",
+          "4": "La gente murmura que {character} escondió {object} en {location}.",
+          "5": "Si le pagas lo suficiente a {character}, te dirá cómo entrar a {location}.",
+          "6": "Cuidado con {character}, últimamente ha estado muy interesado en {object}.",
+          "7": "Ayer por la tarde, {character} discutió violentamente sobre {object} en {location}.",
+          "8": "Se rumorea que el antiguo líder de {location} dejó atrás {object}, y {character} tiene el mapa.",
+          "9": "Nadie confía en {character} desde que ocurrió aquel incidente con {creature}.",
+          "10": "Dicen que si dejas {object} en {location}, {creature} te concederá un deseo."
+        },
+        "char": {
+          "1": "un extraño encapuchado",
+          "2": "el viejo alcalde",
+          "3": "la dueña de la posada",
+          "4": "un mercader extranjero",
+          "5": "el capitán de la guardia",
+          "6": "un niño huérfano",
+          "7": "el sacerdote del pueblo",
+          "8": "un cazador furtivo",
+          "9": "una elfa silenciosa",
+          "10": "un enano gruñón"
+        },
+        "loc": {
+          "1": "las ruinas antiguas",
+          "2": "el bosque maldito",
+          "3": "las alcantarillas",
+          "4": "la cueva de cristal",
+          "5": "el cementerio abandonado",
+          "6": "la torre en ruinas",
+          "7": "el pantano",
+          "8": "la mansión del lord",
+          "9": "el cruce de caminos",
+          "10": "el mercado negro"
+        },
+        "obj": {
+          "1": "un cofre lleno de oro",
+          "2": "una reliquia familiar",
+          "3": "un artefacto mágico inestable",
+          "4": "un mapa del tesoro",
+          "5": "una daga ensangrentada",
+          "6": "una poción extraña",
+          "7": "un libro prohibido",
+          "8": "un pergamino encriptado",
+          "9": "una llave oxidada",
+          "10": "un cristal brillante"
+        },
+        "crea": {
+          "1": "un dragón joven",
+          "2": "una manada de lobos huargo",
+          "3": "un espíritu vengativo",
+          "4": "un demonio menor",
+          "5": "un troll de las cavernas",
+          "6": "una banda de duendes",
+          "7": "un nigromante oscuro",
+          "8": "un elemental de fuego",
+          "9": "una bestia sombra",
+          "10": "un cambiaformas"
+        }
+      }
+    },
     "tools": {
       "newspaper": {
         "title": "La Voz del Conejo",
@@ -56,6 +155,105 @@
     }
   },
   "en": {
+    "nav": {
+      "home": "Home",
+      "newspaper": "Press",
+      "rumors": "Whispers"
+    },
+    "rumors": {
+      "title": "Tavern Whispers",
+      "subtitle": "Procedural gossip and rumor generator to feed your living world.",
+      "context": "Specific Context",
+      "input": {
+        "character": "Character (Optional)",
+        "location": "Location (Optional)",
+        "object": "Object (Optional)",
+        "creature": "Creature (Optional)"
+      },
+      "placeholder": {
+        "character": "E.g. The innkeeper",
+        "location": "E.g. The port",
+        "object": "E.g. A chest",
+        "creature": "E.g. A dragon"
+      },
+      "btn": {
+        "generate": "Generate Rumor",
+        "clear": "Clear Table"
+      },
+      "empty": {
+        "title": "The Tavern Is Empty",
+        "desc": "Generate a rumor to hear what people are saying."
+      },
+      "truth": {
+        "Mentira Absoluta": "Absolute Lie",
+        "Poco Probable": "Unlikely",
+        "Dudoso": "Doubtful",
+        "Posiblemente Cierto": "Possibly True",
+        "Verdad Innegable": "Undeniable Truth"
+      },
+      "gen": {
+        "template": {
+          "1": "Word is that {character} was seen near {location} late at night with {object}.",
+          "2": "I heard {character} is looking for {object} in {location}.",
+          "3": "A guard swears they saw {character} talking to {creature} in {location}.",
+          "4": "People murmur that {character} hid {object} in {location}.",
+          "5": "If you pay {character} enough, they will tell you how to enter {location}.",
+          "6": "Watch out for {character}, they've been very interested in {object} lately.",
+          "7": "Yesterday afternoon, {character} argued violently about {object} in {location}.",
+          "8": "Rumor has it that the former leader of {location} left behind {object}, and {character} has the map.",
+          "9": "No one trusts {character} since that incident with {creature}.",
+          "10": "They say if you leave {object} in {location}, {creature} will grant you a wish."
+        },
+        "char": {
+          "1": "a hooded stranger",
+          "2": "the old mayor",
+          "3": "the innkeeper",
+          "4": "a foreign merchant",
+          "5": "the captain of the guard",
+          "6": "an orphan child",
+          "7": "the village priest",
+          "8": "a poacher",
+          "9": "a silent elf",
+          "10": "a grumpy dwarf"
+        },
+        "loc": {
+          "1": "the ancient ruins",
+          "2": "the cursed forest",
+          "3": "the sewers",
+          "4": "the crystal cave",
+          "5": "the abandoned cemetery",
+          "6": "the ruined tower",
+          "7": "the swamp",
+          "8": "the lord's manor",
+          "9": "the crossroads",
+          "10": "the black market"
+        },
+        "obj": {
+          "1": "a chest full of gold",
+          "2": "a family heirloom",
+          "3": "an unstable magical artifact",
+          "4": "a treasure map",
+          "5": "a bloodstained dagger",
+          "6": "a strange potion",
+          "7": "a forbidden book",
+          "8": "an encrypted scroll",
+          "9": "a rusty key",
+          "10": "a glowing crystal"
+        },
+        "crea": {
+          "1": "a young dragon",
+          "2": "a pack of dire wolves",
+          "3": "a vengeful spirit",
+          "4": "a minor demon",
+          "5": "a cave troll",
+          "6": "a band of goblins",
+          "7": "a dark necromancer",
+          "8": "a fire elemental",
+          "9": "a shadow beast",
+          "10": "a shapeshifter"
+        }
+      }
+    },
     "tools": {
       "newspaper": {
         "title": "The Rabbit's Voice",
