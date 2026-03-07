@@ -53,6 +53,15 @@
         "title": "Laboratorio",
         "desc": "Zona de pruebas para nuevas mecánicas."
       }
+    },
+    "nav": {
+      "home": "Inicio",
+      "newspaper": "Prensa",
+      "rumors": "Rumores"
+    },
+    "rumors": {
+      "town_name": "Pueblo/Ciudad",
+      "characters": "Personajes Relevantes"
     }
   },
   "en": {
@@ -109,6 +118,15 @@
         "title": "Laboratory",
         "desc": "Testing ground for new mechanics."
       }
+    },
+    "nav": {
+      "home": "Home",
+      "newspaper": "Newspaper",
+      "rumors": "Rumors"
+    },
+    "rumors": {
+      "town_name": "Town/City",
+      "characters": "Relevant Characters"
     }
   }
 }
