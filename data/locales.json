@@ -53,6 +53,25 @@
         "title": "Laboratorio",
         "desc": "Zona de pruebas para nuevas mecánicas."
       }
+    },
+    "nav": {
+      "home": "Inicio",
+      "newspaper": "Prensa",
+      "rumors": "Rumores"
+    },
+    "rumors": {
+      "ui": {
+        "config": "Configuración",
+        "town_name": "Nombre del Pueblo",
+        "add_character": "Añadir Personaje",
+        "character_name": "Nombre",
+        "character_role": "Rol/Profesión",
+        "add_btn": "Añadir",
+        "characters_list": "Personajes Registrados",
+        "rumors_board": "Tablón de Susurros",
+        "clear_btn": "Limpiar",
+        "generate_btn": "Generar Rumores"
+      }
     }
   },
   "en": {
@@ -108,6 +127,25 @@
       "labs": {
         "title": "Laboratory",
         "desc": "Testing ground for new mechanics."
+      }
+    },
+    "nav": {
+      "home": "Home",
+      "newspaper": "Press",
+      "rumors": "Rumors"
+    },
+    "rumors": {
+      "ui": {
+        "config": "Configuration",
+        "town_name": "Town Name",
+        "add_character": "Add Character",
+        "character_name": "Name",
+        "character_role": "Role/Profession",
+        "add_btn": "Add",
+        "characters_list": "Registered Characters",
+        "rumors_board": "Whispers Board",
+        "clear_btn": "Clear",
+        "generate_btn": "Generate Rumors"
       }
     }
   }

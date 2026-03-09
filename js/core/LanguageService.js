@@ -158,17 +158,31 @@ export const LanguageService = {
             const response = await fetch('./data/locales.json');
             const externalData = await response.json();
             
-            for (const lang in externalData) {
-                if (!this.dictionary[lang]) this.dictionary[lang] = {};
-                if (externalData[lang].tools) {
-                    for (const toolKey in externalData[lang].tools) {
-                        const tool = externalData[lang].tools[toolKey];
-                        this.dictionary[lang][`tools.${toolKey}.title`] = tool.title;
-                        this.dictionary[lang][`tools.${toolKey}.desc`] = tool.desc;
+            const flattenObj = (ob) => {
+                let result = {};
+                for (const i in ob) {
+                    if ((typeof ob[i]) === 'object' && !Array.isArray(ob[i])) {
+                        const temp = flattenObj(ob[i]);
+                        for (const j in temp) {
+                            result[i + '.' + j] = temp[j];
+                        }
+                    } else {
+                        result[i] = ob[i];
                     }
                 }
+                return result;
+            };
+
+            for (const lang in externalData) {
+                if (!this.dictionary[lang]) this.dictionary[lang] = {};
+
+                // Keep backwards compatibility for old 'tools' format if needed, but generic flatten handles it better.
+                // tools.newspaper.title -> tools.newspaper.title
+
+                const flattened = flattenObj(externalData[lang]);
+                Object.assign(this.dictionary[lang], flattened);
             }
-            console.log("🌍 Idiomas externos cargados.");
+            console.log("🌍 Idiomas externos cargados de forma recursiva.");
         } catch (e) {
             console.warn("No se pudieron cargar locales externos, usando defaults.", e);
         }
