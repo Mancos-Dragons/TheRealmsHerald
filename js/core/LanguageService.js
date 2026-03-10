@@ -11,6 +11,7 @@ export const LanguageService = {
             "app.title": "The Realm's Herald",
             "nav.home": "Inicio",
             "nav.newspaper": "Prensa",
+            "nav.rumors": "Rumores",
             "btn.launch": "Iniciar",
             "btn.locked": "Bloqueado",
             "home.welcome": "Bienvenido, Arquitecto",
@@ -77,12 +78,25 @@ export const LanguageService = {
             "conf.date.curr": "Fecha Actual",
             "conf.freq": "Frecuencia",
             "conf.manual": "Ed. Manual",
-            "btn.save": "Guardar Ajustes"
+            "btn.save": "Guardar Ajustes",
+
+            "rumors.title": "Susurros de Taberna",
+            "rumors.variables": "Variables del Mundo",
+            "rumors.generate": "Generar Rumor",
+            "rumors.result": "Rumores Generados",
+            "rumors.town": "Pueblo/Ciudad",
+            "rumors.npc": "NPC / Personaje",
+            "rumors.location": "Lugar",
+            "rumors.item": "Objeto",
+            "rumors.add": "Añadir",
+            "rumors.delete": "Eliminar",
+            "rumors.no_data": "Añade variables para generar rumores."
         },
         en: {
             "app.title": "The Realm's Herald",
             "nav.home": "Home",
             "nav.newspaper": "Newspaper",
+            "nav.rumors": "Rumors",
             "btn.launch": "Launch",
             "btn.locked": "Locked",
             "home.welcome": "Welcome, Architect",
@@ -149,7 +163,19 @@ export const LanguageService = {
             "conf.date.curr": "Current Date",
             "conf.freq": "Frequency",
             "conf.manual": "Manual Ed.",
-            "btn.save": "Save Settings"
+            "btn.save": "Save Settings",
+
+            "rumors.title": "Tavern Whispers",
+            "rumors.variables": "World Variables",
+            "rumors.generate": "Generate Rumor",
+            "rumors.result": "Generated Rumors",
+            "rumors.town": "Town/City",
+            "rumors.npc": "NPC / Character",
+            "rumors.location": "Location",
+            "rumors.item": "Item",
+            "rumors.add": "Add",
+            "rumors.delete": "Delete",
+            "rumors.no_data": "Add variables to generate rumors."
         }
     },
 

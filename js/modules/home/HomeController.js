@@ -7,7 +7,7 @@ export default class HomeController {
         
         this.tools = [
             { id: 'newspaper', icon: 'ph-newspaper', locked: false },
-            { id: 'rumors', icon: 'ph-mask-happy', locked: true },
+            { id: 'rumors', icon: 'ph-mask-happy', locked: false },
             { id: 'public_opinion', icon: 'ph-users-three', locked: true },
             { id: 'npcs', icon: 'ph-user-focus', locked: true },
             { id: 'timeline', icon: 'ph-hourglass', locked: true },
