@@ -11,6 +11,7 @@ class AppOrchestrator {
         this.modules = {
             'home': () => import('./modules/home/HomeController.js'),
             'newspaper': () => import('./modules/newspaper/NewspaperController.js'),
+            'rumors': () => import('./modules/rumors/RumorsController.js'),
         };
         
         this.init();
