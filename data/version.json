@@ -1,12 +1,21 @@
 {
   "name": "The Realm's Herald",
-  "version": "0.2.0",
-  "codename": "Susurros",
-  "releaseDate": "2026-02-05",
+  "version": "0.2.1",
+  "codename": "Prensa Inteligente",
+  "releaseDate": "2026-03-13",
   "status": "alpha",
   "author": "Fernando Machado",
   "description": "Suite de herramientas narrativas y generadores de documentos para Dungeon Masters.",
   "changelog": [
+    {
+      "version": "0.2.1",
+      "date": "2026-03-13",
+      "changes": [
+        "IA en la Prensa: Añadido generador de noticias impulsado por Inteligencia Artificial en La Voz del Conejo.",
+        "Páginas Dinámicas: El periódico ahora crea páginas adicionales automáticamente según sea necesario.",
+        "Mejora de UX: Alertas y confirmaciones del navegador reemplazadas por ventanas modales estilizadas."
+      ]
+    },
     {
       "version": "0.2.0",
       "date": "2026-02-05",
