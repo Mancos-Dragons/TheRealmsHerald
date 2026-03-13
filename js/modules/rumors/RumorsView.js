@@ -2,6 +2,19 @@ import { LanguageService } from '../../core/LanguageService.js';
 
 import { AIService } from '../../services/AIService.js';
 
+const BOLD_REGEX = /\*(.*?)\*/g;
+const BR_REGEX = /\n/g;
+
+function escapeHTML(str) {
+    if (!str) return '';
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 export default class RumorsView {
     constructor(container) {
         this.container = container;
@@ -85,8 +98,9 @@ export default class RumorsView {
         const hookTextEl = this.container.querySelector('#output-rumor-hook');
 
         if (container && rumorTextEl && hookTextEl) {
-            rumorTextEl.textContent = rumor;
-            hookTextEl.textContent = hook;
+            const formatText = (text) => escapeHTML(text).replace(BOLD_REGEX, '<strong>$1</strong>').replace(BR_REGEX, '<br>');
+            rumorTextEl.innerHTML = formatText(rumor);
+            hookTextEl.innerHTML = formatText(hook);
             container.classList.remove('d-none');
         }
     }
