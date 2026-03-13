@@ -1,5 +1,6 @@
 import { LanguageService } from '../../core/LanguageService.js';
 import { DataService } from '../../services/DataService.js';
+import { ModalService } from '../../core/ModalService.js';
 
 export default class HomeController {
     constructor(container) {
@@ -152,7 +153,7 @@ export default class HomeController {
                     modal.hide();
                 }
 
-                alert(LanguageService.get('home.ai_config.saved'));
+                ModalService.alert("Aviso", LanguageService.get('home.ai_config.saved'));
             });
         }
     }

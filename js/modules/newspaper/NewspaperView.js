@@ -138,6 +138,34 @@ export default class NewspaperView {
                                 </div>
                             </div>
                         </form>
+
+                        <div class="border-t border-gray-700 pt-4 mt-2">
+                            <h3 class="text-amber-500 font-bold mb-3 text-sm flex items-center gap-2">
+                                <i class="ph ph-magic-wand"></i> <span data-i18n="news.ai.title">${t('news.ai.title')}</span>
+                            </h3>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="${labelClass}" data-i18n="news.ai.town">${t('news.ai.town')}</label>
+                                    <input type="text" id="inp-ai-town" class="${inputClass}" placeholder="${t('news.ai.town.placeholder')}">
+                                </div>
+                                <div>
+                                    <label class="${labelClass}" data-i18n="news.ai.character">${t('news.ai.character')}</label>
+                                    <input type="text" id="inp-ai-character" class="${inputClass}" placeholder="${t('news.ai.character.placeholder')}">
+                                </div>
+                                <div>
+                                    <label class="${labelClass}" data-i18n="news.ai.type">${t('news.ai.type')}</label>
+                                    <select id="inp-ai-type" class="${inputClass}">
+                                        <option value="rumor" data-i18n="news.ai.type.rumor">${t('news.ai.type.rumor')}</option>
+                                        <option value="event" data-i18n="news.ai.type.event">${t('news.ai.type.event')}</option>
+                                        <option value="scandal" data-i18n="news.ai.type.scandal">${t('news.ai.type.scandal')}</option>
+                                        <option value="obituary" data-i18n="news.ai.type.obituary">${t('news.ai.type.obituary')}</option>
+                                        <option value="ad" data-i18n="news.ai.type.ad">${t('news.ai.type.ad')}</option>
+                                    </select>
+                                </div>
+                                <button type="button" id="btn-ai-generate" class="w-full bg-purple-700 hover:bg-purple-600 text-white py-2 rounded font-bold uppercase tracking-wide transition shadow-lg text-xs mt-2" data-i18n="news.ai.generate">${t('news.ai.generate')}</button>
+                            </div>
+                        </div>
+
                     </div>
 
                     <div class="p-2 border-t border-[#222] bg-[#161616] grid grid-cols-4 gap-1">

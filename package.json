@@ -1,6 +1,6 @@
 {
   "name": "the-realms-herald",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "description": "Herramientas web para DMs, escritores y constructores de mundos.",
   "type": "module",
   "scripts": {
