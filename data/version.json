@@ -1,12 +1,22 @@
 {
   "name": "The Realm's Herald",
-  "version": "0.1.1",
-  "codename": "Cimientos",
-  "releaseDate": "2025-12-31",
+  "version": "0.2.0",
+  "codename": "Susurros",
+  "releaseDate": "2026-02-05",
   "status": "alpha",
   "author": "Fernando Machado",
   "description": "Suite de herramientas narrativas y generadores de documentos para Dungeon Masters.",
   "changelog": [
+    {
+      "version": "0.2.0",
+      "date": "2026-02-05",
+      "changes": [
+        "Nueva herramienta integrada: 'Susurros de Taberna' (Generador de Rumores). Crea chismes y notas para el DM al instante.",
+        "Integración de Inteligencia Artificial: Nuevo panel de Configuración de IA en el menú principal. Conecta cualquier API compatible (OpenAI, Deepseek, Gemini) para potenciar tus herramientas.",
+        "Generación Procedural Masiva: Si no usas IA, el sistema de rumores ahora cuenta con más de 100 plantillas y ganchos de aventura únicos para garantizar variedad infinita.",
+        "Soporte Multilenguaje Completo: La interfaz, los rumores generados por IA y las 100+ plantillas procedurales ahora soportan completamente Español e Inglés."
+      ]
+    },
     {
       "version": "0.1.1",
       "date": "2026-01-02",
@@ -73,10 +83,10 @@
     },
     {
       "phase": "Fase 4: Vida y Azar",
-      "status": "pendiente",
+      "status": "en_progreso",
       "description": "Herramientas para ayudarte a improvisar y darle color a la partida.",
       "features": [
-        "Generador de Rumores: Crea chismes creíbles (o no tanto) dependiendo de si se escuchan en una taberna o en la corte.",
+        "Generador de Rumores: [COMPLETADO] Generador de chismes procedurales o mediante IA con soporte en múltiples idiomas.",
         "Opinión Pública: Un medidor de qué tan famosos (o infames) son tus jugadores y cómo eso afecta los precios en las tiendas.",
         "Generador de NPCs: Crea personajes al instante con personalidad y posibles vínculos con tus jugadores.",
         "Traductor Narrativo: Convierte números aburridos (como puntos de golpe) en descripciones emocionantes.",

@@ -49,6 +49,9 @@ class AppOrchestrator {
                     this.currentModule.attachEvents(); 
                 } else if (this.currentModuleKey === 'home') {
                     this.currentModule.render();
+                } else if (this.currentModuleKey === 'rumors') {
+                    this.currentModule.view.render(this.currentModule.model);
+                    this.currentModule.attachEvents();
                 }
             }
         }

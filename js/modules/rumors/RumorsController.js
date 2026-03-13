@@ -16,13 +16,20 @@ export default class RumorsController {
     attachEvents() {
         const generateBtn = this.container.querySelector('#btn-generate-rumor');
         if (generateBtn) {
-            generateBtn.addEventListener('click', () => {
+            generateBtn.addEventListener('click', async () => {
                 const townName = this.container.querySelector('#input-town-name').value || '';
                 const npcName = this.container.querySelector('#input-npc-name').value || '';
                 const npcRole = this.container.querySelector('#input-npc-role').value || '';
 
-                const result = this.model.generateRumor(townName, npcName, npcRole);
-                this.view.updateResult(result);
+                this.view.setLoading(true);
+                try {
+                    const result = await this.model.generateRumor(townName, npcName, npcRole);
+                    this.view.updateResult(result);
+                } catch (error) {
+                    console.error("RumorsController: Error generating rumor", error);
+                } finally {
+                    this.view.setLoading(false);
+                }
             });
         }
     }
