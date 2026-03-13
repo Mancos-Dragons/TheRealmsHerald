@@ -1,4 +1,5 @@
 import { LanguageService } from '../../core/LanguageService.js';
+import { DataService } from '../../services/DataService.js';
 
 export default class HomeController {
     constructor(container) {
@@ -78,6 +79,9 @@ export default class HomeController {
                             <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#roadmapModal">
                                 <i class="ph ph-path"></i> <span data-i18n="home.roadmap">${t('home.roadmap')}</span>
                             </button>
+                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#aiConfigModal">
+                                <i class="ph ph-robot"></i> <span data-i18n="home.ai_config">${t('home.ai_config')}</span>
+                            </button>
                         </div>
                     </div>
 
@@ -90,7 +94,10 @@ export default class HomeController {
 
             ${this.renderChangelogModal()}
             ${this.renderRoadmapModal()}
+            ${this.renderAIConfigModal()}
         `;
+
+        this.attachAIEvents();
 
         this.container.querySelectorAll('.launcher-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -123,6 +130,66 @@ export default class HomeController {
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body custom-scrollbar">${content}</div>
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    attachAIEvents() {
+        const aiConfigForm = this.container.querySelector('#aiConfigForm');
+        if (aiConfigForm) {
+            aiConfigForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const baseUrl = this.container.querySelector('#aiBaseUrl').value.replace(/\/$/, ''); // Remove trailing slash
+                const apiKey = this.container.querySelector('#aiApiKey').value;
+                const model = this.container.querySelector('#aiModel').value;
+
+                DataService.save('ai_config', { baseUrl, apiKey, model });
+
+                const modalEl = this.container.querySelector('#aiConfigModal');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) {
+                    modal.hide();
+                }
+
+                alert(LanguageService.get('home.ai_config.saved'));
+            });
+        }
+    }
+
+    renderAIConfigModal() {
+        const t = (key) => LanguageService.get(key);
+        const config = DataService.load('ai_config') || { baseUrl: '', apiKey: '', model: '' };
+
+        return `
+            <div class="modal fade" id="aiConfigModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content bg-[#111] border border-[#333] text-gray-200">
+                        <div class="modal-header border-bottom border-[#333]">
+                            <h5 class="modal-title medieval-font text-amber-600"><i class="ph ph-robot me-2"></i><span data-i18n="home.ai_config">${t('home.ai_config')}</span></h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="text-sm text-gray-400 mb-4" data-i18n="home.ai_config.desc">${t('home.ai_config.desc')}</p>
+                            <form id="aiConfigForm">
+                                <div class="mb-3">
+                                    <label for="aiBaseUrl" class="form-label" data-i18n="home.ai_config.baseUrl">${t('home.ai_config.baseUrl')}</label>
+                                    <input type="url" class="form-control bg-[#222] text-white border-secondary" id="aiBaseUrl" value="${config.baseUrl || ''}" placeholder="https://api.openai.com/v1" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="aiApiKey" class="form-label" data-i18n="home.ai_config.apiKey">${t('home.ai_config.apiKey')}</label>
+                                    <input type="password" class="form-control bg-[#222] text-white border-secondary" id="aiApiKey" value="${config.apiKey || ''}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="aiModel" class="form-label" data-i18n="home.ai_config.model">${t('home.ai_config.model')}</label>
+                                    <input type="text" class="form-control bg-[#222] text-white border-secondary" id="aiModel" value="${config.model || ''}" placeholder="gpt-4o-mini" required>
+                                </div>
+                                <div class="text-end mt-4">
+                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" data-i18n="home.ai_config.cancel">${t('home.ai_config.cancel')}</button>
+                                    <button type="submit" class="btn btn-warning" data-i18n="home.ai_config.save">${t('home.ai_config.save')}</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>`;
