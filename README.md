@@ -7,7 +7,7 @@ Su objetivo es facilitar la creación de documentos diegéticos (periódicos, ca
 
 ---
 
-## 🌟 Características Principales (Versión 0.1.0)
+## 🌟 Características Principales (Versión 0.2.1)
 
 Actualmente, la suite cuenta con su **Panel de Control Central** y la herramienta insignia: **La Voz del Conejo**.
 

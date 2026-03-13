@@ -1,5 +1,8 @@
 import NewspaperModel from './NewspaperModel.js';
 import NewspaperView from './NewspaperView.js';
+import { AIService } from '../../services/AIService.js';
+import { DataService } from '../../services/DataService.js';
+import { ModalService } from '../../core/ModalService.js';
 
 export default class NewspaperController {
     constructor(container) {
@@ -71,9 +74,10 @@ export default class NewspaperController {
                 if (itemBottom > (pageBottom - 40)) { 
                     item.classList.add('error-overflow');
                     item.title = "Click para mover a la siguiente página automáticamente";
-                    item.onclick = (e) => {
+                    item.onclick = async (e) => {
                         e.stopPropagation();
-                        if(confirm("Este artículo se sale de la hoja. ¿Mover a la siguiente página?")) {
+                        const isConfirmed = await ModalService.confirm("Aviso", "Este artículo se sale de la hoja. ¿Mover a la siguiente página?");
+                        if(isConfirmed) {
                             this.model.moveItem(pageNum, pageNum + 1, item.dataset.id);
                             this.refreshPaper();
                         }
@@ -137,6 +141,9 @@ export default class NewspaperController {
         const btnDelete = document.getElementById('btn-delete');
         if (btnDelete) btnDelete.addEventListener('click', () => this.handleDelete());
 
+        const btnAIGenerate = document.getElementById('btn-ai-generate');
+        if (btnAIGenerate) btnAIGenerate.addEventListener('click', () => this.handleAIGenerate());
+
         const btnConfig = document.getElementById('btn-config-toggle');
         if (btnConfig) btnConfig.addEventListener('click', () => {
             this.fillConfigModal(); 
@@ -162,8 +169,9 @@ export default class NewspaperController {
         });
         document.getElementById('btn-export-pdf')?.addEventListener('click', () => this.exportPDF());
         
-        document.getElementById('btn-new')?.addEventListener('click', () => {
-            if(confirm("¿Borrar todo y empezar una nueva edición?")) {
+        document.getElementById('btn-new')?.addEventListener('click', async () => {
+            const isConfirmed = await ModalService.confirm("Aviso", "¿Borrar todo y empezar una nueva edición?");
+            if(isConfirmed) {
                 this.model.itemsByPage = { 1: [] };
                 this.model.save();
                 this.refreshPaper();
@@ -252,6 +260,50 @@ export default class NewspaperController {
         }, { offset: Number.NEGATIVE_INFINITY }).element;
     }
 
+    async handleAIGenerate() {
+        const btn = document.getElementById('btn-ai-generate');
+        const town = document.getElementById('inp-ai-town').value.trim();
+        const character = document.getElementById('inp-ai-character').value.trim();
+        const type = document.getElementById('inp-ai-type').value;
+
+        const originalText = btn.innerText;
+        btn.innerText = "Generando...";
+        btn.disabled = true;
+
+        try {
+            let prompt = `Noticia para periódico medieval.`;
+            if (town) prompt += ` Ubicación: ${town}.`;
+            if (character) prompt += ` Involucra a: ${character}.`;
+            prompt += ` Tema: ${type}.`;
+
+            const config = DataService.getGlobal();
+            const model = config.apiKey ? 'gpt' : (config.geminiKey ? 'gemini' : null);
+
+            if (!model) {
+                await ModalService.alert("Aviso", "Debes configurar la API Key de OpenAI o Gemini en Configuración de IA (Pantalla de inicio).");
+                btn.innerText = originalText;
+                btn.disabled = false;
+                return;
+            }
+
+            const rawResponse = await AIService.generateText(prompt, type, model);
+
+            if (rawResponse) {
+                const parsed = AIService.parseResponse(rawResponse);
+                document.getElementById('inp-title').value = parsed.title;
+                document.getElementById('inp-body').value = parsed.body;
+            } else {
+                await ModalService.alert("Aviso", "Error: No se recibió respuesta de la IA.");
+            }
+        } catch (error) {
+            console.error("AI Generation Error:", error);
+            await ModalService.alert("Aviso", `Error generando contenido: ${error.message}`);
+        } finally {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
+    }
+
     fillConfigModal() {
         const c = this.model.config;
         const setVal = (id, val) => {
@@ -317,11 +369,12 @@ export default class NewspaperController {
         this.refreshPaper();
     }
 
-    handleDelete() {
+    async handleDelete() {
         const id = document.getElementById('edit-id').value;
         if (!id) return;
         
-        if(confirm("¿Seguro que deseas eliminar este elemento?")) {
+        const isConfirmed = await ModalService.confirm("Aviso", "¿Seguro que deseas eliminar este elemento?");
+        if(isConfirmed) {
             let page = null;
             for(const [p, items] of Object.entries(this.model.itemsByPage)) {
                 if(items.find(i => i.id === id)) { page = p; break; }
@@ -370,26 +423,26 @@ export default class NewspaperController {
         const file = e.target.files[0];
         if (!file) return;
         const reader = new FileReader();
-        reader.onload = (event) => {
+        reader.onload = async (event) => {
             const success = this.model.fromJSON(event.target.result);
             if (success) {
                 this.refreshPaper();
-                alert("¡Archivo cargado con éxito!");
+                await ModalService.alert("Éxito", "¡Archivo cargado con éxito!");
             } else {
-                alert("Error: El pergamino está corrupto.");
+                await ModalService.alert("Error", "El pergamino está corrupto.");
             }
         };
         reader.readAsText(file);
     }
 
-    exportPDF() {
+    async exportPDF() {
         const originalElement = document.getElementById('paper-capture');
         if (!originalElement) return;
 
         // Use print() approach to maintain absolute CSS fidelity (CSS Grid, filters, mix-blend-mode).
         const printWindow = window.open('', '_blank');
         if (!printWindow) {
-            alert('Por favor, permite ventanas emergentes para exportar el PDF.');
+            await ModalService.alert("Aviso", "Por favor, permite ventanas emergentes para exportar el PDF.");
             return;
         }
 
