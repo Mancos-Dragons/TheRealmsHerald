@@ -30,7 +30,11 @@ export const AIService = {
         const config = DataService.load('ai_config');
 
         try {
-            const response = await fetch(`${config.baseUrl}/chat/completions`, {
+            // Remove trailing slashes from baseUrl to prevent double slashes in the endpoint
+            const baseUrl = config.baseUrl.replace(/\/+$/, '');
+            const endpoint = `${baseUrl}/chat/completions`;
+
+            const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
