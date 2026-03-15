@@ -271,27 +271,42 @@ export default class NewspaperController {
         btn.disabled = true;
 
         try {
-            let prompt = `Noticia para periódico medieval.`;
-            if (town) prompt += ` Ubicación: ${town}.`;
-            if (character) prompt += ` Involucra a: ${character}.`;
-            prompt += ` Tema: ${type}.`;
-
-            const config = DataService.getGlobal();
-            const model = config.apiKey ? 'gpt' : (config.geminiKey ? 'gemini' : null);
-
-            if (!model) {
-                await ModalService.alert("Aviso", "Debes configurar la API Key de OpenAI o Gemini en Configuración de IA (Pantalla de inicio).");
+            if (!AIService.isConfigured()) {
+                await ModalService.alert("Aviso", "Debes configurar la API de IA en la pantalla de inicio.");
                 btn.innerText = originalText;
                 btn.disabled = false;
                 return;
             }
 
-            const rawResponse = await AIService.generateText(prompt, type, model);
+            const systemPrompt = `Eres un redactor de un periódico en un mundo de fantasía medieval. Genera una noticia atractiva.
+Debes responder ESTRICTAMENTE con un objeto JSON válido con el siguiente formato:
+{
+  "title": "Título llamativo de la noticia",
+  "body": "Cuerpo de la noticia, detallando los eventos."
+}`;
+
+            let userPrompt = `Genera una noticia sobre el tema: ${type}.`;
+            if (town) userPrompt += ` Ubicación: ${town}.`;
+            if (character) userPrompt += ` Involucra a: ${character}.`;
+
+            const rawResponse = await AIService.generate(systemPrompt, userPrompt);
 
             if (rawResponse) {
-                const parsed = AIService.parseResponse(rawResponse);
-                document.getElementById('inp-title').value = parsed.title;
-                document.getElementById('inp-body').value = parsed.body;
+                try {
+                    // Limpiar la respuesta por si la IA incluye markdown
+                    let jsonStr = rawResponse.trim();
+                    if (jsonStr.startsWith('\`\`\`json')) {
+                        jsonStr = jsonStr.substring(7, jsonStr.length - 3).trim();
+                    } else if (jsonStr.startsWith('\`\`\`')) {
+                        jsonStr = jsonStr.substring(3, jsonStr.length - 3).trim();
+                    }
+                    const parsed = JSON.parse(jsonStr);
+                    document.getElementById('inp-title').value = parsed.title || '';
+                    document.getElementById('inp-body').value = parsed.body || '';
+                } catch (parseError) {
+                    console.error("AI Parse Error:", parseError, rawResponse);
+                    await ModalService.alert("Aviso", "Error al procesar la respuesta de la IA.");
+                }
             } else {
                 await ModalService.alert("Aviso", "Error: No se recibió respuesta de la IA.");
             }
