@@ -146,21 +146,26 @@ export default class DocumentsController {
                     }
                     #document-preview {
                         transform: none !important;
-                        margin: 0 !important;
-                        padding: 0 !important;
-                        display: block !important;
-                        width: 100% !important;
+                        margin: 0 auto !important;
+                        display: flex !important;
                     }
                     .paper-page {
                         width: 210mm !important;
                         height: 297mm !important;
-                        margin: 0 !important;
-                        padding: 12mm 15mm 15mm 15mm !important;
+                        margin: 0 auto !important;
+                        padding: 15mm !important; /* Keep original padding */
                         box-shadow: none !important;
                         border: none !important;
                         position: relative;
                         box-sizing: border-box;
                         overflow: hidden;
+                        display: flex !important;
+                        flex-direction: column !important;
+                        flex-shrink: 0 !important;
+                    }
+                    .doc-decree {
+                        justify-content: center !important;
+                        align-items: center !important;
                     }
 
                     /* Ensure backgrounds and filters print correctly */

@@ -170,12 +170,21 @@ export default class DocumentsView {
             if (config.customFont.includes('fonts.googleapis.com')) {
                 fontStyle.innerHTML = `@import url('${config.customFont}');\n .font-custom { font-family: 'CustomFont', sans-serif; /* Fallback, specific font name handled below if possible, or relying on user config */ }`;
                 // To properly use google fonts without knowing the exact family name,
-                // we'll attempt to parse it, but standard `@import` is safest.
-                const urlObj = new URL(config.customFont);
-                const familyParam = urlObj.searchParams.get('family');
-                if (familyParam) {
-                    const familyName = familyParam.split(':')[0].replace(/\+/g, ' ');
-                    fontStyle.innerHTML += `\n.font-custom .doc-title, .font-custom .doc-body, .font-custom .doc-signature { font-family: '${familyName}', sans-serif !important; }`;
+                // we'll attempt to parse it safely.
+                try {
+                    // Ensure it has a protocol to be a valid URL for the parser
+                    let urlToParse = config.customFont;
+                    if (urlToParse.startsWith('//')) urlToParse = 'https:' + urlToParse;
+                    else if (!urlToParse.startsWith('http')) urlToParse = 'https://' + urlToParse;
+
+                    const urlObj = new URL(urlToParse);
+                    const familyParam = urlObj.searchParams.get('family');
+                    if (familyParam) {
+                        const familyName = familyParam.split(':')[0].replace(/\+/g, ' ');
+                        fontStyle.innerHTML += `\n.font-custom .doc-title, .font-custom .doc-body, .font-custom .doc-signature { font-family: '${familyName}', sans-serif !important; }`;
+                    }
+                } catch (e) {
+                    console.warn("Could not parse custom font URL for family name fallback", e);
                 }
             } else {
                  fontStyle.innerHTML = `
@@ -257,8 +266,8 @@ export default class DocumentsView {
             const minScale = 0.4; // Don't shrink below 40%
 
             // While the content overflows its container, shrink the text
-            // The .paper-page container is what imposes height boundaries
-            while ((inner.scrollHeight > container.clientHeight || inner.offsetHeight > container.clientHeight) && scale > minScale) {
+            // The inner element is what imposes height boundaries
+            while ((inner.scrollHeight > inner.clientHeight || inner.offsetHeight > inner.clientHeight) && scale > minScale) {
                 scale -= 0.05;
                 container.style.setProperty('--doc-scale', scale.toFixed(2));
             }
