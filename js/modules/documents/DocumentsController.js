@@ -52,6 +52,35 @@ export default class DocumentsController {
         if (btnExport) {
             btnExport.addEventListener('click', () => this.exportPDF());
         }
+
+        // Handle file uploads for custom textures and seals
+        const handleFileUpload = (inputId, configKey) => {
+            const fileInput = document.getElementById(inputId);
+            if (fileInput) {
+                fileInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            const newValues = this.view.getFormValues();
+                            newValues[configKey] = event.target.result;
+                            this.model.setConfig(newValues);
+                            this.view.renderWorkspace(this.model.getConfig());
+                            this.view.renderDocument(this.model.getConfig());
+                            this.attachEvents(); // Re-attach because workspace was re-rendered
+
+                            // Set focus back or manage state to avoid losing cursor
+                            const textInput = document.getElementById(`inp-${configKey.replace(/([A-Z])/g, "-$1").toLowerCase()}`);
+                            if(textInput) textInput.value = event.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+        };
+
+        handleFileUpload('inp-custom-texture-file', 'customTexture');
+        handleFileUpload('inp-custom-seal-file', 'customSeal');
     }
 
     async exportPDF() {
@@ -75,11 +104,24 @@ export default class DocumentsController {
 
         const config = this.model.getConfig();
 
+        const escapeHTML = (str) => {
+            return str.replace(/[&<>'"]/g,
+                tag => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    "'": '&#39;',
+                    '"': '&quot;'
+                }[tag] || tag)
+            );
+        };
+        const safeTitle = config.title ? escapeHTML(config.title) : 'Documento';
+
         const htmlContent = `
             <!DOCTYPE html>
             <html>
             <head>
-                <title>${config.title || 'Documento'}</title>
+                <title>${safeTitle}</title>
                 <!-- Load required external styles -->
                 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Special+Elite&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&family=Rye&display=swap" rel="stylesheet">
                 <link rel="stylesheet" href="${basePath}css/main.css">

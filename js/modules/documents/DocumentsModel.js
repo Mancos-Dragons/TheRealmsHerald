@@ -9,7 +9,10 @@ export default class DocumentsModel {
             signature: '',
             seal: 'ph-crown',
             texture: 'texture-clean',
-            font: 'font-royal'
+            font: 'font-royal',
+            customTexture: '',
+            customFont: '',
+            customSeal: ''
         };
         this.STORAGE_KEY = 'trh_documents_data';
     }

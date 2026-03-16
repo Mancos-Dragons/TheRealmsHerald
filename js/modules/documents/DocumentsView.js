@@ -38,7 +38,14 @@ export default class DocumentsView {
                                 <select id="inp-texture" class="${inputClass} cursor-pointer">
                                     <option value="texture-clean" ${config.texture === 'texture-clean' ? 'selected' : ''} data-i18n="docs.texture.clean">${t('docs.texture.clean')}</option>
                                     <option value="texture-gritty" ${config.texture === 'texture-gritty' ? 'selected' : ''} data-i18n="docs.texture.gritty">${t('docs.texture.gritty')}</option>
+                                    <option value="texture-custom" ${config.texture === 'texture-custom' ? 'selected' : ''} data-i18n="docs.texture.custom">Personalizada</option>
                                 </select>
+                            </div>
+
+                            <div id="opts-custom-texture" class="${config.texture === 'texture-custom' ? '' : 'hidden'}">
+                                <label class="${labelClass}">URL o Archivo de Textura</label>
+                                <input type="text" id="inp-custom-texture" class="${inputClass} mb-1" value="${config.customTexture || ''}" placeholder="URL de imagen...">
+                                <input type="file" id="inp-custom-texture-file" class="w-full text-xs text-gray-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-amber-700 file:text-white hover:file:bg-amber-600 cursor-pointer" accept="image/*">
                             </div>
 
                             <div>
@@ -46,7 +53,13 @@ export default class DocumentsView {
                                 <select id="inp-font" class="${inputClass} cursor-pointer">
                                     <option value="font-royal" ${config.font === 'font-royal' ? 'selected' : ''} data-i18n="docs.font.royal">${t('docs.font.royal')}</option>
                                     <option value="font-script" ${config.font === 'font-script' ? 'selected' : ''} data-i18n="docs.font.script">${t('docs.font.script')}</option>
+                                    <option value="font-custom" ${config.font === 'font-custom' ? 'selected' : ''} data-i18n="docs.font.custom">Personalizada</option>
                                 </select>
+                            </div>
+
+                            <div id="opts-custom-font" class="${config.font === 'font-custom' ? '' : 'hidden'}">
+                                <label class="${labelClass}">URL de Fuente (CSS o archivo)</label>
+                                <input type="text" id="inp-custom-font" class="${inputClass}" value="${config.customFont || ''}" placeholder="URL de Google Fonts o .ttf...">
                             </div>
 
                             <div>
@@ -67,6 +80,12 @@ export default class DocumentsView {
                             <div id="opts-seal" class="${config.type === 'decree' ? '' : 'hidden'}">
                                 <label class="${labelClass}" data-i18n="docs.seal">${t('docs.seal')}</label>
                                 <input type="text" id="inp-seal" class="${inputClass}" value="${config.seal || ''}" placeholder="Ej: ph-crown">
+                            </div>
+
+                            <div id="opts-custom-seal" class="${config.type === 'decree' ? '' : 'hidden'}">
+                                <label class="${labelClass}">Sello de Cera (Archivo o URL)</label>
+                                <input type="text" id="inp-custom-seal" class="${inputClass} mb-1" value="${config.customSeal || ''}" placeholder="Opcional. URL de imagen...">
+                                <input type="file" id="inp-custom-seal-file" class="w-full text-xs text-gray-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-amber-700 file:text-white hover:file:bg-amber-600 cursor-pointer" accept="image/*">
                             </div>
 
                             <button type="button" id="btn-export-pdf" class="${btnClass}">
@@ -99,6 +118,9 @@ export default class DocumentsView {
             seal: document.getElementById('inp-seal')?.value || 'ph-crown',
             texture: document.getElementById('inp-texture')?.value || 'texture-clean',
             font: document.getElementById('inp-font')?.value || 'font-royal',
+            customTexture: document.getElementById('inp-custom-texture')?.value || '',
+            customFont: document.getElementById('inp-custom-font')?.value || '',
+            customSeal: document.getElementById('inp-custom-seal')?.value || ''
         };
     }
 
@@ -106,17 +128,70 @@ export default class DocumentsView {
         const previewContainer = document.getElementById('document-preview');
         if (!previewContainer) return;
 
-        // Show/hide seal field based on type
+        // Show/hide dynamic fields
         const sealOpts = document.getElementById('opts-seal');
+        const customSealOpts = document.getElementById('opts-custom-seal');
+        const customTextureOpts = document.getElementById('opts-custom-texture');
+        const customFontOpts = document.getElementById('opts-custom-font');
+
         if (sealOpts) {
-            if (config.type === 'decree') {
-                sealOpts.classList.remove('hidden');
-            } else {
-                sealOpts.classList.add('hidden');
-            }
+            sealOpts.classList.toggle('hidden', config.type !== 'decree');
+        }
+        if (customSealOpts) {
+            customSealOpts.classList.toggle('hidden', config.type !== 'decree');
+        }
+        if (customTextureOpts) {
+            customTextureOpts.classList.toggle('hidden', config.texture !== 'texture-custom');
+        }
+        if (customFontOpts) {
+            customFontOpts.classList.toggle('hidden', config.font !== 'font-custom');
         }
 
         previewContainer.className = `paper-page ${config.texture} ${config.font} doc-${config.type}`;
+
+        if (config.texture === 'texture-custom' && config.customTexture) {
+            previewContainer.style.backgroundImage = `url('${config.customTexture}')`;
+            previewContainer.style.backgroundSize = 'cover';
+        } else {
+            previewContainer.style.backgroundImage = '';
+            previewContainer.style.backgroundSize = '';
+        }
+
+        // Handle Custom Fonts (Dynamic Injection)
+        if (config.font === 'font-custom' && config.customFont) {
+            let fontId = 'custom-doc-font';
+            let fontStyle = document.getElementById(fontId);
+            if (!fontStyle) {
+                fontStyle = document.createElement('style');
+                fontStyle.id = fontId;
+                document.head.appendChild(fontStyle);
+            }
+
+            if (config.customFont.includes('fonts.googleapis.com')) {
+                fontStyle.innerHTML = `@import url('${config.customFont}');\n .font-custom { font-family: 'CustomFont', sans-serif; /* Fallback, specific font name handled below if possible, or relying on user config */ }`;
+                // To properly use google fonts without knowing the exact family name,
+                // we'll attempt to parse it, but standard `@import` is safest.
+                const urlObj = new URL(config.customFont);
+                const familyParam = urlObj.searchParams.get('family');
+                if (familyParam) {
+                    const familyName = familyParam.split(':')[0].replace(/\+/g, ' ');
+                    fontStyle.innerHTML += `\n.font-custom .doc-title, .font-custom .doc-body, .font-custom .doc-signature { font-family: '${familyName}', sans-serif !important; }`;
+                }
+            } else {
+                 fontStyle.innerHTML = `
+                    @font-face {
+                        font-family: 'UserCustomFont';
+                        src: url('${config.customFont}');
+                    }
+                    .font-custom .doc-title, .font-custom .doc-body, .font-custom .doc-signature {
+                        font-family: 'UserCustomFont', sans-serif !important;
+                    }
+                `;
+            }
+        } else {
+             const fontStyle = document.getElementById('custom-doc-font');
+             if (fontStyle) fontStyle.remove();
+        }
 
         const escapeHTML = (str) => {
             return str.replace(/[&<>'"]/g,
@@ -134,17 +209,21 @@ export default class DocumentsView {
         const safeTitle = config.title ? escapeHTML(config.title) : '';
         const safeSignature = config.signature ? escapeHTML(config.signature) : '';
         const safeSeal = config.seal ? escapeHTML(config.seal) : '';
+        const safeCustomSeal = config.customSeal ? escapeHTML(config.customSeal) : '';
 
         let content = '';
         if (config.type === 'decree') {
             let sealContent = safeSeal;
-            if (safeSeal.startsWith('ph-')) {
+            if (config.customSeal) {
+                // If custom seal is provided, use it as background image for the seal container
+                sealContent = ''; // Empty out icon
+            } else if (safeSeal.startsWith('ph-')) {
                 sealContent = `<i class="ph ${safeSeal}"></i>`;
             }
 
             content = `
                 <div class="doc-decree-inner">
-                    <div class="doc-seal">${sealContent}</div>
+                    <div class="doc-seal" ${config.customSeal ? `style="background-image: url('${safeCustomSeal}'); background-size: cover; background-position: center;"` : ''}>${sealContent}</div>
                     <h1 class="doc-title">${safeTitle}</h1>
                     <div class="doc-body">${safeBody}</div>
                     ${safeSignature ? `<div class="doc-signature">Fdo: ${safeSignature}</div>` : ''}
@@ -161,5 +240,28 @@ export default class DocumentsView {
         }
 
         previewContainer.innerHTML = content;
+        this.autoFitText(previewContainer);
+    }
+
+    autoFitText(container) {
+        // Find inner wrappers to check scroll height
+        const inner = container.querySelector('.doc-decree-inner, .doc-letter-inner');
+        if (!inner) return;
+
+        // Reset scale first
+        container.style.setProperty('--doc-scale', '1');
+
+        // Use a slight timeout to let DOM updates reflect actual sizes
+        setTimeout(() => {
+            let scale = 1.0;
+            const minScale = 0.4; // Don't shrink below 40%
+
+            // While the content overflows its container, shrink the text
+            // The .paper-page container is what imposes height boundaries
+            while ((inner.scrollHeight > container.clientHeight || inner.offsetHeight > container.clientHeight) && scale > minScale) {
+                scale -= 0.05;
+                container.style.setProperty('--doc-scale', scale.toFixed(2));
+            }
+        }, 10);
     }
 }

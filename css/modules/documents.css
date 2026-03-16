@@ -15,6 +15,8 @@
     border: 1px solid #d4c49c;
     transition: all 0.3s ease;
     box-sizing: border-box;
+    container-type: inline-size;
+    --doc-scale: 1;
 }
 
 .texture-clean {
@@ -61,20 +63,23 @@
 }
 
 .doc-decree .doc-title {
-    font-size: 3rem;
+    font-size: calc(clamp(2rem, 5cqw, 3rem) * var(--doc-scale));
     text-align: center;
     border-bottom: 2px solid #d4af37;
     padding-bottom: 5mm;
     margin-bottom: 10mm;
     text-transform: uppercase;
+    word-break: break-word;
 }
 
 .doc-decree .doc-body {
-    font-size: 1.4rem;
+    font-size: calc(clamp(1rem, 2.5cqw, 1.4rem) * var(--doc-scale));
     font-style: italic;
     line-height: 1.8;
     text-align: center;
     flex-grow: 1;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
 }
 
 .doc-decree .doc-seal {
@@ -90,11 +95,12 @@
     color: rgba(0,0,0,0.3);
     font-size: 3rem;
     border: 2px dashed rgba(255,255,255,0.2);
+    flex-shrink: 0;
 }
 
 .doc-decree .doc-signature {
     margin-top: 10mm;
-    font-size: 1.5rem;
+    font-size: calc(1.5rem * var(--doc-scale));
     align-self: flex-end;
 }
 
@@ -108,20 +114,23 @@
 }
 
 .doc-letter .doc-title {
-    font-size: 2.5rem;
+    font-size: calc(clamp(2rem, 4cqw, 2.5rem) * var(--doc-scale));
     margin-bottom: 10mm;
     text-align: center;
+    word-break: break-word;
 }
 
 .doc-letter .doc-body {
-    font-size: 1.5rem;
+    font-size: calc(clamp(1rem, 2cqw, 1.5rem) * var(--doc-scale));
     line-height: 2;
     text-align: justify;
     flex-grow: 1;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
 }
 
 .doc-letter .doc-signature {
     margin-top: 15mm;
-    font-size: 2rem;
+    font-size: calc(2rem * var(--doc-scale));
     text-align: right;
 }
