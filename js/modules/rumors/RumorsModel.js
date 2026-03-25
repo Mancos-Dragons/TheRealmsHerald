@@ -7,241 +7,81 @@ export default class RumorsModel {
         this.defaultNpcName = { es: "Desconocido", en: "Unknown" };
         this.defaultNpcRole = { es: "Viajero", en: "Traveler" };
 
-        // 100 localized templates per language for variety
-        this.templates = {
-            es: [
-                "Se dice que {npcName}, el {npcRole} de {townName}, fue visto haciendo tratos oscuros cerca del bosque viejo a medianoche.",
-                "Algunos murmuran que {npcName} (el {npcRole}) sabe dónde está el tesoro perdido de {townName}, pero tiene demasiado miedo para hablar.",
-                "Anoche hubo ruidos extraños en {townName}. Creen que {npcName}, nuestro {npcRole}, está invocando fuerzas que no comprende.",
-                "Un mercader forastero llegó a {townName} preguntando específicamente por {npcName}, el {npcRole}. Parecía muy enojado.",
-                "Dicen las malas lenguas en {townName} que {npcName}, el {npcRole}, no es quien dice ser y que en realidad es un espía del reino vecino.",
-                "En la última luna llena, se vio a {npcName}, el {npcRole} de {townName}, desenterrando algo en el viejo cementerio.",
-                "Los cuervos en {townName} no paran de graznar desde que {npcName}, el {npcRole}, trajo esa extraña reliquia a su casa.",
-                "Hay rumores de que {npcName}, el {npcRole}, está fabricando venenos para un asesino a sueldo en {townName}.",
-                "Nadie confía en {npcName}, el {npcRole}. Se dice que hizo un pacto con un demonio de encrucijada cerca de {townName}.",
-                "Se rumorea en {townName} que {npcName}, el {npcRole}, es el heredero perdido de una nobleza caída en desgracia.",
-                "Los niños de {townName} dicen que {npcName}, el {npcRole}, habla con los árboles y que los árboles le responden.",
-                "Un guardia en {townName} asegura que vio a {npcName}, el {npcRole}, desvanecerse en las sombras durante su ronda.",
-                "Dicen que si le pagas el precio correcto a {npcName}, el {npcRole} de {townName}, puede hacer que cualquiera desaparezca sin dejar rastro.",
-                "Las cosechas en {townName} se han echado a perder y muchos culpan a la 'magia negra' de {npcName}, el {npcRole}.",
-                "Un mendigo ciego en {townName} jura que {npcName}, el {npcRole}, no tiene sombra al mediodía.",
-                "Se comenta que la riqueza repentina de {npcName}, el {npcRole} de {townName}, proviene del contrabando de polvo de hadas.",
-                "Nadie sabe de dónde vino realmente {npcName}, el {npcRole}, pero apareció en {townName} el mismo día que desapareció el alcalde anterior.",
-                "En la taberna de {townName} se susurra que {npcName}, el {npcRole}, fue visto bebiendo sangre de un cáliz profano.",
-                "Dicen que el perro de {npcName}, el {npcRole} de {townName}, es en realidad un familiar demoníaco.",
-                "Las cartas de tarot de la vidente local de {townName} siempre muestran la carta de la Muerte cuando se pregunta por {npcName}, el {npcRole}.",
-                "Una extraña melodía sale de la casa de {npcName}, el {npcRole} en {townName}, a altas horas de la noche.",
-                "Se rumorea que el pozo de {townName} está maldito desde que {npcName}, el {npcRole}, tiró algo brillando en él.",
-                "Los viajeros que pasan por {townName} afirman que {npcName}, el {npcRole}, les ofreció un mapa hacia una ciudad de oro escondida.",
-                "Dicen que {npcName}, el {npcRole} de {townName}, es en realidad un dragón que tomó forma humana.",
-                "Alguien encontró un extraño símbolo tallado en la puerta de {npcName}, el {npcRole} en {townName}. Algunos dicen que es la marca del Culto del Ojo.",
-                "Se comenta en el mercado de {townName} que {npcName}, el {npcRole}, tiene un mapa antiguo tatuado en la espalda.",
-                "Los lobos aúllan cada vez que {npcName}, el {npcRole}, entra al bosque en las afueras de {townName}.",
-                "Se dice que las herramientas de {npcName}, el {npcRole} en {townName}, se mueven solas cuando no hay nadie mirando.",
-                "Nadie ha visto a la familia de {npcName}, el {npcRole} de {townName}, desde el solsticio de invierno.",
-                "Un cazador encontró la ropa de {npcName}, el {npcRole}, rasgada y cubierta de sangre cerca del río de {townName}, pero {npcName} estaba ileso en el pueblo.",
-                "Se rumorea que {npcName}, el {npcRole} de {townName}, colecciona almas en frascos de cristal.",
-                "Un elfo ermitaño cerca de {townName} afirma que {npcName}, el {npcRole}, es una abominación encubierta.",
-                "Las luces de la casa de {npcName}, el {npcRole} en {townName}, parpadean con un color morado antinatural.",
-                "Se dice que el espejo de la habitación de {npcName}, el {npcRole} de {townName}, no refleja su rostro.",
-                "El panadero de {townName} asegura que las monedas que le da {npcName}, el {npcRole}, se convierten en hojas secas a la mañana siguiente.",
-                "Se escucha que {npcName}, el {npcRole} de {townName}, tiene un hermano gemelo malvado encerrado en su sótano.",
-                "Las estatuas del templo de {townName} parecen llorar sangre cada vez que {npcName}, el {npcRole}, entra a rezar.",
-                "Un ladrón en {townName} intentó robar a {npcName}, el {npcRole}, y terminó loco, hablando de ojos en la oscuridad.",
-                "Dicen que si le susurras un secreto a {npcName}, el {npcRole} de {townName}, se te olvida para siempre.",
-                "La tabernera de {townName} jura que vio a {npcName}, el {npcRole}, caminando por el techo como una araña.",
-                "Se rumorea que el gremio de ladrones de {townName} está aterrorizado de {npcName}, el {npcRole}.",
-                "El viejo loco del puente cerca de {townName} no para de gritar el nombre de {npcName}, el {npcRole}, a los viajeros.",
-                "Se dice que las plantas se marchitan al paso de {npcName}, el {npcRole} de {townName}.",
-                "Alguien robó la campana del ayuntamiento de {townName} y todos señalan a {npcName}, el {npcRole}.",
-                "Un barco fantasma fue visto en la costa cerca de {townName}, y {npcName}, el {npcRole}, es el único que parecía esperarlo.",
-                "Las cicatrices en el rostro de {npcName}, el {npcRole} de {townName}, cambian de forma cada semana, según los rumores.",
-                "Se dice que {npcName}, el {npcRole} de {townName}, habla fluidamente el idioma de los muertos.",
-                "El herrero de {townName} se niega a trabajar para {npcName}, el {npcRole}, diciendo que su dinero está maldito.",
-                "Dicen que los ojos de {npcName}, el {npcRole} en {townName}, brillan en la oscuridad con un amarillo enfermizo.",
-                "Se comenta que la última esposa de {npcName}, el {npcRole} de {townName}, fue vista huyendo hacia las montañas.",
-                "Un extraño olor a azufre persigue a {npcName}, el {npcRole}, donde quiera que vaya en {townName}.",
-                "Se rumorea que {npcName}, el {npcRole} de {townName}, encontró la entrada a la Ciudad Subterránea.",
-                "El alcalde de {townName} recibe cartas amenazantes y todas apuntan a {npcName}, el {npcRole}.",
-                "Dicen que la verdadera edad de {npcName}, el {npcRole} de {townName}, es de más de trescientos años.",
-                "Un meteorito cayó cerca de {townName} y {npcName}, el {npcRole}, fue el primero en llegar al cráter.",
-                "Las ovejas en {townName} se niegan a acercarse a {npcName}, el {npcRole}.",
-                "Se dice que {npcName}, el {npcRole} de {townName}, tiene el corazón de un troll en un cofre cerrado.",
-                "Un aventurero en la taberna de {townName} jura que {npcName}, el {npcRole}, es el mismo hombre que lo traicionó hace diez años.",
-                "Dicen que la sangre de {npcName}, el {npcRole} de {townName}, es negra como la brea.",
-                "Se rumorea que el verdadero líder del culto de {townName} no es otro que {npcName}, el {npcRole}.",
-                "Los relojes en {townName} se detienen cuando {npcName}, el {npcRole}, pasa caminando.",
-                "Se dice que {npcName}, el {npcRole} de {townName}, puede predecir la muerte de una persona con solo mirarla.",
-                "Nadie ha visto a {npcName}, el {npcRole} de {townName}, comer ni beber nada en años.",
-                "Las sombras en la casa de {npcName}, el {npcRole} en {townName}, parecen moverse por sí solas.",
-                "Un mapa misterioso fue encontrado en {townName} y tiene el nombre de {npcName}, el {npcRole}, escrito en sangre.",
-                "Dicen que la voz de {npcName}, el {npcRole} de {townName}, puede hipnotizar a los débiles de mente.",
-                "El cementerio de {townName} ha sido profanado repetidamente y sospechan de {npcName}, el {npcRole}.",
-                "Se rumorea que las joyas que vende {npcName}, el {npcRole} en {townName}, traen desgracia a sus compradores.",
-                "Las aves migratorias evitan pasar por encima de la casa de {npcName}, el {npcRole} en {townName}.",
-                "Dicen que si miras a los ojos a {npcName}, el {npcRole} de {townName}, verás tu propia muerte.",
-                "Un libro de hechizos prohibidos fue robado en la biblioteca de {townName} y acusan a {npcName}, el {npcRole}.",
-                "Se dice que el fuego no quema a {npcName}, el {npcRole} de {townName}.",
-                "El pozo seco de {townName} empezó a dar agua cristalina después de que {npcName}, el {npcRole}, derramara una pócima en él.",
-                "Dicen que la espada que lleva {npcName}, el {npcRole} de {townName}, tiene vida propia.",
-                "Un fantasma en las ruinas cerca de {townName} llora el nombre de {npcName}, el {npcRole}.",
-                "Se rumorea que la verdadera identidad de {npcName}, el {npcRole} en {townName}, es la de un rey exiliado.",
-                "Nadie puede recordar cómo llegó {npcName}, el {npcRole}, a {townName} por primera vez.",
-                "Las heridas de {npcName}, el {npcRole} de {townName}, parecen curarse a una velocidad antinatural.",
-                "Dicen que un pacto oscuro protege a {npcName}, el {npcRole} de {townName}, de cualquier daño físico.",
-                "Se comenta en la corte de {townName} que {npcName}, el {npcRole}, está manipulando al consejo de ancianos.",
-                "Un artefacto robado del museo de {townName} apareció extrañamente en manos de {npcName}, el {npcRole}.",
-                "Las moscas siempre parecen rodear la casa de {npcName}, el {npcRole} en {townName}.",
-                "Se dice que la sonrisa de {npcName}, el {npcRole} de {townName}, te hiela la sangre.",
-                "Un niño en {townName} afirma que {npcName}, el {npcRole}, se transforma en lobo por las noches.",
-                "Dicen que el diario de {npcName}, el {npcRole} de {townName}, contiene los secretos más oscuros de todos los habitantes.",
-                "La lluvia parece evitar mojar a {npcName}, el {npcRole} en {townName}.",
-                "Se rumorea que la fortuna de {npcName}, el {npcRole} de {townName}, fue construida sobre la traición y el asesinato.",
-                "Un pergamino maldito fue entregado al sabio de {townName} y se cree que fue obra de {npcName}, el {npcRole}.",
-                "Dicen que la puerta de la casa de {npcName}, el {npcRole} en {townName}, no puede ser abierta con ninguna llave.",
-                "Las pesadillas de los habitantes de {townName} comenzaron cuando {npcName}, el {npcRole}, llegó al pueblo.",
-                "Se comenta que la verdadera lealtad de {npcName}, el {npcRole} de {townName}, es hacia el Rey Liche.",
-                "Un cazador de demonios llegó a {townName} buscando a {npcName}, el {npcRole}.",
-                "Dicen que el amuleto que lleva {npcName}, el {npcRole} de {townName}, emite un brillo rojo cuando hay peligro cerca.",
-                "Se rumorea que las pociones que prepara {npcName}, el {npcRole} en {townName}, tienen efectos secundarios horribles.",
-                "El agua bendita se evapora si {npcName}, el {npcRole} de {townName}, la toca.",
-                "Dicen que un cuervo gigante visita la ventana de {npcName}, el {npcRole} en {townName}, todas las madrugadas.",
-                "Nadie se atreve a desafiar a {npcName}, el {npcRole} de {townName}, por miedo a su terrible venganza.",
-                "Se dice que el sótano de {npcName}, el {npcRole} en {townName}, esconde un portal a otro mundo.",
-                "Las estrellas parecen alinearse extrañamente sobre la casa de {npcName}, el {npcRole} de {townName}.",
-                "Un bardo fue expulsado de {townName} por cantar una canción sobre los pecados de {npcName}, el {npcRole}.",
-                "Se rumorea que el destino de {townName} está atado irremediablemente a la vida de {npcName}, el {npcRole}."
-            ],
-            en: [
-                "They say {npcName}, the {npcRole} from {townName}, was seen making dark deals near the old forest at midnight.",
-                "Some whisper that {npcName} (the {npcRole}) knows where the lost treasure of {townName} is, but is too afraid to speak.",
-                "There were strange noises in {townName} last night. They think {npcName}, our {npcRole}, is summoning forces they don't understand.",
-                "A foreign merchant arrived in {townName} asking specifically for {npcName}, the {npcRole}. He seemed very angry.",
-                "Rumor has it in {townName} that {npcName}, the {npcRole}, is not who they claim to be and is actually a spy from the neighboring kingdom.",
-                "On the last full moon, {npcName}, the {npcRole} of {townName}, was seen digging something up in the old graveyard.",
-                "The crows in {townName} haven't stopped cawing since {npcName}, the {npcRole}, brought that strange relic to their house.",
-                "There are rumors that {npcName}, the {npcRole}, is crafting poisons for a hired assassin in {townName}.",
-                "Nobody trusts {npcName}, the {npcRole}. It's said they made a pact with a crossroad demon near {townName}.",
-                "Word around {townName} is that {npcName}, the {npcRole}, is the lost heir of a disgraced noble family.",
-                "The children of {townName} say that {npcName}, the {npcRole}, talks to the trees and the trees talk back.",
-                "A guard in {townName} swears he saw {npcName}, the {npcRole}, vanish into the shadows during his patrol.",
-                "They say if you pay the right price to {npcName}, the {npcRole} from {townName}, they can make anyone disappear without a trace.",
-                "The crops in {townName} have rotted and many blame the 'black magic' of {npcName}, the {npcRole}.",
-                "A blind beggar in {townName} swears that {npcName}, the {npcRole}, casts no shadow at noon.",
-                "It's commented that the sudden wealth of {npcName}, the {npcRole} of {townName}, comes from smuggling fairy dust.",
-                "No one knows where {npcName}, the {npcRole}, really came from, but they appeared in {townName} the exact same day the previous mayor disappeared.",
-                "In the tavern of {townName} it's whispered that {npcName}, the {npcRole}, was seen drinking blood from a profane chalice.",
-                "They say that the dog of {npcName}, the {npcRole} of {townName}, is actually a demonic familiar.",
-                "The tarot cards of the local seer in {townName} always show the Death card when asked about {npcName}, the {npcRole}.",
-                "A strange melody comes from the house of {npcName}, the {npcRole} in {townName}, late at night.",
-                "It's rumored that the well in {townName} is cursed ever since {npcName}, the {npcRole}, dropped something glowing into it.",
-                "Travelers passing through {townName} claim {npcName}, the {npcRole}, offered them a map to a hidden city of gold.",
-                "They say {npcName}, the {npcRole} of {townName}, is actually a dragon that took human form.",
-                "Someone found a strange symbol carved on the door of {npcName}, the {npcRole} in {townName}. Some say it's the mark of the Eye Cult.",
-                "It's discussed in the market of {townName} that {npcName}, the {npcRole}, has an ancient map tattooed on their back.",
-                "The wolves howl every time {npcName}, the {npcRole}, enters the forest on the outskirts of {townName}.",
-                "It's said the tools of {npcName}, the {npcRole} in {townName}, move by themselves when nobody is looking.",
-                "No one has seen the family of {npcName}, the {npcRole} of {townName}, since the winter solstice.",
-                "A hunter found the clothes of {npcName}, the {npcRole}, torn and covered in blood near the river of {townName}, but {npcName} was unharmed in town.",
-                "It's rumored that {npcName}, the {npcRole} of {townName}, collects souls in glass jars.",
-                "A hermit elf near {townName} claims {npcName}, the {npcRole}, is a hidden abomination.",
-                "The lights in the house of {npcName}, the {npcRole} in {townName}, flicker with an unnatural purple color.",
-                "It's said the mirror in the room of {npcName}, the {npcRole} of {townName}, doesn't reflect their face.",
-                "The baker of {townName} swears that the coins {npcName}, the {npcRole}, gives him turn into dry leaves the next morning.",
-                "It is heard that {npcName}, the {npcRole} of {townName}, has an evil twin brother locked in their basement.",
-                "The statues in the temple of {townName} seem to weep blood every time {npcName}, the {npcRole}, enters to pray.",
-                "A thief in {townName} tried to rob {npcName}, the {npcRole}, and ended up mad, mumbling about eyes in the dark.",
-                "They say if you whisper a secret to {npcName}, the {npcRole} of {townName}, you forget it forever.",
-                "The barkeep of {townName} swears she saw {npcName}, the {npcRole}, walking on the ceiling like a spider.",
-                "It is rumored that the thieves guild of {townName} is terrified of {npcName}, the {npcRole}.",
-                "The mad old man by the bridge near {townName} won't stop screaming the name of {npcName}, the {npcRole}, at travelers.",
-                "It's said that plants wither in the wake of {npcName}, the {npcRole} of {townName}.",
-                "Someone stole the town hall bell of {townName} and everyone points to {npcName}, the {npcRole}.",
-                "A ghost ship was seen on the coast near {townName}, and {npcName}, the {npcRole}, is the only one who seemed to expect it.",
-                "The scars on the face of {npcName}, the {npcRole} of {townName}, change shape every week, according to rumors.",
-                "It's said that {npcName}, the {npcRole} of {townName}, speaks the language of the dead fluently.",
-                "The blacksmith of {townName} refuses to work for {npcName}, the {npcRole}, claiming their money is cursed.",
-                "They say the eyes of {npcName}, the {npcRole} in {townName}, glow in the dark with a sickly yellow.",
-                "It is commented that the last spouse of {npcName}, the {npcRole} of {townName}, was seen fleeing towards the mountains.",
-                "A strange smell of brimstone follows {npcName}, the {npcRole}, wherever they go in {townName}.",
-                "It's rumored that {npcName}, the {npcRole} of {townName}, found the entrance to the Underground City.",
-                "The mayor of {townName} is receiving threatening letters and they all point to {npcName}, the {npcRole}.",
-                "They say the true age of {npcName}, the {npcRole} of {townName}, is over three hundred years.",
-                "A meteorite fell near {townName} and {npcName}, the {npcRole}, was the first to reach the crater.",
-                "The sheep in {townName} refuse to go near {npcName}, the {npcRole}.",
-                "It is said that {npcName}, the {npcRole} of {townName}, keeps a troll's heart in a locked chest.",
-                "An adventurer in the tavern of {townName} swears {npcName}, the {npcRole}, is the same person who betrayed him ten years ago.",
-                "They say the blood of {npcName}, the {npcRole} of {townName}, is black as pitch.",
-                "It's rumored that the true leader of the cult in {townName} is none other than {npcName}, the {npcRole}.",
-                "The clocks in {townName} stop ticking when {npcName}, the {npcRole}, walks by.",
-                "It's said that {npcName}, the {npcRole} of {townName}, can predict a person's death just by looking at them.",
-                "Nobody has seen {npcName}, the {npcRole} of {townName}, eat or drink anything in years.",
-                "The shadows in the house of {npcName}, the {npcRole} in {townName}, seem to move on their own.",
-                "A mysterious map was found in {townName} and it has the name of {npcName}, the {npcRole}, written in blood.",
-                "They say the voice of {npcName}, the {npcRole} of {townName}, can hypnotize the weak-minded.",
-                "The cemetery of {townName} has been desecrated repeatedly and they suspect {npcName}, the {npcRole}.",
-                "It's rumored that the jewels {npcName}, the {npcRole} sells in {townName}, bring misfortune to their buyers.",
-                "Migratory birds avoid flying over the house of {npcName}, the {npcRole} in {townName}.",
-                "They say if you look into the eyes of {npcName}, the {npcRole} of {townName}, you will see your own death.",
-                "A forbidden spellbook was stolen from the library of {townName} and they accuse {npcName}, the {npcRole}.",
-                "It is said that fire does not burn {npcName}, the {npcRole} of {townName}.",
-                "The dry well of {townName} began giving crystal clear water after {npcName}, the {npcRole}, poured a potion into it.",
-                "They say the sword {npcName}, the {npcRole} of {townName} carries, has a mind of its own.",
-                "A ghost in the ruins near {townName} cries out the name of {npcName}, the {npcRole}.",
-                "It's rumored that the true identity of {npcName}, the {npcRole} in {townName}, is that of an exiled king.",
-                "Nobody can remember how {npcName}, the {npcRole}, came to {townName} for the first time.",
-                "The wounds of {npcName}, the {npcRole} of {townName}, seem to heal at an unnatural speed.",
-                "They say a dark pact protects {npcName}, the {npcRole} of {townName}, from any physical harm.",
-                "It is commented in the court of {townName} that {npcName}, the {npcRole}, is manipulating the council of elders.",
-                "A stolen artifact from the museum of {townName} strangely appeared in the hands of {npcName}, the {npcRole}.",
-                "Flies always seem to surround the house of {npcName}, the {npcRole} in {townName}.",
-                "It is said that the smile of {npcName}, the {npcRole} of {townName}, chills your blood.",
-                "A child in {townName} claims {npcName}, the {npcRole}, turns into a wolf at night.",
-                "They say the diary of {npcName}, the {npcRole} of {townName}, contains the darkest secrets of all the inhabitants.",
-                "The rain seems to avoid getting {npcName}, the {npcRole} wet in {townName}.",
-                "It's rumored that the fortune of {npcName}, the {npcRole} of {townName}, was built upon betrayal and murder.",
-                "A cursed scroll was delivered to the sage of {townName} and it's believed to be the work of {npcName}, the {npcRole}.",
-                "They say the door to the house of {npcName}, the {npcRole} in {townName}, cannot be opened by any key.",
-                "The nightmares of the residents of {townName} began when {npcName}, the {npcRole}, arrived in town.",
-                "It is commented that the true loyalty of {npcName}, the {npcRole} of {townName}, lies with the Lich King.",
-                "A demon hunter arrived in {townName} looking for {npcName}, the {npcRole}.",
-                "They say the amulet worn by {npcName}, the {npcRole} of {townName}, emits a red glow when danger is near.",
-                "It's rumored that the potions brewed by {npcName}, the {npcRole} in {townName}, have horrible side effects.",
-                "Holy water evaporates if {npcName}, the {npcRole} of {townName}, touches it.",
-                "They say a giant raven visits the window of {npcName}, the {npcRole} in {townName}, every dawn.",
-                "No one dares to challenge {npcName}, the {npcRole} of {townName}, for fear of their terrible vengeance.",
-                "It is said the basement of {npcName}, the {npcRole} in {townName}, hides a portal to another world.",
-                "The stars seem to align strangely over the house of {npcName}, the {npcRole} of {townName}.",
-                "A bard was chased out of {townName} for singing a song about the sins of {npcName}, the {npcRole}.",
-                "It's rumored that the fate of {townName} is inextricably tied to the life of {npcName}, the {npcRole}."
-            ]
-        };
-
-        this.plotHooks = {
-            es: [
-                "Gancho de Aventura: Si los jugadores investigan el área, encontrarán huellas misteriosas que llevan a una cueva oculta.",
-                "Gancho de Aventura: El PNJ negará todo rotundamente y se pondrá a la defensiva si se le presiona, pero su diario contiene pistas vitales.",
-                "Gancho de Aventura: Esto es solo un malentendido creado por un rival del PNJ para arruinar su reputación. El rival ofrecerá oro si los aventureros lo confirman.",
-                "Gancho de Aventura: Los rumores son ciertos. El PNJ está bajo los efectos de un encantamiento y necesita ser rescatado o detenido antes del próximo eclipse.",
-                "Gancho de Aventura: El PNJ fue contratado en secreto por el alcalde para investigar la corrupción local, y el rumor es una trampa.",
-                "Gancho de Aventura: Los jugadores son atacados por mercenarios si preguntan demasiado sobre este rumor en la taberna.",
-                "Gancho de Aventura: El PNJ suplica ayuda a los jugadores porque está siendo extorsionado por un gremio de ladrones.",
-                "Gancho de Aventura: Un fantasma acecha a este PNJ, y solo al resolver un crimen antiguo el espíritu descansará.",
-                "Gancho de Aventura: El PNJ resulta ser un dragón de cobre disfrazado que solo busca entretenerse con mortales.",
-                "Gancho de Aventura: Una extraña plaga sigue a los pasos del PNJ; los aventureros deben encontrar una cura mítica."
-            ],
-            en: [
-                "Plot Hook: If the players investigate the area, they will find mysterious footprints leading to a hidden cave.",
-                "Plot Hook: The NPC will strongly deny everything and become defensive if pressed, but their diary contains vital clues.",
-                "Plot Hook: This is just a misunderstanding created by a rival of the NPC to ruin their reputation. The rival will offer gold if the adventurers confirm it.",
-                "Plot Hook: The rumors are true. The NPC is under an enchantment and needs to be rescued or stopped before the next eclipse.",
-                "Plot Hook: The NPC was secretly hired by the mayor to investigate local corruption, and the rumor is a trap.",
-                "Plot Hook: The players are attacked by mercenaries if they ask too many questions about this rumor in the tavern.",
-                "Plot Hook: The NPC begs the players for help because they are being blackmailed by a thieves guild.",
-                "Plot Hook: A ghost haunts this NPC, and only by solving an ancient crime will the spirit rest.",
-                "Plot Hook: The NPC turns out to be a copper dragon in disguise who is just looking to be entertained by mortals.",
-                "Plot Hook: A strange plague follows in the NPC's footsteps; the adventurers must find a mythical cure."
-            ]
+        this.grammar = {
+            es: {
+                intros: [
+                    "Se dice en la posada que",
+                    "Un mercader forastero jura que",
+                    "Dicen las malas lenguas de {townName} que",
+                    "Es un secreto a voces que",
+                    "Anoche escuché a dos guardias comentar que"
+                ],
+                subjects: [
+                    "{npcName}, el {npcRole},",
+                    "{npcName}, nuestro {npcRole},",
+                    "ese tal {npcName} (el {npcRole})",
+                    "el {npcRole} que llamamos {npcName}",
+                    "nadie menos que {npcName}, el {npcRole},"
+                ],
+                actions: [
+                    "hizo un pacto con entidades oscuras",
+                    "está escondiendo un tesoro robado",
+                    "planea asesinar al alcalde",
+                    "en realidad es un espía infiltrado",
+                    "descubrió una ruina antigua"
+                ],
+                locations: [
+                    "cerca del bosque viejo a medianoche.",
+                    "en los túneles debajo de {townName}.",
+                    "justo en las narices de la guardia.",
+                    "en el viejo cementerio.",
+                    "en las montañas del norte."
+                ],
+                hooks: [
+                    "Gancho de Aventura: Si los jugadores investigan el área, encontrarán huellas misteriosas.",
+                    "Gancho de Aventura: El PNJ negará todo rotundamente y se pondrá a la defensiva si se le presiona.",
+                    "Gancho de Aventura: Esto es solo un malentendido creado por un rival del PNJ para arruinar su reputación.",
+                    "Gancho de Aventura: Los rumores son ciertos. El PNJ está bajo los efectos de un encantamiento.",
+                    "Gancho de Aventura: Los jugadores son atacados por mercenarios si preguntan demasiado sobre este rumor en la taberna."
+                ]
+            },
+            en: {
+                intros: [
+                    "Word at the tavern is that",
+                    "A foreign merchant swears that",
+                    "Rumor has it in {townName} that",
+                    "It's an open secret that",
+                    "Last night I heard two guards whispering that"
+                ],
+                subjects: [
+                    "{npcName}, the {npcRole},",
+                    "{npcName}, our {npcRole},",
+                    "that {npcName} (the {npcRole})",
+                    "the {npcRole} we call {npcName}",
+                    "none other than {npcName}, the {npcRole},"
+                ],
+                actions: [
+                    "made a pact with dark entities",
+                    "is hiding stolen treasure",
+                    "plans to assassinate the mayor",
+                    "is actually an undercover spy",
+                    "discovered an ancient ruin"
+                ],
+                locations: [
+                    "near the old forest at midnight.",
+                    "in the tunnels beneath {townName}.",
+                    "right under the guard's nose.",
+                    "in the old graveyard.",
+                    "in the northern mountains."
+                ],
+                hooks: [
+                    "Plot Hook: If the players investigate the area, they will find mysterious footprints.",
+                    "Plot Hook: The NPC will strongly deny everything and become defensive if pressed.",
+                    "Plot Hook: This is just a misunderstanding created by a rival of the NPC to ruin their reputation.",
+                    "Plot Hook: The rumors are true. The NPC is under an enchantment.",
+                    "Plot Hook: The players are attacked by mercenaries if they ask too many questions about this rumor in the tavern."
+                ]
+            }
         };
     }
 
@@ -278,18 +118,25 @@ export default class RumorsModel {
         }
 
         // Fallback procedural generation
-        const temps = this.templates[lang] || this.templates['es'];
-        const hooks = this.plotHooks[lang] || this.plotHooks['es'];
+        const grammar = this.grammar[lang] || this.grammar['es'];
 
-        const templateIndex = Math.floor(Math.random() * temps.length);
-        const hookIndex = Math.floor(Math.random() * hooks.length);
+        const getRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-        let rumorText = temps[templateIndex];
+        let intro = getRandom(grammar.intros);
+        let subject = getRandom(grammar.subjects);
+        let action = getRandom(grammar.actions);
+        let location = getRandom(grammar.locations);
+        let hook = getRandom(grammar.hooks);
+
+        let rumorText = `${intro} ${subject} ${action} ${location}`;
+
         rumorText = rumorText.replace(/{townName}/g, town);
         rumorText = rumorText.replace(/{npcName}/g, name);
         rumorText = rumorText.replace(/{npcRole}/g, role);
 
-        const hookText = hooks[hookIndex];
+        let hookText = hook.replace(/{townName}/g, town);
+        hookText = hookText.replace(/{npcName}/g, name);
+        hookText = hookText.replace(/{npcRole}/g, role);
 
         return {
             rumor: rumorText,
