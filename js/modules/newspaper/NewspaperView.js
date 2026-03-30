@@ -134,6 +134,7 @@ export default class NewspaperView {
                                     <select id="inp-special-style" class="${inputClass}">
                                         <option value="style-wanted" data-i18n="news.special.wanted">${t('news.special.wanted')}</option>
                                         <option value="style-decree" data-i18n="news.special.decree">${t('news.special.decree')}</option>
+                                        <option value="style-obituary">Obituario Especial</option>
                                     </select>
                                 </div>
                                 <div>
@@ -370,6 +371,12 @@ export default class NewspaperView {
                     lblExtra.innerText = t('lbl.decree.auth');
                     lblImage.innerText = t('lbl.decree.image');
                     divDecreeSettings.classList.remove('hidden');
+                } else if (style === 'style-obituary') {
+                    lblTitle.innerText = 'Nombre del Difunto';
+                    lblBody.innerText = 'Palabras de Despedida';
+                    lblExtra.innerText = 'Firma/Familia';
+                    lblImage.innerText = 'Retrato';
+                    divDecreeSettings.classList.add('hidden');
                 } else {
                     lblTitle.innerText = t('lbl.wanted.name');
                     lblBody.innerText = t('lbl.wanted.desc');
@@ -486,6 +493,21 @@ export default class NewspaperView {
                         <p>${item.body}</p>
                     </div>
                     <div class="wanted-reward">${item.extra || 'REWARD'}</div>
+                `;
+            } else if (item.specialStyle === 'style-obituary') {
+                content = `
+                    <div style="border: 4px double #111; padding: 2rem; background-color: rgba(0,0,0,0.05); text-align: center;">
+                        <i class="ph ph-flower-lotus" style="font-size: 3rem; color: #333; margin-bottom: 1rem;"></i>
+                        <h2 class="headline" style="font-size: 2.5rem; text-transform: uppercase; letter-spacing: 2px; border-bottom: 2px solid #333; display: inline-block; padding-bottom: 5px; margin-bottom: 1.5rem;">In Memoriam</h2>
+                        ${item.image ? `<img src="${item.image}" class="news-img" style="max-height: 250px; border-radius: 50%; border: 3px solid #111; margin: 0 auto 1.5rem auto; width: 250px; object-fit: cover;">` : ''}
+                        <h3 style="font-size: 2rem; font-family: var(--font-royal); margin-bottom: 1rem;">${item.title}</h3>
+                        <div class="news-body" style="font-style: italic; font-size: 1.2rem; line-height: 1.8; max-width: 80%; margin: 0 auto; color: #222;">
+                            ${item.body.replace(/\n/g, '<br>')}
+                        </div>
+                        <div style="margin-top: 2rem; font-size: 1rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                            ${item.extra ? `— ${item.extra} —` : ''}
+                        </div>
+                    </div>
                 `;
             } else {
                 let sealContent = '<i class="ph ph-crown"></i>';

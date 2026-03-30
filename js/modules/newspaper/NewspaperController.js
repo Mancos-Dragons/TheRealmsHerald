@@ -313,7 +313,7 @@ export default class NewspaperController {
                     break;
                 case "obituary":
                     typeInstructions = "Genera un obituario recordando a un fallecido.";
-                    jsonFormat = `{\n  "title": "Nombre del fallecido",\n  "body": "Un pequeño homenaje, destacando su vida, cómo murió o quién lo llora."\n}`;
+                    jsonFormat = `{\n  "title": "Nombre del fallecido",\n  "body": "Un pequeño homenaje o dedicatoria de despedida.",\n  "extra": "Firma o familia que lo llora"\n}`;
                     break;
             }
 
@@ -346,7 +346,7 @@ ${jsonFormat}`;
                     document.getElementById('inp-body').value = parsed.body || '';
 
                     // Auto-seleccionar tipo en la vista
-                    if (type === 'news' || type === 'obituary') {
+                    if (type === 'news') {
                         document.getElementById('type-news')?.click();
                     } else if (type === 'ad') {
                         document.getElementById('type-ad')?.click();
@@ -363,6 +363,14 @@ ${jsonFormat}`;
                         const selStyle = document.getElementById('inp-special-style');
                         if (selStyle) {
                             selStyle.value = 'style-decree';
+                            selStyle.dispatchEvent(new Event('change'));
+                        }
+                        document.getElementById('inp-extra').value = parsed.extra || '';
+                    } else if (type === 'obituary') {
+                        document.getElementById('type-special')?.click();
+                        const selStyle = document.getElementById('inp-special-style');
+                        if (selStyle) {
+                            selStyle.value = 'style-obituary';
                             selStyle.dispatchEvent(new Event('change'));
                         }
                         document.getElementById('inp-extra').value = parsed.extra || '';
