@@ -14,12 +14,6 @@ export default class FlyersController {
         this.dragOffsetX = 0;
         this.dragOffsetY = 0;
 
-        // Resize state
-        this.isResizing = false;
-        this.initialDistance = 0;
-        this.initialScale = 1;
-        this.initialCenterX = 0;
-        this.initialCenterY = 0;
 
         // Bound event listeners
         this.onMouseMove = this.handleMouseMove.bind(this);
@@ -115,7 +109,7 @@ export default class FlyersController {
                     this.view.renderCanvas(this.model);
                 });
                 canvas.addEventListener('resize-flyer-element', (e) => {
-                    this.model.updateElement(e.detail.id, { scale: e.detail.scale });
+                    this.model.updateElement(e.detail.id, { widthClass: e.detail.widthClass });
                     this.view.renderCanvas(this.model);
                 });
                 canvas.dataset.eventsAttached = 'true';
@@ -146,41 +140,22 @@ export default class FlyersController {
         const flyerEl = e.target.closest('.flyer-element');
         if (!flyerEl) return;
 
-        // Check if clicking delete button
-        if (e.target.closest('button.btn-del')) return;
+        // Check if clicking a button (delete or size)
+        if (e.target.closest('button')) return;
 
-        const isHandle = e.target.classList.contains('resize-handle');
         this.draggedElement = flyerEl;
         flyerEl.style.zIndex = 1000;
 
         const elRect = flyerEl.getBoundingClientRect();
-        const container = document.getElementById('flyer-canvas-container');
-        const canvasScale = container ? container.getBoundingClientRect().width / container.offsetWidth : 1;
+        this.isDragging = true;
 
-        if (isHandle) {
-            this.isResizing = true;
-
-            // Calculate initial distance to center
-            this.initialCenterX = elRect.left + elRect.width / 2;
-            this.initialCenterY = elRect.top + elRect.height / 2;
-            this.initialDistance = Math.sqrt(Math.pow(e.clientX - this.initialCenterX, 2) + Math.pow(e.clientY - this.initialCenterY, 2));
-
-            // Get current scale from model
-            const id = flyerEl.dataset.id;
-            const elementData = this.model.elements.find(el => el.id === id);
-            this.initialScale = elementData ? (elementData.scale || 1) : 1;
-
-        } else {
-            this.isDragging = true;
-
-            // Calculate where inside the element the user clicked
-            this.dragOffsetX = e.clientX - elRect.left;
-            this.dragOffsetY = e.clientY - elRect.top;
-        }
+        // Calculate where inside the element the user clicked
+        this.dragOffsetX = e.clientX - elRect.left;
+        this.dragOffsetY = e.clientY - elRect.top;
     }
 
     handleMouseMove(e) {
-        if (!this.draggedElement) return;
+        if (!this.draggedElement || !this.isDragging) return;
 
         const canvas = document.getElementById('flyer-canvas');
         if (!canvas) return;
@@ -188,71 +163,30 @@ export default class FlyersController {
         const container = document.getElementById('flyer-canvas-container');
         const canvasScale = container ? container.getBoundingClientRect().width / container.offsetWidth : 1;
 
-        if (this.isResizing) {
-            const currentDistance = Math.sqrt(Math.pow(e.clientX - this.initialCenterX, 2) + Math.pow(e.clientY - this.initialCenterY, 2));
+        const canvasRect = canvas.getBoundingClientRect();
 
-            // Calculate scale ratio based on initial distance
-            let ratio = currentDistance / this.initialDistance;
-            let newScale = this.initialScale * ratio;
+        // Calculate new position relative to canvas
+        let newX = e.clientX - canvasRect.left - this.dragOffsetX;
+        let newY = e.clientY - canvasRect.top - this.dragOffsetY;
 
-            // Clamp scale bounds
-            newScale = Math.max(0.2, Math.min(newScale, 5));
+        newX = newX / canvasScale;
+        newY = newY / canvasScale;
 
-            const id = this.draggedElement.dataset.id;
-            const elementData = this.model.elements.find(el => el.id === id);
-
-            if (elementData) {
-                // Apply visual change immediately for smooth UX
-                const contentContainer = this.draggedElement.querySelector('.pointer-events-none');
-                if (contentContainer) {
-                    if (elementData.type === 'text') {
-                        const textDiv = contentContainer.querySelector('div');
-                        if (textDiv) textDiv.style.fontSize = `${newScale * 24}px`;
-                    } else if (elementData.type === 'image') {
-                        const img = contentContainer.querySelector('img');
-                        if (img) img.style.width = `${newScale * 250}px`;
-                    }
-                }
-
-                // Track scale temporarily on DOM for MouseUp
-                this.draggedElement.dataset.tempScale = newScale;
-            }
-
-        } else if (this.isDragging) {
-            const canvasRect = canvas.getBoundingClientRect();
-
-            // Calculate new position relative to canvas
-            let newX = e.clientX - canvasRect.left - this.dragOffsetX;
-            let newY = e.clientY - canvasRect.top - this.dragOffsetY;
-
-            newX = newX / canvasScale;
-            newY = newY / canvasScale;
-
-            // Apply visual update immediately
-            this.draggedElement.style.left = `${newX}px`;
-            this.draggedElement.style.top = `${newY}px`;
-        }
+        // Apply visual update immediately
+        this.draggedElement.style.left = `${newX}px`;
+        this.draggedElement.style.top = `${newY}px`;
     }
 
     handleMouseUp(e) {
-        if (this.draggedElement) {
+        if (this.draggedElement && this.isDragging) {
             const id = this.draggedElement.dataset.id;
 
-            if (this.isResizing) {
-                const tempScale = parseFloat(this.draggedElement.dataset.tempScale);
-                if (!isNaN(tempScale)) {
-                    this.model.updateElement(id, { scale: tempScale });
-                }
-                delete this.draggedElement.dataset.tempScale;
-            } else if (this.isDragging) {
-                const newX = parseFloat(this.draggedElement.style.left);
-                const newY = parseFloat(this.draggedElement.style.top);
-                this.model.updateElement(id, { x: newX, y: newY });
-            }
+            const newX = parseFloat(this.draggedElement.style.left);
+            const newY = parseFloat(this.draggedElement.style.top);
+            this.model.updateElement(id, { x: newX, y: newY });
 
             this.draggedElement.style.zIndex = '';
             this.isDragging = false;
-            this.isResizing = false;
             this.draggedElement = null;
         }
     }
@@ -277,9 +211,9 @@ export default class FlyersController {
             }
         });
 
-        // Remove delete buttons and resize handles
+        // Remove delete buttons and size buttons
         clonedContent.querySelectorAll('button').forEach(btn => btn.remove());
-        clonedContent.querySelectorAll('.resize-handle').forEach(el => el.remove());
+        clonedContent.querySelectorAll('.btn-size').forEach(el => el.remove());
         // Remove hover/border effects
         clonedContent.querySelectorAll('.flyer-element').forEach(el => {
             el.classList.remove('hover:border-amber-500/50', 'hover:bg-amber-500/10', 'border', 'border-transparent');

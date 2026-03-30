@@ -128,30 +128,51 @@ export default class FlyersView {
             };
             wrapper.appendChild(delBtn);
 
-            // Drag-to-resize handle
-            const resizeHandle = document.createElement('div');
-            resizeHandle.className = 'absolute -bottom-2 -right-2 w-4 h-4 bg-amber-500 rounded-full cursor-se-resize opacity-0 group-hover:opacity-100 transition-opacity z-50 shadow-md pointer-events-auto resize-handle border-2 border-white';
-            wrapper.appendChild(resizeHandle);
+            // Size cycle button
+            const sizeBtn = document.createElement('button');
+            sizeBtn.className = 'absolute -bottom-3 -right-3 bg-[#222] text-amber-500 rounded-full w-auto px-2 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-50 shadow-md hover:bg-[#333] hover:text-amber-400 pointer-events-auto text-xs font-bold font-sans border border-amber-600/30 whitespace-nowrap btn-size';
+
+            // Map of widths for toggling
+            const widths = [
+                { class: 'w-1/4', label: '25%', fontClass: 'text-2xl' },
+                { class: 'w-1/2', label: '50%', fontClass: 'text-4xl' },
+                { class: 'w-3/4', label: '75%', fontClass: 'text-6xl' },
+                { class: 'w-full', label: '100%', fontClass: 'text-7xl' }
+            ];
+
+            const currentWidthClass = el.widthClass || 'w-1/2';
+            const currentIndex = widths.findIndex(w => w.class === currentWidthClass) !== -1 ? widths.findIndex(w => w.class === currentWidthClass) : 1;
+            const nextIndex = (currentIndex + 1) % widths.length;
+
+            sizeBtn.innerHTML = `<i class="ph ph-arrows-out-line mr-1 pointer-events-none"></i> <span class="pointer-events-none">${widths[currentIndex].label}</span>`;
+            sizeBtn.onclick = (e) => {
+                e.stopPropagation(); // prevent dragging
+                canvas.dispatchEvent(new CustomEvent('resize-flyer-element', { detail: { id: el.id, widthClass: widths[nextIndex].class } }));
+            };
+            wrapper.appendChild(sizeBtn);
 
             // Container for scalable content
             const contentContainer = document.createElement('div');
-            contentContainer.className = 'pointer-events-none';
+            // Tailwind width class directly applied to content container
+            contentContainer.className = `pointer-events-none ${currentWidthClass}`;
 
-            const scale = el.scale || 1;
+            // We need wrapper to stretch based on content. But if content is percentage based, percentage of what?
+            // The canvas is the relative parent. So the wrapper needs the width class, or wrapper needs width: currentWidthClass.
+            // Wait, wrapper is position absolute. If wrapper gets w-1/4, it will be 25% of canvas width.
+            wrapper.classList.add(currentWidthClass);
+            contentContainer.className = 'pointer-events-none w-full';
 
             if (el.type === 'text') {
                 const textDiv = document.createElement('div');
-                textDiv.className = 'medieval-font text-black leading-tight whitespace-pre-wrap';
+                // Use the mapped font class for scaling the text size automatically
+                textDiv.className = `medieval-font text-black leading-tight whitespace-pre-wrap w-full break-words ${widths[currentIndex].fontClass}`;
                 textDiv.style.textShadow = '0 1px 1px rgba(255,255,255,0.5)';
-                textDiv.style.fontSize = `${scale * 24}px`; // Base font size is 24px
                 textDiv.innerHTML = this.escapeHTML(el.content).replace(/\n/g, '<br>');
                 contentContainer.appendChild(textDiv);
             } else if (el.type === 'image') {
                 const img = document.createElement('img');
                 img.src = el.src;
-                img.className = 'object-contain mix-blend-multiply'; // mix-blend makes white transparent on texture
-                img.style.width = `${scale * 250}px`; // Base size is 250px
-                img.style.height = 'auto'; // Maintain aspect ratio
+                img.className = 'w-full h-auto object-contain mix-blend-multiply';
                 contentContainer.appendChild(img);
             }
 
