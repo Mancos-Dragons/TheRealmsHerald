@@ -13,7 +13,7 @@ export default class HomeController {
             { id: 'public_opinion', icon: 'ph-users-three', locked: true },
             { id: 'npcs', icon: 'ph-user-focus', locked: true },
             { id: 'timeline', icon: 'ph-hourglass', locked: true },
-            { id: 'documents', icon: 'ph-scroll', locked: true },
+            { id: 'documents', icon: 'ph-scroll', locked: false },
             { id: 'factions', icon: 'ph-crown', locked: true },
             { id: 'secrets', icon: 'ph-key', locked: true },
             { id: 'summary', icon: 'ph-book-open', locked: true },
