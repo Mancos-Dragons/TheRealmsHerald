@@ -267,7 +267,10 @@ export default class DocumentsView {
 
             // While the content overflows its container, shrink the text
             // The inner element is what imposes height boundaries
-            while ((inner.scrollHeight > inner.clientHeight || inner.offsetHeight > inner.clientHeight) && scale > minScale) {
+            // We compare scrollHeight to clientHeight. We don't use offsetHeight because
+            // offsetHeight includes borders, which will always be larger than clientHeight,
+            // causing an infinite loop until minScale is hit.
+            while (inner.scrollHeight > inner.clientHeight && scale > minScale) {
                 scale -= 0.05;
                 container.style.setProperty('--doc-scale', scale.toFixed(2));
             }
