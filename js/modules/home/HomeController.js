@@ -20,7 +20,12 @@ export default class HomeController {
             { id: 'chaos', icon: 'ph-lightning', locked: true },
             { id: 'consequences', icon: 'ph-gavel', locked: true },
             { id: 'maps', icon: 'ph-map-trifold', locked: true },
-            { id: 'labs', icon: 'ph-flask', locked: true }
+            { id: 'labs', icon: 'ph-flask', locked: true },
+            { id: 'oracle', icon: 'ph-crystal-ball', locked: true },
+            { id: 'encounters', icon: 'ph-swords', locked: true },
+            { id: 'items', icon: 'ph-backpack', locked: true },
+            { id: 'flyers', icon: 'ph-megaphone', locked: false },
+            { id: 'weather', icon: 'ph-cloud-sun', locked: true }
         ];
     }
 

@@ -1,0 +1,47 @@
+/*
+ * Flyers (Pregonero Visual) Module Styles
+ */
+
+.flyer-page {
+    width: 210mm;
+    height: 297mm;
+    background-color: #fff;
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    position: relative;
+    overflow: hidden;
+    /* Scale down slightly to fit on standard screens by default, while maintaining A4 aspect ratio */
+    transform-origin: top center;
+    transform: scale(0.8);
+    margin: 2rem auto;
+}
+
+/* Texture classes */
+.texture-clean {
+    background-image: url('../../assets/img/paper.png');
+    background-size: cover;
+    background-position: center;
+}
+
+.texture-gritty {
+    background-image: url('../../assets/img/ag-square.png');
+    background-size: cover;
+    background-position: center;
+}
+
+.texture-magic {
+    background-image: url('../../assets/img/stardust.png');
+    background-size: cover;
+    background-position: center;
+}
+
+/* Drag interaction */
+.flyer-element {
+    cursor: move; /* fallback */
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+}
+
+.flyer-element:active {
+    cursor: grabbing;
+}

@@ -27,6 +27,7 @@ export const LanguageService = {
             "home.ai_config.save": "Guardar",
             "home.ai_config.saved": "Configuración de IA guardada con éxito.",
             "nav.documents": "Documentos",
+            "nav.flyers": "Pregonero",
             "docs.editor.title": "Editor Real",
             "docs.type": "Tipo de Documento",
             "docs.type.decree": "Decreto",
@@ -151,6 +152,7 @@ export const LanguageService = {
             "home.ai_config.save": "Save",
             "home.ai_config.saved": "AI configuration saved successfully.",
             "nav.documents": "Documents",
+            "nav.flyers": "Flyers",
             "docs.editor.title": "Royal Editor",
             "docs.type": "Document Type",
             "docs.type.decree": "Decree",
@@ -262,15 +264,23 @@ export const LanguageService = {
             const response = await fetch('./data/locales.json');
             const externalData = await response.json();
             
-            for (const lang in externalData) {
-                if (!this.dictionary[lang]) this.dictionary[lang] = {};
-                if (externalData[lang].tools) {
-                    for (const toolKey in externalData[lang].tools) {
-                        const tool = externalData[lang].tools[toolKey];
-                        this.dictionary[lang][`tools.${toolKey}.title`] = tool.title;
-                        this.dictionary[lang][`tools.${toolKey}.desc`] = tool.desc;
+            const flatten = (obj, prefix = '') => {
+                let res = {};
+                for (let k in obj) {
+                    const key = prefix ? `${prefix}.${k}` : k;
+                    if (typeof obj[k] === 'object' && obj[k] !== null && !Array.isArray(obj[k])) {
+                        Object.assign(res, flatten(obj[k], key));
+                    } else {
+                        res[key] = obj[k];
                     }
                 }
+                return res;
+            };
+
+            for (const lang in externalData) {
+                if (!this.dictionary[lang]) this.dictionary[lang] = {};
+                const flatData = flatten(externalData[lang]);
+                this.dictionary[lang] = { ...this.dictionary[lang], ...flatData };
             }
             console.log("🌍 Idiomas externos cargados.");
         } catch (e) {
@@ -292,8 +302,8 @@ export const LanguageService = {
         return this.dictionary[this.currentLang][key] || key;
     },
 
-    translateDOM() {
-        document.querySelectorAll('[data-i18n]').forEach(el => {
+    translateDOM(root = document) {
+        root.querySelectorAll('[data-i18n]').forEach(el => {
             const key = el.dataset.i18n;
             if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
                 el.placeholder = this.get(key);
