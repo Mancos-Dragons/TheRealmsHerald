@@ -128,33 +128,10 @@ export default class FlyersView {
             };
             wrapper.appendChild(delBtn);
 
-            // Resize controls container
-            const resizeControls = document.createElement('div');
-            resizeControls.className = 'absolute -bottom-4 left-1/2 transform -translate-x-1/2 flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-50 bg-[#222] rounded-full px-2 py-1 shadow-md pointer-events-auto btn-resize';
-
-            const btnMinus = document.createElement('button');
-            btnMinus.className = 'text-gray-300 hover:text-white pointer-events-auto';
-            btnMinus.innerHTML = '<i class="ph ph-minus text-xs font-bold pointer-events-none"></i>';
-            btnMinus.onclick = (e) => {
-                e.stopPropagation(); // prevent dragging
-                const currentScale = el.scale || 1;
-                const newScale = Math.max(0.2, currentScale - 0.1);
-                canvas.dispatchEvent(new CustomEvent('resize-flyer-element', { detail: { id: el.id, scale: newScale } }));
-            };
-
-            const btnPlus = document.createElement('button');
-            btnPlus.className = 'text-gray-300 hover:text-white pointer-events-auto';
-            btnPlus.innerHTML = '<i class="ph ph-plus text-xs font-bold pointer-events-none"></i>';
-            btnPlus.onclick = (e) => {
-                e.stopPropagation(); // prevent dragging
-                const currentScale = el.scale || 1;
-                const newScale = Math.min(5, currentScale + 0.1);
-                canvas.dispatchEvent(new CustomEvent('resize-flyer-element', { detail: { id: el.id, scale: newScale } }));
-            };
-
-            resizeControls.appendChild(btnMinus);
-            resizeControls.appendChild(btnPlus);
-            wrapper.appendChild(resizeControls);
+            // Drag-to-resize handle
+            const resizeHandle = document.createElement('div');
+            resizeHandle.className = 'absolute -bottom-2 -right-2 w-4 h-4 bg-amber-500 rounded-full cursor-se-resize opacity-0 group-hover:opacity-100 transition-opacity z-50 shadow-md pointer-events-auto resize-handle border-2 border-white';
+            wrapper.appendChild(resizeHandle);
 
             // Container for scalable content
             const contentContainer = document.createElement('div');
