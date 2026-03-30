@@ -1,24 +1,31 @@
 import { LanguageService } from '../../core/LanguageService.js';
 import { DataService } from '../../services/DataService.js';
+import { ModalService } from '../../core/ModalService.js';
 
 export default class HomeController {
     constructor(container) {
         this.container = container;
         this.versionData = null;
+        
         this.tools = [
             { id: 'newspaper', icon: 'ph-newspaper', locked: false },
-            { id: 'rumors', icon: 'ph-mask-happy', locked: true },
+            { id: 'rumors', icon: 'ph-mask-happy', locked: false },
             { id: 'public_opinion', icon: 'ph-users-three', locked: true },
             { id: 'npcs', icon: 'ph-user-focus', locked: true },
             { id: 'timeline', icon: 'ph-hourglass', locked: true },
-            { id: 'documents', icon: 'ph-scroll', locked: true },
+            { id: 'documents', icon: 'ph-scroll', locked: false },
             { id: 'factions', icon: 'ph-crown', locked: true },
             { id: 'secrets', icon: 'ph-key', locked: true },
             { id: 'summary', icon: 'ph-book-open', locked: true },
             { id: 'chaos', icon: 'ph-lightning', locked: true },
             { id: 'consequences', icon: 'ph-gavel', locked: true },
             { id: 'maps', icon: 'ph-map-trifold', locked: true },
-            { id: 'labs', icon: 'ph-flask', locked: true }
+            { id: 'labs', icon: 'ph-flask', locked: true },
+            { id: 'oracle', icon: 'ph-crystal-ball', locked: true },
+            { id: 'encounters', icon: 'ph-swords', locked: true },
+            { id: 'items', icon: 'ph-backpack', locked: true },
+            { id: 'flyers', icon: 'ph-megaphone', locked: false },
+            { id: 'weather', icon: 'ph-cloud-sun', locked: true }
         ];
     }
 
@@ -34,15 +41,16 @@ export default class HomeController {
 
     render() {
         const t = (key) => LanguageService.get(key);
-        const globalConfig = DataService.getGlobal();
         
         const toolsHTML = this.tools.map(tool => {
             const opacity = tool.locked ? 'opacity-50 grayscale' : 'hover-scale';
             const btnClass = tool.locked ? 'btn-outline-secondary disabled' : 'btn-outline-warning launcher-btn';
             const btnIcon = tool.locked ? 'ph-lock-key' : 'ph-play';
             const btnText = tool.locked ? t('btn.locked') : t('btn.launch');
+            
             const title = t(`tools.${tool.id}.title`);
             const desc = t(`tools.${tool.id}.desc`);
+
             return `
                 <div class="col-md-4 col-lg-3">
                     <div class="card bg-[#161616] border border-[#333] h-100 shadow-lg ${opacity} transition-all">
@@ -57,12 +65,14 @@ export default class HomeController {
                             </button>
                         </div>
                     </div>
-                </div>`;
+                </div>
+            `;
         }).join('');
 
         this.container.innerHTML = `
             <div class="container-fluid h-100 overflow-y-auto custom-scrollbar py-5 fade-in">
                 <div class="container">
+                    <!-- Header -->
                     <div class="text-center mb-5">
                         <div class="mb-2"><i class="ph ph-crown text-5xl text-amber-600"></i></div>
                         <h1 class="display-4 medieval-font text-amber-500 mb-2" data-i18n="home.welcome">${t('home.welcome')}</h1>
@@ -72,99 +82,35 @@ export default class HomeController {
                             <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#changelogModal">
                                 <i class="ph ph-clock-counter-clockwise"></i> <span data-i18n="home.changelog">${t('home.changelog')}</span>
                             </button>
-                            <!-- BOTÓN SETTINGS -->
-                            <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#settingsModal">
-                                <i class="ph ph-gear"></i> <span data-i18n="home.settings">${t('home.settings')}</span>
+                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#roadmapModal">
+                                <i class="ph ph-path"></i> <span data-i18n="home.roadmap">${t('home.roadmap')}</span>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#aiConfigModal">
+                                <i class="ph ph-robot"></i> <span data-i18n="home.ai_config">${t('home.ai_config')}</span>
                             </button>
                         </div>
                     </div>
-                    <div class="row g-4 pb-5">${toolsHTML}</div>
+
+                    <!-- Tools Grid -->
+                    <div class="row g-4 pb-5">
+                        ${toolsHTML}
+                    </div>
                 </div>
             </div>
 
-            <!-- Modales -->
             ${this.renderChangelogModal()}
-            ${this.renderSettingsModal(globalConfig)}
+            ${this.renderRoadmapModal()}
+            ${this.renderAIConfigModal()}
         `;
 
-        this.attachEvents();
-    }
+        this.attachAIEvents();
 
-    renderSettingsModal(config) {
-        const t = (key) => LanguageService.get(key);
-        return `
-            <div class="modal fade" id="settingsModal" tabindex="-1">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content bg-[#111] border border-[#333] text-gray-200">
-                        <div class="modal-header border-bottom border-[#333]">
-                            <h5 class="modal-title medieval-font text-amber-600" data-i18n="settings.global.title">${t('settings.global.title')}</h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body custom-scrollbar p-4 space-y-4">
-                            <!-- API KEYS -->
-                            <div class="bg-[#1a1a1a] p-3 rounded border border-purple-900/30">
-                                <h6 class="text-purple-400 font-bold text-sm mb-2"><i class="ph ph-brain"></i> Inteligencia Artificial</h6>
-                                
-                                <div class="mb-3">
-                                    <label class="text-xs text-gray-400 block mb-1" data-i18n="settings.api.key">${t('settings.api.key')}</label>
-                                    <input type="password" id="global-api-key" class="w-full bg-[#111] border border-gray-700 text-gray-100 p-2 rounded" value="${config?.apiKey || ''}" placeholder="sk-...">
-                                </div>
-
-                                <div>
-                                    <label class="text-xs text-gray-400 block mb-1">Gemini API Key (Google)</label>
-                                    <input type="password" id="global-gemini-key" class="w-full bg-[#111] border border-gray-700 text-gray-100 p-2 rounded" value="${config?.geminiKey || ''}" placeholder="AIza...">
-                                </div>
-                                
-                                <p class="text-[10px] text-gray-500 mt-2">Las claves se guardan localmente en tu navegador.</p>
-                            </div>
-                            
-                            <!-- CALENDARIO -->
-                            <div>
-                                <label class="text-xs text-amber-500 font-bold uppercase mb-1" data-i18n="settings.calendar">${t('settings.calendar')}</label>
-                                <select id="global-calendar" class="w-full bg-[#1c1c1c] border border-gray-700 text-gray-100 p-2 rounded">
-                                    <option value="gregorian" ${config?.calendarSystem==='gregorian'?'selected':''} data-i18n="settings.cal.gregorian">${t('settings.cal.gregorian')}</option>
-                                    <option value="harptos" ${config?.calendarSystem==='harptos'?'selected':''} data-i18n="settings.cal.harptos">${t('settings.cal.harptos')}</option>
-                                    <option value="imperial" ${config?.calendarSystem==='imperial'?'selected':''} data-i18n="settings.cal.imperial">${t('settings.cal.imperial')}</option>
-                                </select>
-                            </div>
-
-                            <!-- CUSTOM ASSETS -->
-                            <div class="border-t border-gray-800 pt-4 mt-4">
-                                <h6 class="text-amber-500 font-bold mb-3" data-i18n="settings.custom.assets">${t('settings.custom.assets')}</h6>
-                                
-                                <div class="grid grid-cols-2 gap-4">
-                                    <!-- PAPEL -->
-                                    <div>
-                                        <label class="text-xs text-gray-400 font-bold mb-1" data-i18n="settings.upload.paper">${t('settings.upload.paper')}</label>
-                                        <div class="flex gap-2">
-                                            <input type="text" id="custom-paper-name" class="w-1/2 bg-[#1c1c1c] border border-gray-700 text-gray-100 p-1 rounded text-xs" placeholder="Nombre">
-                                            <label class="cursor-pointer bg-[#222] border border-gray-700 text-gray-400 hover:text-white px-2 py-1 rounded flex items-center justify-center flex-1">
-                                                <i class="ph ph-upload-simple"></i>
-                                                <input type="file" id="file-custom-paper" class="hidden" accept="image/*">
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <!-- FUENTE -->
-                                    <div>
-                                        <label class="text-xs text-gray-400 font-bold mb-1" data-i18n="settings.upload.font">${t('settings.upload.font')}</label>
-                                        <div class="flex gap-2">
-                                            <input type="text" id="custom-font-name" class="w-1/2 bg-[#1c1c1c] border border-gray-700 text-gray-100 p-1 rounded text-xs" placeholder="Nombre">
-                                            <label class="cursor-pointer bg-[#222] border border-gray-700 text-gray-400 hover:text-white px-2 py-1 rounded flex items-center justify-center flex-1">
-                                                <i class="ph ph-text-t"></i>
-                                                <input type="file" id="file-custom-font" class="hidden" accept=".ttf,.woff,.woff2">
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div id="custom-assets-status" class="text-xs text-green-500 mt-2 h-4"></div>
-                            </div>
-                        </div>
-                        <div class="modal-footer border-top border-[#333]">
-                            <button type="button" class="btn btn-warning" id="btn-save-global" data-i18n="btn.save.global">${t('btn.save.global')}</button>
-                        </div>
-                    </div>
-                </div>
-            </div>`;
+        this.container.querySelectorAll('.launcher-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const module = e.target.closest('button').dataset.module;
+                window.App.loadModule(module);
+            });
+        });
     }
 
     renderChangelogModal() {
@@ -190,6 +136,66 @@ export default class HomeController {
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body custom-scrollbar">${content}</div>
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    attachAIEvents() {
+        const aiConfigForm = this.container.querySelector('#aiConfigForm');
+        if (aiConfigForm) {
+            aiConfigForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const baseUrl = this.container.querySelector('#aiBaseUrl').value.replace(/\/$/, ''); // Remove trailing slash
+                const apiKey = this.container.querySelector('#aiApiKey').value;
+                const model = this.container.querySelector('#aiModel').value;
+
+                DataService.save('ai_config', { baseUrl, apiKey, model });
+
+                const modalEl = this.container.querySelector('#aiConfigModal');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) {
+                    modal.hide();
+                }
+
+                ModalService.alert("Aviso", LanguageService.get('home.ai_config.saved'));
+            });
+        }
+    }
+
+    renderAIConfigModal() {
+        const t = (key) => LanguageService.get(key);
+        const config = DataService.load('ai_config') || { baseUrl: '', apiKey: '', model: '' };
+
+        return `
+            <div class="modal fade" id="aiConfigModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content bg-[#111] border border-[#333] text-gray-200">
+                        <div class="modal-header border-bottom border-[#333]">
+                            <h5 class="modal-title medieval-font text-amber-600"><i class="ph ph-robot me-2"></i><span data-i18n="home.ai_config">${t('home.ai_config')}</span></h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="text-sm text-gray-400 mb-4" data-i18n="home.ai_config.desc">${t('home.ai_config.desc')}</p>
+                            <form id="aiConfigForm">
+                                <div class="mb-3">
+                                    <label for="aiBaseUrl" class="form-label" data-i18n="home.ai_config.baseUrl">${t('home.ai_config.baseUrl')}</label>
+                                    <input type="url" class="form-control bg-[#222] text-white border-secondary" id="aiBaseUrl" value="${config.baseUrl || ''}" placeholder="https://api.openai.com/v1" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="aiApiKey" class="form-label" data-i18n="home.ai_config.apiKey">${t('home.ai_config.apiKey')}</label>
+                                    <input type="password" class="form-control bg-[#222] text-white border-secondary" id="aiApiKey" value="${config.apiKey || ''}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="aiModel" class="form-label" data-i18n="home.ai_config.model">${t('home.ai_config.model')}</label>
+                                    <input type="text" class="form-control bg-[#222] text-white border-secondary" id="aiModel" value="${config.model || ''}" placeholder="gpt-4o-mini" required>
+                                </div>
+                                <div class="text-end mt-4">
+                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" data-i18n="home.ai_config.cancel">${t('home.ai_config.cancel')}</button>
+                                    <button type="submit" class="btn btn-warning" data-i18n="home.ai_config.save">${t('home.ai_config.save')}</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>`;
@@ -225,50 +231,10 @@ export default class HomeController {
             </div>`;
     }
 
-    attachEvents() {
-        this.container.querySelectorAll('.launcher-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => window.App.loadModule(e.target.closest('button').dataset.module));
-        });
-
-        const btnSave = document.getElementById('btn-save-global');
-        if (btnSave) {
-            btnSave.addEventListener('click', () => {
-                const config = DataService.getGlobal();
-                config.apiKey = document.getElementById('global-api-key').value;
-                config.geminiKey = document.getElementById('global-gemini-key').value; // NUEVO
-                config.calendarSystem = document.getElementById('global-calendar').value;
-                DataService.saveGlobal(config);
-                const modal = bootstrap.Modal.getInstance(document.getElementById('settingsModal'));
-                modal.hide();
-                alert("Configuración global guardada.");
-            });
-        }
-
-        const filePaper = document.getElementById('file-custom-paper');
-        if (filePaper) filePaper.addEventListener('change', (e) => this.handleCustomUpload(e, 'papers'));
-
-        const fileFont = document.getElementById('file-custom-font');
-        if (fileFont) fileFont.addEventListener('change', (e) => this.handleCustomUpload(e, 'fonts'));
-    }
-
-    handleCustomUpload(e, type) {
-        const file = e.target.files[0];
-        if (!file) return;
-        const nameInput = type === 'papers' ? 'custom-paper-name' : 'custom-font-name';
-        const name = document.getElementById(nameInput).value || file.name.split('.')[0];
-        
-        const reader = new FileReader();
-        reader.onload = (evt) => {
-            DataService.addCustomStyle(type, { name, url: evt.target.result });
-            document.getElementById('custom-assets-status').innerText = `¡${name} añadido!`;
-            setTimeout(() => document.getElementById('custom-assets-status').innerText = '', 3000);
-        };
-        reader.readAsDataURL(file);
-    }
-
     destroy() {
         document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
         document.body.classList.remove('modal-open');
+        document.body.style = '';
         this.container.innerHTML = '';
     }
 }

@@ -1,0 +1,23 @@
+{
+  "name": "the-realms-herald",
+  "version": "0.2.1",
+  "description": "Herramientas web para DMs, escritores y constructores de mundos.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test js/services/*.test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mancos-Dragons/TheRealmsHerald.git"
+  },
+  "keywords": [],
+  "author": "Fernando Machado",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Mancos-Dragons/TheRealmsHerald/issues"
+  },
+  "homepage": "https://github.com/Mancos-Dragons/TheRealmsHerald#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.58.2"
+  }
+}

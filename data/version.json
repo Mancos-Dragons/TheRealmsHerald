@@ -1,12 +1,51 @@
 {
   "name": "The Realm's Herald",
-  "version": "0.1.1",
-  "codename": "Cimientos",
-  "releaseDate": "2025-12-31",
+  "version": "0.4.0",
+  "codename": "Forja de Papel",
+  "releaseDate": "2026-03-24",
   "status": "alpha",
   "author": "Fernando Machado",
   "description": "Suite de herramientas narrativas y generadores de documentos para Dungeon Masters.",
   "changelog": [
+    {
+      "version": "0.4.0",
+      "date": "2026-03-24",
+      "changes": [
+        "Pregonero Visual: Nueva herramienta de diseño para crear documentos informales y panfletos (Flyers).",
+        "Control de Escala Preciso: Nuevo sistema de control flotante que permite modificar el tamaño de las imágenes y textos con incrementos precisos de 0.1x.",
+        "Soporte Multilenguaje Dinámico: El sistema ahora traduce instantáneamente todos los textos y placeholders de la interfaz sin necesidad de recargar la página.",
+        "Integración de Herramientas: Se han registrado y preparado las bases para futuras herramientas (Oráculo, Facciones, Clima, Inventario)."
+      ]
+    },
+    {
+      "version": "0.3.0",
+      "date": "2026-03-18",
+      "changes": [
+        "Escriba Real: Nueva herramienta dedicada a la generación de documentos oficiales y formales.",
+        "Decretos Reales y Cartas: Plantillas especializadas para edictos con sellos de cera personalizables y cartas manuscritas.",
+        "Carteles de Recompensa: Crea pósters individuales de 'Se Busca' listos para imprimir y entregar a los jugadores.",
+        "Firmas y Sellos Personalizados: Soporte para cargar imágenes propias como sellos de lacre y texturas de papel real."
+      ]
+    },
+    {
+      "version": "0.2.1",
+      "date": "2026-03-13",
+      "changes": [
+        "IA en la Prensa: Añadido generador de noticias impulsado por Inteligencia Artificial en La Voz del Conejo.",
+        "Páginas Dinámicas: El periódico ahora crea páginas adicionales automáticamente según sea necesario.",
+        "Mejora de UX: Alertas y confirmaciones del navegador reemplazadas por ventanas modales estilizadas."
+      ]
+    },
+    {
+      "version": "0.2.0",
+      "date": "2026-02-05",
+      "changes": [
+        "Nueva herramienta integrada: 'Susurros de Taberna' (Generador de Rumores). Crea chismes y notas para el DM al instante.",
+        "Integración de Inteligencia Artificial: Nuevo panel de Configuración de IA en el menú principal. Conecta cualquier API compatible (OpenAI, Deepseek, Gemini) para potenciar tus herramientas.",
+        "Generación Procedural Masiva: Si no usas IA, el sistema de rumores ahora cuenta con más de 100 plantillas y ganchos de aventura únicos para garantizar variedad infinita.",
+        "Soporte Multilenguaje Completo: La interfaz, los rumores generados por IA y las 100+ plantillas procedurales ahora soportan completamente Español e Inglés."
+      ]
+    },
     {
       "version": "0.1.1",
       "date": "2026-01-02",
@@ -43,21 +82,22 @@
       "description": "Herramienta viva para generar periodicos que se adapten a la campaña.",
       "features": [
         "Generador de Titulares: Una ayuda para crear títulos impactantes basados en quién hizo qué recientemente.",
-        "Sección 'Se busca': Una plantilla especial para crear carteles de recompensa con foto y descripción del delito.",
+        "Sección 'Se busca': [COMPLETADO] Una plantilla especial para crear carteles de recompensa con foto y descripción del delito.",
         "Obituarios y Clasificados: Textos de relleno rápidos para cuando necesitas que el periódico parezca lleno de vida.",
         "Filtro de Censura: Un botón para cambiar el tono de las noticias automáticamente (ej. a favor del Rey o a favor de los Rebeldes)."
       ]
     },
     {
       "phase": "Fase 2: Documentos y Entregables",
-      "status": "pendiente",
+      "status": "en_progreso",
       "description": "Herramientas para crear objetos físicos y digitales que puedes dar a tus jugadores.",
       "features": [
-        "Generador de Decretos Reales: Crea leyes y anuncios formales con sellos de cera que puedes personalizar.",
-        "Cartas Escritas a Mano: Crea cartas de amor, amenazas o pistas con tipografías que parecen escritas con pluma.",
-        "Pósters de 'Se Busca' Individuales: Crea hojas completas para imprimir y pegar en tu tablero de juego.",
+        "Generador de Decretos Reales: [COMPLETADO] Crea leyes y anuncios formales con sellos de cera que puedes personalizar.",
+        "Cartas Escritas a Mano: [COMPLETADO] Crea cartas de amor, amenazas o pistas con tipografías que parecen escritas con pluma.",
+        "Pósters de 'Se Busca' Individuales: [COMPLETADO] Crea hojas completas para imprimir y pegar en tu tablero de juego.",
+        "Pregonero Visual: [COMPLETADO] Editor libre de panfletos y flyers informales.",
         "Diario de Sesión: Una herramienta para escribir el resumen de la partida con distintos estilos (como un poema épico o un informe militar).",
-        "Firmas y Sellos: Añade marcas de agua y firmas oficiales para que tus documentos parezcan auténticos."
+        "Firmas y Sellos: [COMPLETADO] Añade marcas de agua y firmas oficiales para que tus documentos parezcan auténticos."
       ]
     },
     {
@@ -73,10 +113,10 @@
     },
     {
       "phase": "Fase 4: Vida y Azar",
-      "status": "pendiente",
+      "status": "en_progreso",
       "description": "Herramientas para ayudarte a improvisar y darle color a la partida.",
       "features": [
-        "Generador de Rumores: Crea chismes creíbles (o no tanto) dependiendo de si se escuchan en una taberna o en la corte.",
+        "Generador de Rumores: [COMPLETADO] Generador de chismes procedurales o mediante IA con soporte en múltiples idiomas.",
         "Opinión Pública: Un medidor de qué tan famosos (o infames) son tus jugadores y cómo eso afecta los precios en las tiendas.",
         "Generador de NPCs: Crea personajes al instante con personalidad y posibles vínculos con tus jugadores.",
         "Traductor Narrativo: Convierte números aburridos (como puntos de golpe) en descripciones emocionantes.",

@@ -2,7 +2,7 @@ import NewspaperModel from './NewspaperModel.js';
 import NewspaperView from './NewspaperView.js';
 import { AIService } from '../../services/AIService.js';
 import { DataService } from '../../services/DataService.js';
-import { ExportService } from '../../core/ExportService.js';
+import { ModalService } from '../../core/ModalService.js';
 
 export default class NewspaperController {
     constructor(container) {
@@ -10,18 +10,17 @@ export default class NewspaperController {
         this.view = new NewspaperView(container);
         this.zoomLevel = 0.9;
         this.draggedItem = null;
+        this.draggedFromPage = null;
         this.resizeObserver = null;
     }
 
     async init() {
         this.loadStyles();
         await this.model.load();
-        
         this.view.renderWorkspace(this.model.config);
         this.refreshPaper();
         this.attachEvents();
         this.initResizeObserver();
-
         console.log("📰 Controlador de Prensa: Listo.");
     }
 
@@ -39,19 +38,14 @@ export default class NewspaperController {
         const lastPage = this.model.getLastActivePage();
         const maxPages = lastPage + 1;
         const editionNum = this.model.getEditionNumber();
-        
         this.view.renderPages(this.model.itemsByPage, this.model.config, maxPages, editionNum);
-        
         const currentSel = document.getElementById('inp-page')?.value || 1;
         this.view.updatePageSelect(maxPages, currentSel);
-        
         this.attachDynamicEvents();
-        
         setTimeout(() => {
             this.applyMasonryLayout();
             this.checkOverflow(); 
         }, 50);
-        
         this.waitForImages();
     }
 
@@ -73,7 +67,6 @@ export default class NewspaperController {
             const pageNum = parseInt(page.dataset.page);
             const contentBox = page.querySelector('.columns-container');
             if(!contentBox) return;
-
             const pageBottom = page.clientHeight;
             const items = contentBox.querySelectorAll('.news-item, .ad-box');
             items.forEach(item => {
@@ -81,9 +74,10 @@ export default class NewspaperController {
                 if (itemBottom > (pageBottom - 40)) { 
                     item.classList.add('error-overflow');
                     item.title = "Click para mover a la siguiente página automáticamente";
-                    item.onclick = (e) => {
+                    item.onclick = async (e) => {
                         e.stopPropagation();
-                        if(confirm("Este artículo se sale de la hoja. ¿Mover a la siguiente página?")) {
+                        const isConfirmed = await ModalService.confirm("Aviso", "Este artículo se sale de la hoja. ¿Mover a la siguiente página?");
+                        if(isConfirmed) {
                             this.model.moveItem(pageNum, pageNum + 1, item.dataset.id);
                             this.refreshPaper();
                         }
@@ -126,7 +120,7 @@ export default class NewspaperController {
                 if(e.target.files && e.target.files[0]) {
                     const reader = new FileReader();
                     reader.onload = (evt) => {
-                        input.value = evt.target.result; 
+                        input.value = evt.target.result;
                     };
                     reader.readAsDataURL(e.target.files[0]);
                 }
@@ -147,6 +141,9 @@ export default class NewspaperController {
         const btnDelete = document.getElementById('btn-delete');
         if (btnDelete) btnDelete.addEventListener('click', () => this.handleDelete());
 
+        const btnAIGenerate = document.getElementById('btn-ai-generate');
+        if (btnAIGenerate) btnAIGenerate.addEventListener('click', () => this.handleAIGenerate());
+
         const btnConfig = document.getElementById('btn-config-toggle');
         if (btnConfig) btnConfig.addEventListener('click', () => {
             this.fillConfigModal(); 
@@ -159,7 +156,9 @@ export default class NewspaperController {
         const btnSaveConfig = document.getElementById('btn-save-config');
         if (btnSaveConfig) btnSaveConfig.addEventListener('click', () => this.handleConfigSave());
 
-        // Zoom y Toolbar
+        this.setupImageUpload('btn-upload-main', 'file-upload-main', 'inp-img');
+        this.setupImageUpload('btn-upload-decree', 'file-upload-decree', 'inp-decree-img');
+
         document.getElementById('zoom-in')?.addEventListener('click', () => {
             this.zoomLevel = Math.min(this.zoomLevel + 0.1, 2.0);
             this.view.setZoom(this.zoomLevel);
@@ -168,18 +167,16 @@ export default class NewspaperController {
             this.zoomLevel = Math.max(this.zoomLevel - 0.1, 0.4);
             this.view.setZoom(this.zoomLevel);
         });
-        
-        // Exportación PDF con nuevo método
         document.getElementById('btn-export-pdf')?.addEventListener('click', () => this.exportPDF());
         
-        document.getElementById('btn-new')?.addEventListener('click', () => {
-            if(confirm("¿Borrar todo y empezar una nueva edición?")) {
+        document.getElementById('btn-new')?.addEventListener('click', async () => {
+            const isConfirmed = await ModalService.confirm("Aviso", "¿Borrar todo y empezar una nueva edición?");
+            if(isConfirmed) {
                 this.model.itemsByPage = { 1: [] };
                 this.model.save();
                 this.refreshPaper();
             }
         });
-        
         document.getElementById('btn-save-json')?.addEventListener('click', () => this.downloadJSON());
         
         const btnImport = document.getElementById('btn-import');
@@ -187,51 +184,6 @@ export default class NewspaperController {
         if (btnImport && fileInput) {
             btnImport.addEventListener('click', () => fileInput.click());
             fileInput.addEventListener('change', (e) => this.uploadJSON(e));
-        }
-
-        this.setupImageUpload('btn-upload-main', 'file-upload-main', 'inp-img');
-        this.setupImageUpload('btn-upload-decree', 'file-upload-decree', 'inp-decree-img');
-
-        // EVENTOS IA
-        const btnAI = document.getElementById('btn-ai-gen');
-        if (btnAI) btnAI.addEventListener('click', () => this.handleAIGeneration('news'));
-
-        const btnObit = document.getElementById('btn-ai-obit');
-        if (btnObit) btnObit.addEventListener('click', () => this.handleAIGeneration('obituary'));
-    }
-
-    async handleAIGeneration(type) {
-        const promptInput = document.getElementById('ai-prompt');
-        const maxCharsInput = document.getElementById('ai-max-chars');
-        const prompt = promptInput.value;
-        const maxChars = maxCharsInput ? parseInt(maxCharsInput.value) : 280;
-        
-        const modelSelect = document.getElementById('ai-model-select');
-        const model = modelSelect ? modelSelect.value : 'gemini'; 
-        
-        if (!prompt && type === 'news') {
-            alert("Por favor, describe el suceso.");
-            return;
-        }
-
-        const btn = document.getElementById(type === 'news' ? 'btn-ai-gen' : 'btn-ai-obit');
-        const originalContent = btn.innerHTML;
-        
-        btn.innerHTML = '<i class="ph ph-spinner animate-spin"></i>';
-        btn.disabled = true;
-
-        try {
-            const generatedText = await AIService.generateText(prompt || "Generar obituario aleatorio", type, model, maxChars);
-            const { title, body } = AIService.parseResponse(generatedText);
-
-            document.getElementById('inp-title').value = title;
-            document.getElementById('inp-body').value = body;
-            
-        } catch (error) {
-            alert("Error IA: " + error.message);
-        } finally {
-            btn.innerHTML = originalContent;
-            btn.disabled = false;
         }
     }
 
@@ -308,11 +260,87 @@ export default class NewspaperController {
         }, { offset: Number.NEGATIVE_INFINITY }).element;
     }
 
+    async handleAIGenerate() {
+        const btn = document.getElementById('btn-ai-generate');
+        const town = document.getElementById('inp-ai-town').value.trim();
+        const character = document.getElementById('inp-ai-character').value.trim();
+        const type = document.getElementById('inp-ai-type').value;
+
+        const originalText = btn.innerText;
+        btn.innerText = "Generando...";
+        btn.disabled = true;
+
+        try {
+            if (!AIService.isConfigured()) {
+                await ModalService.alert("Aviso", "Debes configurar la API de IA en la pantalla de inicio.");
+                btn.innerText = originalText;
+                btn.disabled = false;
+                return;
+            }
+
+            const systemPrompt = `Eres un redactor de un periódico en un mundo de fantasía medieval. Genera una noticia atractiva.
+Debes responder ESTRICTAMENTE con un objeto JSON válido con el siguiente formato:
+{
+  "title": "Título llamativo de la noticia",
+  "body": "Cuerpo de la noticia, detallando los eventos."
+}`;
+
+            let userPrompt = `Genera una noticia sobre el tema: ${type}.`;
+            if (town) userPrompt += ` Ubicación: ${town}.`;
+            if (character) userPrompt += ` Involucra a: ${character}.`;
+
+            const rawResponse = await AIService.generate(systemPrompt, userPrompt);
+
+            if (rawResponse) {
+                try {
+                    // Limpiar la respuesta por si la IA incluye markdown
+                    let jsonStr = rawResponse.trim();
+                    if (jsonStr.startsWith('\`\`\`json')) {
+                        jsonStr = jsonStr.substring(7, jsonStr.length - 3).trim();
+                    } else if (jsonStr.startsWith('\`\`\`')) {
+                        jsonStr = jsonStr.substring(3, jsonStr.length - 3).trim();
+                    }
+                    const parsed = JSON.parse(jsonStr);
+                    document.getElementById('inp-title').value = parsed.title || '';
+                    document.getElementById('inp-body').value = parsed.body || '';
+                } catch (parseError) {
+                    console.error("AI Parse Error:", parseError, rawResponse);
+                    await ModalService.alert("Aviso", "Error al procesar la respuesta de la IA.");
+                }
+            } else {
+                await ModalService.alert("Aviso", "Error: No se recibió respuesta de la IA.");
+            }
+        } catch (error) {
+            console.error("AI Generation Error:", error);
+            await ModalService.alert("Aviso", `Error generando contenido: ${error.message}`);
+        } finally {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
+    }
+
+    fillConfigModal() {
+        const c = this.model.config;
+        const setVal = (id, val) => {
+            const el = document.getElementById(id);
+            if(el) el.value = val || '';
+        };
+        
+        setVal('modal-name', c.name);
+        setVal('modal-price', c.price);
+        setVal('modal-subtitle', c.subtitle);
+        setVal('modal-texture', c.texture);
+        setVal('modal-font', c.fontTheme);
+        setVal('modal-base-date', c.baseDate);
+        setVal('modal-current-date', c.currentDate);
+        setVal('modal-freq', c.frequency);
+        setVal('modal-manual', c.manualEdition);
+    }
+
     handleFormSubmit() {
         const title = document.getElementById('inp-title').value;
         const body = document.getElementById('inp-body').value;
         const type = document.getElementById('inp-type').value; 
-        
         const page = type === 'special' ? 1 : parseInt(document.getElementById('inp-page').value);
         const image = document.getElementById('inp-img').value;
         const id = document.getElementById('edit-id').value;
@@ -356,11 +384,12 @@ export default class NewspaperController {
         this.refreshPaper();
     }
 
-    handleDelete() {
+    async handleDelete() {
         const id = document.getElementById('edit-id').value;
         if (!id) return;
         
-        if(confirm("¿Seguro que deseas eliminar este elemento?")) {
+        const isConfirmed = await ModalService.confirm("Aviso", "¿Seguro que deseas eliminar este elemento?");
+        if(isConfirmed) {
             let page = null;
             for(const [p, items] of Object.entries(this.model.itemsByPage)) {
                 if(items.find(i => i.id === id)) { page = p; break; }
@@ -371,26 +400,6 @@ export default class NewspaperController {
                 this.refreshPaper();
             }
         }
-    }
-
-    fillConfigModal() {
-        const c = this.model.config;
-        const global = DataService.getGlobal() || {};
-        const setVal = (id, val) => {
-            const el = document.getElementById(id);
-            if(el) el.value = val || '';
-        };
-        setVal('modal-name', c.name);
-        setVal('modal-price', c.price);
-        setVal('modal-subtitle', c.subtitle);
-        setVal('modal-texture', c.texture);
-        setVal('modal-font', c.fontTheme);
-        setVal('modal-base-date', c.baseDate);
-        setVal('modal-current-date', c.currentDate);
-        setVal('modal-freq', c.frequency);
-        setVal('modal-manual', c.manualEdition);
-        setVal('modal-api-key', global.apiKey);
-        setVal('modal-gemini-key', global.geminiKey);
     }
 
     handleConfigSave() {
@@ -409,13 +418,6 @@ export default class NewspaperController {
             name, price, subtitle, texture, fontTheme, 
             baseDate, currentDate, frequency, manualEdition
         });
-        
-        const global = DataService.getGlobal() || {};
-        const apiKey = document.getElementById('modal-api-key')?.value;
-        const geminiKey = document.getElementById('modal-gemini-key')?.value;
-        if (apiKey !== undefined) global.apiKey = apiKey;
-        if (geminiKey !== undefined) global.geminiKey = geminiKey;
-        DataService.saveGlobal(global);
         
         this.view.toggleConfigModal(false);
         this.refreshPaper();
@@ -436,83 +438,126 @@ export default class NewspaperController {
         const file = e.target.files[0];
         if (!file) return;
         const reader = new FileReader();
-        reader.onload = (event) => {
+        reader.onload = async (event) => {
             const success = this.model.fromJSON(event.target.result);
             if (success) {
                 this.refreshPaper();
-                alert("¡Archivo cargado con éxito!");
+                await ModalService.alert("Éxito", "¡Archivo cargado con éxito!");
             } else {
-                alert("Error: El pergamino está corrupto.");
+                await ModalService.alert("Error", "El pergamino está corrupto.");
             }
         };
         reader.readAsText(file);
     }
 
-    // --- LÓGICA DE EXPORTACIÓN PÁGINA A PÁGINA (ESTRICTA) ---
-    exportPDF() {
-        const element = document.getElementById('paper-capture');
-        const originalTransform = element.style.transform;
-        const originalWidth = element.style.width;
-        
-        ExportService.exportToPDF('paper-capture', this.model.config.name, {
-            onBefore: (el) => {
-                // 1. Reset Zoom para asegurar renderizado 1:1
-                el.style.transform = 'scale(1)';
-                
-                // 2. FORZAR ANCHO FIJO: Esto es clave para que el Grid no se descalabre
-                // al renderizarse en el canvas invisible. Usamos el ancho de una página A4 aprox.
-                el.style.width = '210mm'; 
-                
-                // 3. Aplanar páginas (quitar margenes y sombras para evitar cortes y hojas extra)
-                const pages = el.querySelectorAll('.paper-page');
-                pages.forEach(p => {
-                    p.dataset.originalMb = p.style.marginBottom;
-                    p.dataset.originalShadow = p.style.boxShadow;
-                    p.dataset.originalBorder = p.style.border;
-                    
-                    // IMPORTANTE: Quitamos márgenes y bordes para la "foto"
-                    p.style.marginBottom = '0'; 
-                    p.style.boxShadow = 'none';
-                    // Borde transparente evita colapso de márgenes sin añadir pixeles visibles
-                    p.style.border = '1px solid transparent'; 
-                    
-                    // Limpiar bordes de error rojos si existen
-                    p.querySelectorAll('.error-overflow').forEach(err => {
-                        err.classList.remove('error-overflow');
-                    });
-                });
+    async exportPDF() {
+        const originalElement = document.getElementById('paper-capture');
+        if (!originalElement) return;
 
-                // 4. Limpiar rotaciones problemáticas (Se Busca)
-                const rotated = el.querySelectorAll('.style-wanted');
-                rotated.forEach(r => {
-                    r.dataset.originalTransform = r.style.transform;
-                    r.style.transform = 'none'; 
-                    r.style.border = '5px solid #2b0a0a'; 
-                });
-            },
-            onAfter: (el) => {
-                // Restaurar TODO al estado original
-                el.style.transform = originalTransform;
-                el.style.width = originalWidth;
+        // Use print() approach to maintain absolute CSS fidelity (CSS Grid, filters, mix-blend-mode).
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) {
+            await ModalService.alert("Aviso", "Por favor, permite ventanas emergentes para exportar el PDF.");
+            return;
+        }
 
-                const pages = el.querySelectorAll('.paper-page');
-                pages.forEach(p => {
-                    p.style.marginBottom = p.dataset.originalMb || '';
-                    p.style.boxShadow = p.dataset.originalShadow || '';
-                    p.style.border = p.dataset.originalBorder || '';
-                });
+        const clonedContent = originalElement.cloneNode(true);
+        // Remove interactive overlays from the clone before printing
+        clonedContent.querySelectorAll('.error-overflow, .drag-over').forEach(el => {
+            el.classList.remove('error-overflow', 'drag-over');
+        });
 
-                const rotated = el.querySelectorAll('.style-wanted');
-                rotated.forEach(r => {
-                    if (r.dataset.originalTransform) {
-                        r.style.transform = r.dataset.originalTransform;
-                    }
-                });
-                
-                // Refrescar para asegurar que el grid se recalcule visualmente
-                this.refreshPaper();
+        // Helper function to resolve relative paths for styles and images to absolute paths before printing
+        const basePath = window.location.origin + window.location.pathname.replace('index.html', '');
+
+        clonedContent.querySelectorAll('img').forEach(img => {
+            if (img.src && !img.src.startsWith('data:') && !img.src.startsWith('http')) {
+                img.src = new URL(img.getAttribute('src'), basePath).href;
             }
         });
+
+        const htmlContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>${this.model.config.name || 'Periódico'}</title>
+                <!-- Load required external styles -->
+                <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Special+Elite&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&family=Rye&display=swap" rel="stylesheet">
+                <link rel="stylesheet" href="${basePath}css/main.css">
+                <link rel="stylesheet" href="${basePath}css/modules/newspaper.css">
+                <style>
+                    /* Fix missing backgrounds by injecting inline URLs that point directly to the assets based on absolute path */
+                    .texture-clean { background-image: url('${basePath}assets/img/paper.png') !important; }
+                    .texture-gritty { background-image: url('${basePath}assets/img/ag-square.png') !important; }
+                    .texture-magic { background-image: url('${basePath}assets/img/stardust.png') !important; }
+                    .news-item.style-wanted { background-image: url('${basePath}assets/img/wood-pattern.png') !important; }
+
+                    /* Print-specific overrides to guarantee A4 layout and background rendering */
+                    @page {
+                        size: A4;
+                        margin: 0;
+                    }
+                    body {
+                        margin: 0;
+                        padding: 0;
+                        background: #fff;
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
+                    #paper-capture {
+                        transform: none !important;
+                        margin: 0 !important;
+                        padding: 0 !important;
+                        display: block !important;
+                        width: 100% !important;
+                    }
+                    .paper-page {
+                        width: 210mm !important;
+                        height: 297mm !important;
+                        margin: 0 !important;
+                        padding: 12mm 15mm 15mm 15mm !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        page-break-after: always;
+                        page-break-inside: avoid;
+                        position: relative;
+                        box-sizing: border-box;
+                        overflow: hidden;
+                    }
+                    .paper-page:last-child {
+                        page-break-after: auto;
+                    }
+
+                    /* Ensure backgrounds and filters print correctly */
+                    .texture-clean, .texture-gritty, .texture-magic {
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
+                    .news-img {
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
+                </style>
+            </head>
+            <body>
+                ${clonedContent.outerHTML}
+                <script>
+                    window.onload = () => {
+                        // Wait slightly to ensure fonts and backgrounds load, then trigger print
+                        setTimeout(() => {
+                            window.print();
+                            // Optional: auto-close after print dialogue is handled
+                            // window.close();
+                        }, 500);
+                    };
+                </script>
+            </body>
+            </html>
+        `;
+
+        printWindow.document.open();
+        printWindow.document.write(htmlContent);
+        printWindow.document.close();
     }
 
     destroy() {

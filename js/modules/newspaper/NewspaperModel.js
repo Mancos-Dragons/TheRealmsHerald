@@ -75,17 +75,14 @@ export default class NewspaperModel {
             this.itemsByPage[1] = [item];
         } else {
             if (page1Items.length > 0) {
-                const maxPage = this.getLastActivePage();
-                for (let i = maxPage; i >= 1; i--) {
-                    const contentToMove = this.itemsByPage[i];
-                    if (contentToMove && contentToMove.length > 0) {
-                        if (!this.itemsByPage[i + 1]) this.itemsByPage[i + 1] = [];
-                        this.itemsByPage[i + 1] = [...contentToMove, ...this.itemsByPage[i + 1]];
-                        this.itemsByPage[i] = []; 
-                    }
-                }
+                const newItemsByPage = { 1: [item] };
+                Object.entries(this.itemsByPage).forEach(([page, items]) => {
+                    newItemsByPage[parseInt(page) + 1] = items;
+                });
+                this.itemsByPage = newItemsByPage;
+            } else {
+                this.itemsByPage[1] = [item];
             }
-            this.itemsByPage[1] = [item];
         }
         this.save();
     }
@@ -126,15 +123,15 @@ export default class NewspaperModel {
      * Mueve el contenido de Pág 2 -> Pág 1, Pág 3 -> Pág 2, etc.
      */
     shiftPagesBack() {
-        const pages = Object.keys(this.itemsByPage).map(Number);
-        const maxPage = Math.max(...pages, 1);
-
-        for (let i = 1; i < maxPage; i++) {
-            this.itemsByPage[i] = this.itemsByPage[i + 1] || [];
-        }
+        const newItemsByPage = {};
+        Object.entries(this.itemsByPage).forEach(([page, items]) => {
+            const pageNum = parseInt(page);
+            if (pageNum > 1) {
+                newItemsByPage[pageNum - 1] = items;
+            }
+        });
         
-        delete this.itemsByPage[maxPage];
-        
+        this.itemsByPage = newItemsByPage;
         if (!this.itemsByPage[1]) this.itemsByPage[1] = [];
     }
 

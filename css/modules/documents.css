@@ -1,0 +1,136 @@
+.paper-page {
+    background-color: var(--parchment, #f4e4bc);
+    color: var(--ink, #1b1818);
+    width: 210mm;
+    height: 297mm;
+    padding: 15mm;
+    box-shadow: 0 0 50px rgba(0,0,0,0.5);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    margin-bottom: 3rem;
+    transform-origin: top center;
+    border: 1px solid #d4c49c;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    container-type: inline-size;
+    --doc-scale: 1;
+}
+
+.texture-clean {
+    background-image: url('../../assets/img/paper.png');
+    filter: contrast(1.1) brightness(1.1);
+}
+.texture-gritty {
+    background-image: url('../../assets/img/ag-square.png');
+    background-color: #d6c698;
+    filter: sepia(0.4);
+}
+.texture-magic {
+    background-image: url('../../assets/img/stardust.png');
+    background-color: #e0d8ff;
+    color: #1a0f35;
+    border-color: #8a7cba;
+}
+
+.font-royal .doc-title { font-family: 'Cinzel', serif; }
+.font-royal .doc-body { font-family: 'Old Standard TT', serif; }
+.font-royal .doc-signature { font-family: 'Special Elite', cursive; }
+
+.font-script .doc-title { font-family: 'Special Elite', cursive; }
+.font-script .doc-body { font-family: 'Special Elite', cursive; }
+.font-script .doc-signature { font-family: 'Old Standard TT', serif; font-style: italic; }
+
+.doc-decree {
+    justify-content: center;
+    align-items: center;
+}
+
+.doc-decree-inner {
+    width: 85%;
+    height: 90%;
+    border: double 6px #d4af37;
+    outline: solid 2px #1b1818;
+    outline-offset: -10px;
+    padding: 10mm;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.1);
+    box-sizing: border-box;
+}
+
+.doc-decree .doc-title {
+    font-size: calc(clamp(2rem, 5cqw, 3rem) * var(--doc-scale));
+    text-align: center;
+    border-bottom: 2px solid #d4af37;
+    padding-bottom: 5mm;
+    margin-bottom: 10mm;
+    text-transform: uppercase;
+    word-break: break-word;
+}
+
+.doc-decree .doc-body {
+    font-size: calc(clamp(1rem, 2.5cqw, 1.4rem) * var(--doc-scale));
+    font-style: italic;
+    line-height: 1.8;
+    text-align: center;
+    flex-grow: 1;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
+.doc-decree .doc-seal {
+    width: 40mm;
+    height: 40mm;
+    background-color: #b91c1c;
+    border-radius: 50%;
+    margin-bottom: 10mm;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.3), inset -2px -2px 10px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(0,0,0,0.3);
+    font-size: 3rem;
+    border: 2px dashed rgba(255,255,255,0.2);
+    flex-shrink: 0;
+}
+
+.doc-decree .doc-signature {
+    margin-top: 10mm;
+    font-size: calc(1.5rem * var(--doc-scale));
+    align-self: flex-end;
+}
+
+.doc-letter-inner {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 10mm;
+    box-sizing: border-box;
+}
+
+.doc-letter .doc-title {
+    font-size: calc(clamp(2rem, 4cqw, 2.5rem) * var(--doc-scale));
+    margin-bottom: 10mm;
+    text-align: center;
+    word-break: break-word;
+}
+
+.doc-letter .doc-body {
+    font-size: calc(clamp(1rem, 2cqw, 1.5rem) * var(--doc-scale));
+    line-height: 2;
+    text-align: justify;
+    flex-grow: 1;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
+.doc-letter .doc-signature {
+    margin-top: 15mm;
+    font-size: calc(2rem * var(--doc-scale));
+    text-align: right;
+}

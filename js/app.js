@@ -11,6 +11,9 @@ class AppOrchestrator {
         this.modules = {
             'home': () => import('./modules/home/HomeController.js'),
             'newspaper': () => import('./modules/newspaper/NewspaperController.js'),
+            'rumors': () => import('./modules/rumors/RumorsController.js'),
+            'documents': () => import('./modules/documents/DocumentsController.js'),
+            'flyers': () => import('./modules/flyers/FlyersController.js'),
         };
         
         this.init();
@@ -48,6 +51,17 @@ class AppOrchestrator {
                     this.currentModule.attachEvents(); 
                 } else if (this.currentModuleKey === 'home') {
                     this.currentModule.render();
+                } else if (this.currentModuleKey === 'rumors') {
+                    this.currentModule.view.render(this.currentModule.model);
+                    this.currentModule.attachEvents();
+                } else if (this.currentModuleKey === 'documents') {
+                    this.currentModule.view.renderWorkspace(this.currentModule.model.config);
+                    this.currentModule.view.renderDocument(this.currentModule.model.config);
+                    this.currentModule.attachEvents();
+                } else if (this.currentModuleKey === 'flyers') {
+                    this.currentModule.view.renderWorkspace(this.currentModule.model.getConfig());
+                    this.currentModule.view.renderCanvas(this.currentModule.model);
+                    this.currentModule.attachEvents();
                 }
             }
         }
