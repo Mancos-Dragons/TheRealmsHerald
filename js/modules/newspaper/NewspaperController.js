@@ -262,9 +262,13 @@ export default class NewspaperController {
 
     async handleAIGenerate() {
         const btn = document.getElementById('btn-ai-generate');
+        const type = document.getElementById('inp-ai-type').value;
+        const topic = document.getElementById('inp-ai-topic').value.trim();
         const town = document.getElementById('inp-ai-town').value.trim();
         const character = document.getElementById('inp-ai-character').value.trim();
-        const type = document.getElementById('inp-ai-type').value;
+        const tone = document.getElementById('inp-ai-tone').value.trim();
+        const maxChars = document.getElementById('inp-ai-max-chars').value || 400;
+        const censorship = this.model.config.censorship || 'none';
 
         const originalText = btn.innerText;
         btn.innerText = "Generando...";
@@ -278,16 +282,53 @@ export default class NewspaperController {
                 return;
             }
 
-            const systemPrompt = `Eres un redactor de un periódico en un mundo de fantasía medieval. Genera una noticia atractiva.
-Debes responder ESTRICTAMENTE con un objeto JSON válido con el siguiente formato:
-{
-  "title": "Título llamativo de la noticia",
-  "body": "Cuerpo de la noticia, detallando los eventos."
-}`;
+            let censorshipInstructions = "";
+            switch(censorship) {
+                case "low": censorshipInstructions = "CENSURA BAJA: Suaviza los detalles más escabrosos o violentos, pero mantén la verdad."; break;
+                case "medium": censorshipInstructions = "CENSURA MEDIA: Evita cualquier crítica directa a la nobleza, el gobierno local o la guardia. Tergiversa los hechos ligeramente si es necesario para proteger su imagen."; break;
+                case "high": censorshipInstructions = "CENSURA ALTA: Omite verdades clave que perjudiquen al establishment. Introduce propaganda a favor de las autoridades. Si ocurrió una tragedia por negligencia, culpa a factores externos (bandidos, monstruos, disidentes)."; break;
+                case "extreme": censorshipInstructions = "CENSURA EXTREMA: Oculta por completo cualquier evento negativo. Todo es perfecto bajo el mando del régimen. Si se menciona un problema, es solo para engrandecer la rápida y gloriosa respuesta de las autoridades. Pura propaganda estatal."; break;
+                default: censorshipInstructions = "Eres objetivo y cuentas la verdad tal cual es, sin censura."; break;
+            }
 
-            let userPrompt = `Genera una noticia sobre el tema: ${type}.`;
+            let typeInstructions = "";
+            let jsonFormat = "";
+
+            switch(type) {
+                case "news":
+                    typeInstructions = "Genera una noticia periodística atractiva.";
+                    jsonFormat = `{\n  "title": "Título llamativo de la noticia",\n  "body": "Cuerpo de la noticia."\n}`;
+                    break;
+                case "ad":
+                    typeInstructions = "Genera un anuncio publicitario persuasivo para un negocio, producto o servicio.";
+                    jsonFormat = `{\n  "title": "Nombre del producto/negocio o frase gancho",\n  "body": "Descripción publicitaria persuasiva."\n}`;
+                    break;
+                case "wanted":
+                    typeInstructions = "Genera un cartel de 'Se Busca' para un criminal, monstruo o prófugo.";
+                    jsonFormat = `{\n  "title": "Nombre del prófugo/monstruo",\n  "body": "Descripción de sus crímenes y apariencia física.",\n  "extra": "Recompensa ofrecida (ej: 5000 Monedas de Oro)"\n}`;
+                    break;
+                case "decree":
+                    typeInstructions = "Genera un decreto oficial de la nobleza, el rey o el gobierno local.";
+                    jsonFormat = `{\n  "title": "Título oficial del decreto",\n  "body": "El mandato, ley o anuncio oficial en tono autoritario.",\n  "extra": "Firma o autoridad emisora (ej: Su Majestad el Rey, El Alcalde)"\n}`;
+                    break;
+                case "obituary":
+                    typeInstructions = "Genera un obituario recordando a un fallecido.";
+                    jsonFormat = `{\n  "title": "Nombre del fallecido",\n  "body": "Un pequeño homenaje o dedicatoria de despedida.",\n  "extra": "Firma o familia que lo llora"\n}`;
+                    break;
+            }
+
+            const systemPrompt = `Eres un redactor en un periódico de un mundo de fantasía medieval.
+${typeInstructions}
+${censorshipInstructions}
+El cuerpo del texto NO DEBE superar los ${maxChars} caracteres.
+Debes responder ESTRICTAMENTE con un objeto JSON válido con el siguiente formato:
+${jsonFormat}`;
+
+            let userPrompt = `Genera el contenido basado en esto:`;
+            if (topic) userPrompt += ` Tema/Contexto: ${topic}.`;
             if (town) userPrompt += ` Ubicación: ${town}.`;
             if (character) userPrompt += ` Involucra a: ${character}.`;
+            if (tone) userPrompt += ` Tono de redacción: ${tone}.`;
 
             const rawResponse = await AIService.generate(systemPrompt, userPrompt);
 
@@ -303,6 +344,38 @@ Debes responder ESTRICTAMENTE con un objeto JSON válido con el siguiente format
                     const parsed = JSON.parse(jsonStr);
                     document.getElementById('inp-title').value = parsed.title || '';
                     document.getElementById('inp-body').value = parsed.body || '';
+
+                    // Auto-seleccionar tipo en la vista
+                    if (type === 'news') {
+                        document.getElementById('type-news')?.click();
+                    } else if (type === 'ad') {
+                        document.getElementById('type-ad')?.click();
+                    } else if (type === 'wanted') {
+                        document.getElementById('type-special')?.click();
+                        const selStyle = document.getElementById('inp-special-style');
+                        if (selStyle) {
+                            selStyle.value = 'style-wanted';
+                            selStyle.dispatchEvent(new Event('change'));
+                        }
+                        document.getElementById('inp-extra').value = parsed.extra || '';
+                    } else if (type === 'decree') {
+                        document.getElementById('type-special')?.click();
+                        const selStyle = document.getElementById('inp-special-style');
+                        if (selStyle) {
+                            selStyle.value = 'style-decree';
+                            selStyle.dispatchEvent(new Event('change'));
+                        }
+                        document.getElementById('inp-extra').value = parsed.extra || '';
+                    } else if (type === 'obituary') {
+                        document.getElementById('type-special')?.click();
+                        const selStyle = document.getElementById('inp-special-style');
+                        if (selStyle) {
+                            selStyle.value = 'style-obituary';
+                            selStyle.dispatchEvent(new Event('change'));
+                        }
+                        document.getElementById('inp-extra').value = parsed.extra || '';
+                    }
+
                 } catch (parseError) {
                     console.error("AI Parse Error:", parseError, rawResponse);
                     await ModalService.alert("Aviso", "Error al procesar la respuesta de la IA.");
@@ -335,6 +408,7 @@ Debes responder ESTRICTAMENTE con un objeto JSON válido con el siguiente format
         setVal('modal-current-date', c.currentDate);
         setVal('modal-freq', c.frequency);
         setVal('modal-manual', c.manualEdition);
+        setVal('modal-censorship', c.censorship);
     }
 
     handleFormSubmit() {
@@ -413,10 +487,11 @@ Debes responder ESTRICTAMENTE con un objeto JSON válido con el siguiente format
         const currentDate = document.getElementById('modal-current-date')?.value || today;
         const frequency = document.getElementById('modal-freq')?.value || "7";
         const manualEdition = document.getElementById('modal-manual')?.value || "0";
+        const censorship = document.getElementById('modal-censorship')?.value || "none";
 
         this.model.setConfig({ 
             name, price, subtitle, texture, fontTheme, 
-            baseDate, currentDate, frequency, manualEdition
+            baseDate, currentDate, frequency, manualEdition, censorship
         });
         
         this.view.toggleConfigModal(false);

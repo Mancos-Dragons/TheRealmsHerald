@@ -42,25 +42,40 @@ export default class NewspaperView {
                                 <div class="p-3 pt-0 border-t border-purple-900/10 space-y-3">
                                     <div class="flex gap-2 mt-3">
                                         <div class="flex-1">
-                                            <label class="text-[10px] text-gray-500 mb-1 block">Modelo</label>
-                                            <select id="ai-model-select" class="w-full bg-[#111] border border-gray-700 text-gray-300 p-1 rounded text-xs">
-                                                <option value="gemini">Gemini (Google)</option>
-                                                <option value="gpt">ChatGPT (OpenAI)</option>
+                                            <label class="text-[10px] text-gray-500 mb-1 block">Tipo</label>
+                                            <select id="inp-ai-type" class="w-full bg-[#111] border border-gray-700 text-gray-300 p-1 rounded text-xs">
+                                                <option value="news">Noticia</option>
+                                                <option value="ad">Anuncio Publicitario</option>
+                                                <option value="wanted">Cartel de Se Busca</option>
+                                                <option value="decree">Decreto Oficial</option>
+                                                <option value="obituary">Obituario</option>
                                             </select>
                                         </div>
                                         <div class="w-20">
-                                            <label class="text-[10px] text-gray-500 mb-1 block">Carácteres</label>
-                                            <input type="number" id="ai-max-chars" class="w-full bg-[#111] border border-gray-700 text-gray-300 p-1 rounded text-xs" value="400" min="50" step="50">
+                                            <label class="text-[10px] text-gray-500 mb-1 block">Max. Caract.</label>
+                                            <input type="number" id="inp-ai-max-chars" class="w-full bg-[#111] border border-gray-700 text-gray-300 p-1 rounded text-xs" value="400" min="50" step="50">
                                         </div>
                                     </div>
                                     
                                     <div>
-                                        <input type="text" id="ai-prompt" class="${inputClass} !bg-[#111] text-xs" placeholder="${t('news.ai.prompt')}">
+                                        <input type="text" id="inp-ai-topic" class="${inputClass} !bg-[#111] text-xs" placeholder="${t('news.ai.prompt')}">
                                     </div>
 
-                                    <div class="flex justify-between items-center">
-                                        <button type="button" id="btn-ai-obit" class="text-[10px] text-gray-500 hover:text-purple-400 underline">${t('news.btn.obituary')}</button>
-                                        <button type="button" id="btn-ai-gen" class="px-3 py-1 bg-purple-800 hover:bg-purple-700 text-white rounded transition text-xs font-bold shadow-lg">
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <input type="text" id="inp-ai-town" class="${inputClass} !bg-[#111] text-xs" placeholder="Pueblo/Ciudad">
+                                        </div>
+                                        <div>
+                                            <input type="text" id="inp-ai-character" class="${inputClass} !bg-[#111] text-xs" placeholder="Personaje">
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <input type="text" id="inp-ai-tone" class="${inputClass} !bg-[#111] text-xs" placeholder="Tono (Ej: Formal, Cómico, Trágico)">
+                                    </div>
+
+                                    <div class="flex justify-end items-center">
+                                        <button type="button" id="btn-ai-generate" class="px-3 py-1 bg-purple-800 hover:bg-purple-700 text-white rounded transition text-xs font-bold shadow-lg">
                                             ${t('news.btn.generate')}
                                         </button>
                                     </div>
@@ -119,6 +134,7 @@ export default class NewspaperView {
                                     <select id="inp-special-style" class="${inputClass}">
                                         <option value="style-wanted" data-i18n="news.special.wanted">${t('news.special.wanted')}</option>
                                         <option value="style-decree" data-i18n="news.special.decree">${t('news.special.decree')}</option>
+                                        <option value="style-obituary">Obituario Especial</option>
                                     </select>
                                 </div>
                                 <div>
@@ -178,32 +194,6 @@ export default class NewspaperView {
                             </div>
                         </form>
 
-                        <div class="border-t border-gray-700 pt-4 mt-2">
-                            <h3 class="text-amber-500 font-bold mb-3 text-sm flex items-center gap-2">
-                                <i class="ph ph-magic-wand"></i> <span data-i18n="news.ai.title">${t('news.ai.title')}</span>
-                            </h3>
-                            <div class="space-y-3">
-                                <div>
-                                    <label class="${labelClass}" data-i18n="news.ai.town">${t('news.ai.town')}</label>
-                                    <input type="text" id="inp-ai-town" class="${inputClass}" placeholder="${t('news.ai.town.placeholder')}">
-                                </div>
-                                <div>
-                                    <label class="${labelClass}" data-i18n="news.ai.character">${t('news.ai.character')}</label>
-                                    <input type="text" id="inp-ai-character" class="${inputClass}" placeholder="${t('news.ai.character.placeholder')}">
-                                </div>
-                                <div>
-                                    <label class="${labelClass}" data-i18n="news.ai.type">${t('news.ai.type')}</label>
-                                    <select id="inp-ai-type" class="${inputClass}">
-                                        <option value="rumor" data-i18n="news.ai.type.rumor">${t('news.ai.type.rumor')}</option>
-                                        <option value="event" data-i18n="news.ai.type.event">${t('news.ai.type.event')}</option>
-                                        <option value="scandal" data-i18n="news.ai.type.scandal">${t('news.ai.type.scandal')}</option>
-                                        <option value="obituary" data-i18n="news.ai.type.obituary">${t('news.ai.type.obituary')}</option>
-                                        <option value="ad" data-i18n="news.ai.type.ad">${t('news.ai.type.ad')}</option>
-                                    </select>
-                                </div>
-                                <button type="button" id="btn-ai-generate" class="w-full bg-purple-700 hover:bg-purple-600 text-white py-2 rounded font-bold uppercase tracking-wide transition shadow-lg text-xs mt-2" data-i18n="news.ai.generate">${t('news.ai.generate')}</button>
-                            </div>
-                        </div>
 
                     </div>
                     
@@ -312,13 +302,26 @@ export default class NewspaperView {
                             </select>
                         </div>
                     </div>
-                    <div class="space-y-3">
+                    <div class="space-y-3 pb-4 border-b border-gray-800">
                         <h4 class="text-xs text-gray-500 font-bold uppercase" data-i18n="conf.chrono">${t('conf.chrono')}</h4>
                         <div><label class="block text-xs text-amber-500 font-bold mb-1" data-i18n="conf.date.base">${t('conf.date.base')}</label><input type="date" id="modal-base-date" class="w-full bg-[#1c1c1c] border border-gray-700 text-gray-100 p-2 rounded"></div>
                         <div><label class="block text-xs text-amber-500 font-bold mb-1" data-i18n="conf.date.curr">${t('conf.date.curr')}</label><input type="date" id="modal-current-date" class="w-full bg-[#1c1c1c] border border-gray-700 text-gray-100 p-2 rounded"></div>
                         <div class="grid grid-cols-2 gap-3">
                             <div><label class="block text-xs text-amber-500 font-bold mb-1" data-i18n="conf.freq">${t('conf.freq')}</label><input type="number" id="modal-freq" class="w-full bg-[#1c1c1c] border border-gray-700 text-gray-100 p-2 rounded"></div>
                             <div><label class="block text-xs text-amber-500 font-bold mb-1" data-i18n="conf.manual">${t('conf.manual')}</label><input type="number" id="modal-manual" class="w-full bg-[#1c1c1c] border border-gray-700 text-gray-100 p-2 rounded" placeholder="0 = Auto"></div>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <h4 class="text-xs text-gray-500 font-bold uppercase">Inteligencia Artificial</h4>
+                        <div>
+                            <label class="block text-xs text-amber-500 font-bold mb-1">Censura en Generación</label>
+                            <select id="modal-censorship" class="w-full bg-[#1c1c1c] border border-gray-700 text-gray-100 p-2 rounded cursor-pointer">
+                                <option value="none">Ninguna (Verdad Absoluta)</option>
+                                <option value="low">Baja (Suavizar detalles escabrosos)</option>
+                                <option value="medium">Media (Evitar críticas al gobierno local)</option>
+                                <option value="high">Alta (Fuerte propaganda y omisiones clave)</option>
+                                <option value="extreme">Extrema (Solo propaganda del Régimen, ocultar toda verdad negativa)</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -368,6 +371,12 @@ export default class NewspaperView {
                     lblExtra.innerText = t('lbl.decree.auth');
                     lblImage.innerText = t('lbl.decree.image');
                     divDecreeSettings.classList.remove('hidden');
+                } else if (style === 'style-obituary') {
+                    lblTitle.innerText = 'Nombre del Difunto';
+                    lblBody.innerText = 'Palabras de Despedida';
+                    lblExtra.innerText = 'Firma/Familia';
+                    lblImage.innerText = 'Retrato';
+                    divDecreeSettings.classList.add('hidden');
                 } else {
                     lblTitle.innerText = t('lbl.wanted.name');
                     lblBody.innerText = t('lbl.wanted.desc');
@@ -484,6 +493,21 @@ export default class NewspaperView {
                         <p>${item.body}</p>
                     </div>
                     <div class="wanted-reward">${item.extra || 'REWARD'}</div>
+                `;
+            } else if (item.specialStyle === 'style-obituary') {
+                content = `
+                    <div style="border: 4px double #111; padding: 2rem; background-color: rgba(0,0,0,0.05); text-align: center;">
+                        <i class="ph ph-flower-lotus" style="font-size: 3rem; color: #333; margin-bottom: 1rem;"></i>
+                        <h2 class="headline" style="font-size: 2.5rem; text-transform: uppercase; letter-spacing: 2px; border-bottom: 2px solid #333; display: inline-block; padding-bottom: 5px; margin-bottom: 1.5rem;">In Memoriam</h2>
+                        ${item.image ? `<img src="${item.image}" class="news-img" style="max-height: 250px; border-radius: 50%; border: 3px solid #111; margin: 0 auto 1.5rem auto; width: 250px; object-fit: cover;">` : ''}
+                        <h3 style="font-size: 2rem; font-family: var(--font-royal); margin-bottom: 1rem;">${item.title}</h3>
+                        <div class="news-body" style="font-style: italic; font-size: 1.2rem; line-height: 1.8; max-width: 80%; margin: 0 auto; color: #222;">
+                            ${item.body.replace(/\n/g, '<br>')}
+                        </div>
+                        <div style="margin-top: 2rem; font-size: 1rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                            ${item.extra ? `— ${item.extra} —` : ''}
+                        </div>
+                    </div>
                 `;
             } else {
                 let sealContent = '<i class="ph ph-crown"></i>';

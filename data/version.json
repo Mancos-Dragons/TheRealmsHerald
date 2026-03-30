@@ -1,12 +1,22 @@
 {
   "name": "The Realm's Herald",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "codename": "Forja de Papel",
-  "releaseDate": "2026-03-24",
+  "releaseDate": "2026-03-30",
   "status": "alpha",
   "author": "Fernando Machado",
   "description": "Suite de herramientas narrativas y generadores de documentos para Dungeon Masters.",
   "changelog": [
+    {
+      "version": "0.4.1",
+      "date": "2026-03-30",
+      "changes": [
+        "Unificación del generador IA: Interfaz consolidada en La Voz del Conejo con soporte para nuevos tipos de contenido (anuncios, se busca, decretos, obituarios).",
+        "Obituarios: Nueva plantilla visual especial para honrar a los caídos.",
+        "Censura de IA: Nuevo ajuste global para controlar el nivel de propaganda y ocultamiento de la verdad en las noticias generadas.",
+        "Corrección de traducciones del módulo de prensa: Se arreglaron las etiquetas faltantes para la interfaz del periódico en inglés y español."
+      ]
+    },
     {
       "version": "0.4.0",
       "date": "2026-03-24",
