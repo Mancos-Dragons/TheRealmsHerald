@@ -99,8 +99,16 @@ export default class FlyersController {
 
         const canvas = document.getElementById('flyer-canvas');
         if (canvas) {
-            canvas.addEventListener('remove-flyer-element', (e) => {
+            // Remove old listeners to avoid duplicates
+            const newCanvas = canvas.cloneNode(true);
+            canvas.parentNode.replaceChild(newCanvas, canvas);
+
+            newCanvas.addEventListener('remove-flyer-element', (e) => {
                 this.model.removeElement(e.detail.id);
+                this.view.renderCanvas(this.model);
+            });
+            newCanvas.addEventListener('resize-flyer-element', (e) => {
+                this.model.updateElement(e.detail.id, { scale: e.detail.scale });
                 this.view.renderCanvas(this.model);
             });
         }
@@ -204,8 +212,9 @@ export default class FlyersController {
             }
         });
 
-        // Remove delete buttons
+        // Remove delete buttons and resize controls
         clonedContent.querySelectorAll('button').forEach(btn => btn.remove());
+        clonedContent.querySelectorAll('.btn-resize').forEach(el => el.remove());
         // Remove hover/border effects
         clonedContent.querySelectorAll('.flyer-element').forEach(el => {
             el.classList.remove('hover:border-amber-500/50', 'hover:bg-amber-500/10', 'border', 'border-transparent');
@@ -217,6 +226,7 @@ export default class FlyersController {
             <html>
             <head>
                 <title>Pregonero Visual</title>
+                <script src="https://cdn.tailwindcss.com"></script>
                 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Special+Elite&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
                 <link rel="stylesheet" href="${basePath}css/main.css">
                 <link rel="stylesheet" href="${basePath}css/modules/flyers.css">
@@ -265,7 +275,7 @@ export default class FlyersController {
                     window.onload = () => {
                         setTimeout(() => {
                             window.print();
-                        }, 500);
+                        }, 1500); // Give tailwind time to process classes
                     };
                 </script>
             </body>

@@ -13,6 +13,7 @@ export default class FlyersModel {
             type: type, // 'text' or 'image'
             x: 50,
             y: 50,
+            scale: 1, // Default scale
             ...data
         };
         this.elements.push(newElement);

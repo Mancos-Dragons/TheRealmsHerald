@@ -1,5 +1,24 @@
 {
   "es": {
+    "flyers": {
+      "title": "Pregonero Visual",
+      "subtitle": "Editor de Flyers",
+      "texture": "Textura del Papel",
+      "textureClean": "Pergamino Limpio",
+      "textureGritty": "Panfleto Sucio",
+      "textureMagic": "Papel Arcano",
+      "filter": "Filtro de Desgaste",
+      "filterNone": "Ninguno",
+      "filterSepia": "Sepia Viejo",
+      "filterGrayscale": "Blanco y Negro",
+      "filterBlood": "Manchas Rojas",
+      "addText": "Añadir Texto",
+      "addTextPlaceholder": "Ej: SE BUSCA: Recompensa 500 po",
+      "addImage": "Añadir Imagen",
+      "addImagePlaceholder": "URL de la imagen...",
+      "exportPdf": "Exportar PDF",
+      "preview": "Vista Previa - Drag & Drop"
+    },
     "tools": {
       "newspaper": {
         "title": "La Voz del Conejo",
@@ -76,6 +95,25 @@
     }
   },
   "en": {
+    "flyers": {
+      "title": "Visual Town Crier",
+      "subtitle": "Flyers Editor",
+      "texture": "Paper Texture",
+      "textureClean": "Clean Parchment",
+      "textureGritty": "Gritty Pamphlet",
+      "textureMagic": "Arcane Paper",
+      "filter": "Wear Filter",
+      "filterNone": "None",
+      "filterSepia": "Old Sepia",
+      "filterGrayscale": "Grayscale",
+      "filterBlood": "Blood Stains",
+      "addText": "Add Text",
+      "addTextPlaceholder": "Ex: WANTED: Reward 500 gp",
+      "addImage": "Add Image",
+      "addImagePlaceholder": "Image URL...",
+      "exportPdf": "Export PDF",
+      "preview": "Preview - Drag & Drop"
+    },
     "tools": {
       "newspaper": {
         "title": "The Rabbit's Voice",

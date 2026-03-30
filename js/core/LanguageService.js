@@ -294,8 +294,8 @@ export const LanguageService = {
         return this.dictionary[this.currentLang][key] || key;
     },
 
-    translateDOM() {
-        document.querySelectorAll('[data-i18n]').forEach(el => {
+    translateDOM(root = document) {
+        root.querySelectorAll('[data-i18n]').forEach(el => {
             const key = el.dataset.i18n;
             if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
                 el.placeholder = this.get(key);

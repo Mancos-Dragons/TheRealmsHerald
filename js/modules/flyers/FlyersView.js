@@ -15,59 +15,59 @@ export default class FlyersView {
         const btnSecClass = "w-full p-2 mt-2 rounded bg-[#333] hover:bg-[#444] text-white font-bold transition flex flex-col items-center gap-1 text-sm shadow-lg";
 
         this.container.innerHTML = `
-            <div class="flex w-full h-full bg-[#0d0d0d] overflow-hidden fade-in font-sans">
+            <div class="flex w-full h-full bg-[#0d0d0d] overflow-hidden fade-in font-sans" id="flyers-container-root">
                 <aside class="w-80 bg-[#111] border-r border-[#222] flex flex-col z-20 shadow-2xl shrink-0">
                     <div class="p-4 border-b border-[#222] bg-[#161616]">
                         <h2 class="text-amber-600 font-bold medieval-font text-2xl truncate">
-                            <i class="ph ph-megaphone align-middle me-2"></i>Pregonero Visual
+                            <i class="ph ph-megaphone align-middle me-2"></i><span data-i18n="flyers.title">${t('flyers.title') || 'Pregonero Visual'}</span>
                         </h2>
-                        <p class="text-xs text-gray-500 uppercase tracking-widest">Editor de Flyers</p>
+                        <p class="text-xs text-gray-500 uppercase tracking-widest" data-i18n="flyers.subtitle">${t('flyers.subtitle') || 'Editor de Flyers'}</p>
                     </div>
 
                     <div class="flex-1 overflow-y-auto custom-scrollbar p-5">
                         <form id="flyers-editor-form" class="space-y-2">
                             <div>
-                                <label class="${labelClass}">Textura del Papel</label>
+                                <label class="${labelClass}" data-i18n="flyers.texture">${t('flyers.texture') || 'Textura del Papel'}</label>
                                 <select id="flyer-texture" class="${inputClass} cursor-pointer">
-                                    <option value="texture-clean" ${config.texture === 'texture-clean' ? 'selected' : ''}>Pergamino Limpio</option>
-                                    <option value="texture-gritty" ${config.texture === 'texture-gritty' ? 'selected' : ''}>Panfleto Sucio</option>
-                                    <option value="texture-magic" ${config.texture === 'texture-magic' ? 'selected' : ''}>Papel Arcano</option>
+                                    <option value="texture-clean" ${config.texture === 'texture-clean' ? 'selected' : ''} data-i18n="flyers.textureClean">${t('flyers.textureClean') || 'Pergamino Limpio'}</option>
+                                    <option value="texture-gritty" ${config.texture === 'texture-gritty' ? 'selected' : ''} data-i18n="flyers.textureGritty">${t('flyers.textureGritty') || 'Panfleto Sucio'}</option>
+                                    <option value="texture-magic" ${config.texture === 'texture-magic' ? 'selected' : ''} data-i18n="flyers.textureMagic">${t('flyers.textureMagic') || 'Papel Arcano'}</option>
                                 </select>
                             </div>
 
                             <div>
-                                <label class="${labelClass}">Filtro de Desgaste</label>
+                                <label class="${labelClass}" data-i18n="flyers.filter">${t('flyers.filter') || 'Filtro de Desgaste'}</label>
                                 <select id="flyer-filter" class="${inputClass} cursor-pointer">
-                                    <option value="none" ${config.filter === 'none' ? 'selected' : ''}>Ninguno</option>
-                                    <option value="sepia" ${config.filter === 'sepia' ? 'selected' : ''}>Sepia Viejo</option>
-                                    <option value="grayscale" ${config.filter === 'grayscale' ? 'selected' : ''}>Blanco y Negro</option>
-                                    <option value="blood" ${config.filter === 'blood' ? 'selected' : ''}>Manchas Rojas</option>
+                                    <option value="none" ${config.filter === 'none' ? 'selected' : ''} data-i18n="flyers.filterNone">${t('flyers.filterNone') || 'Ninguno'}</option>
+                                    <option value="sepia" ${config.filter === 'sepia' ? 'selected' : ''} data-i18n="flyers.filterSepia">${t('flyers.filterSepia') || 'Sepia Viejo'}</option>
+                                    <option value="grayscale" ${config.filter === 'grayscale' ? 'selected' : ''} data-i18n="flyers.filterGrayscale">${t('flyers.filterGrayscale') || 'Blanco y Negro'}</option>
+                                    <option value="blood" ${config.filter === 'blood' ? 'selected' : ''} data-i18n="flyers.filterBlood">${t('flyers.filterBlood') || 'Manchas Rojas'}</option>
                                 </select>
                             </div>
 
                             <hr class="border-[#333] my-4">
 
                             <div>
-                                <label class="${labelClass}">Añadir Texto</label>
-                                <textarea id="flyer-new-text" rows="3" class="${inputClass}" placeholder="Ej: SE BUSCA: Recompensa 500 po"></textarea>
+                                <label class="${labelClass}" data-i18n="flyers.addText">${t('flyers.addText') || 'Añadir Texto'}</label>
+                                <textarea id="flyer-new-text" rows="3" class="${inputClass}" placeholder="${t('flyers.addTextPlaceholder') || 'Ej: SE BUSCA: Recompensa 500 po'}" data-i18n="flyers.addTextPlaceholder"></textarea>
                                 <button type="button" id="btn-add-text" class="${btnSecClass} mt-2">
-                                    <i class="ph ph-text-t"></i> Añadir Texto
+                                    <i class="ph ph-text-t"></i> <span data-i18n="flyers.addText">${t('flyers.addText') || 'Añadir Texto'}</span>
                                 </button>
                             </div>
 
                             <hr class="border-[#333] my-4">
 
                             <div>
-                                <label class="${labelClass}">Añadir Imagen</label>
-                                <input type="text" id="flyer-img-url" class="${inputClass} mb-2" placeholder="URL de la imagen...">
+                                <label class="${labelClass}" data-i18n="flyers.addImage">${t('flyers.addImage') || 'Añadir Imagen'}</label>
+                                <input type="text" id="flyer-img-url" class="${inputClass} mb-2" placeholder="${t('flyers.addImagePlaceholder') || 'URL de la imagen...'}" data-i18n="flyers.addImagePlaceholder">
                                 <input type="file" id="flyer-img-file" class="w-full text-xs text-gray-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-amber-700 file:text-white hover:file:bg-amber-600 cursor-pointer" accept="image/*">
                                 <button type="button" id="btn-add-img" class="${btnSecClass} mt-2">
-                                    <i class="ph ph-image"></i> Añadir Imagen
+                                    <i class="ph ph-image"></i> <span data-i18n="flyers.addImage">${t('flyers.addImage') || 'Añadir Imagen'}</span>
                                 </button>
                             </div>
 
                             <button type="button" id="btn-export-pdf" class="${btnClass} mt-8">
-                                <i class="ph ph-file-pdf text-lg"></i> <span>Exportar PDF</span>
+                                <i class="ph ph-file-pdf text-lg"></i> <span data-i18n="flyers.exportPdf">${t('flyers.exportPdf') || 'Exportar PDF'}</span>
                             </button>
                         </form>
                     </div>
@@ -75,7 +75,7 @@ export default class FlyersView {
 
                 <main class="flex-1 bg-[#18181b] overflow-hidden relative flex flex-col">
                     <div class="h-12 bg-[#222] border-b border-[#333] flex items-center justify-between px-4 shrink-0 z-10 shadow-md">
-                        <div class="text-gray-500 text-xs uppercase tracking-widest font-mono">Vista Previa - Drag & Drop</div>
+                        <div class="text-gray-500 text-xs uppercase tracking-widest font-mono" data-i18n="flyers.preview">${t('flyers.preview') || 'Vista Previa - Drag & Drop'}</div>
                     </div>
                     <div class="flex-1 overflow-auto flex justify-center p-10 bg-[url('assets/img/dark-wood.png')] bg-repeat relative">
                         <!-- Canvas container must have definite dimensions for PDF export like documents -->
@@ -89,6 +89,8 @@ export default class FlyersView {
                 </main>
             </div>
         `;
+
+        LanguageService.translateDOM(this.container);
     }
 
     renderCanvas(model) {
@@ -117,8 +119,8 @@ export default class FlyersView {
 
             // Delete button
             const delBtn = document.createElement('button');
-            delBtn.className = 'absolute -top-3 -right-3 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-50 shadow-md hover:bg-red-500 pointer-events-auto';
-            delBtn.innerHTML = '<i class="ph ph-x text-xs font-bold"></i>';
+            delBtn.className = 'absolute -top-3 -right-3 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-50 shadow-md hover:bg-red-500 pointer-events-auto btn-del';
+            delBtn.innerHTML = '<i class="ph ph-x text-xs font-bold pointer-events-none"></i>';
             delBtn.onclick = (e) => {
                 e.stopPropagation(); // prevent dragging
                 // Fire custom event to be handled by controller
@@ -126,20 +128,53 @@ export default class FlyersView {
             };
             wrapper.appendChild(delBtn);
 
+            // Resize controls container
+            const resizeControls = document.createElement('div');
+            resizeControls.className = 'absolute -bottom-4 left-1/2 transform -translate-x-1/2 flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-50 bg-[#222] rounded-full px-2 py-1 shadow-md pointer-events-auto btn-resize';
+
+            const btnMinus = document.createElement('button');
+            btnMinus.className = 'text-gray-300 hover:text-white pointer-events-auto';
+            btnMinus.innerHTML = '<i class="ph ph-minus text-xs font-bold pointer-events-none"></i>';
+            btnMinus.onclick = (e) => {
+                e.stopPropagation(); // prevent dragging
+                const currentScale = el.scale || 1;
+                const newScale = Math.max(0.2, currentScale - 0.1);
+                canvas.dispatchEvent(new CustomEvent('resize-flyer-element', { detail: { id: el.id, scale: newScale } }));
+            };
+
+            const btnPlus = document.createElement('button');
+            btnPlus.className = 'text-gray-300 hover:text-white pointer-events-auto';
+            btnPlus.innerHTML = '<i class="ph ph-plus text-xs font-bold pointer-events-none"></i>';
+            btnPlus.onclick = (e) => {
+                e.stopPropagation(); // prevent dragging
+                const currentScale = el.scale || 1;
+                const newScale = Math.min(5, currentScale + 0.1);
+                canvas.dispatchEvent(new CustomEvent('resize-flyer-element', { detail: { id: el.id, scale: newScale } }));
+            };
+
+            resizeControls.appendChild(btnMinus);
+            resizeControls.appendChild(btnPlus);
+            wrapper.appendChild(resizeControls);
+
             // Container for scalable content
             const contentContainer = document.createElement('div');
             contentContainer.className = 'pointer-events-none';
 
+            const scale = el.scale || 1;
+
             if (el.type === 'text') {
                 const textDiv = document.createElement('div');
-                textDiv.className = 'medieval-font text-2xl text-black leading-tight whitespace-pre-wrap';
+                textDiv.className = 'medieval-font text-black leading-tight whitespace-pre-wrap';
                 textDiv.style.textShadow = '0 1px 1px rgba(255,255,255,0.5)';
+                textDiv.style.fontSize = `${scale * 24}px`; // Base font size is 24px
                 textDiv.innerHTML = this.escapeHTML(el.content).replace(/\n/g, '<br>');
                 contentContainer.appendChild(textDiv);
             } else if (el.type === 'image') {
                 const img = document.createElement('img');
                 img.src = el.src;
-                img.className = 'max-w-[250px] max-h-[250px] object-contain mix-blend-multiply'; // mix-blend makes white transparent on texture
+                img.className = 'object-contain mix-blend-multiply'; // mix-blend makes white transparent on texture
+                img.style.width = `${scale * 250}px`; // Base size is 250px
+                img.style.height = 'auto'; // Maintain aspect ratio
                 contentContainer.appendChild(img);
             }
 
