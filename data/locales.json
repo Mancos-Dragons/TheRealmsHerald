@@ -52,6 +52,26 @@
       "labs": {
         "title": "Laboratorio",
         "desc": "Zona de pruebas para nuevas mecánicas."
+      },
+      "oracle": {
+        "title": "El Oráculo Mecánico",
+        "desc": "Traductor narrativo para estadísticas y combates."
+      },
+      "encounters": {
+        "title": "Forja de Encuentros",
+        "desc": "Generador de combates dinámicos y balanceados."
+      },
+      "items": {
+        "title": "Tesoros de Leyenda",
+        "desc": "Editor de fichas de objetos mágicos y equipo."
+      },
+      "flyers": {
+        "title": "Pregonero Visual",
+        "desc": "Herramienta de diseño para documentos informales y flyers."
+      },
+      "weather": {
+        "title": "Ecos de la Naturaleza",
+        "desc": "Generador de contexto sensorial y meteorológico."
       }
     }
   },
@@ -108,6 +128,26 @@
       "labs": {
         "title": "Laboratory",
         "desc": "Testing ground for new mechanics."
+      },
+      "oracle": {
+        "title": "The Mechanical Oracle",
+        "desc": "Narrative translator for stats and combat."
+      },
+      "encounters": {
+        "title": "Encounter Forge",
+        "desc": "Dynamic and balanced combat generator."
+      },
+      "items": {
+        "title": "Treasures of Legend",
+        "desc": "Editor for magic items and equipment cards."
+      },
+      "flyers": {
+        "title": "Visual Town Crier",
+        "desc": "Design tool for informal documents and flyers."
+      },
+      "weather": {
+        "title": "Echoes of Nature",
+        "desc": "Sensory and weather context generator."
       }
     }
   }
