@@ -109,7 +109,7 @@ export default class FlyersController {
                     this.view.renderCanvas(this.model);
                 });
                 canvas.addEventListener('resize-flyer-element', (e) => {
-                    this.model.updateElement(e.detail.id, { widthClass: e.detail.widthClass });
+                    this.model.updateElement(e.detail.id, { scale: e.detail.scale });
                     this.view.renderCanvas(this.model);
                 });
                 canvas.dataset.eventsAttached = 'true';
@@ -211,9 +211,8 @@ export default class FlyersController {
             }
         });
 
-        // Remove delete buttons and size buttons
-        clonedContent.querySelectorAll('button').forEach(btn => btn.remove());
-        clonedContent.querySelectorAll('.btn-size').forEach(el => el.remove());
+        // Remove controls bar
+        clonedContent.querySelectorAll('.flyer-controls').forEach(el => el.remove());
         // Remove hover/border effects
         clonedContent.querySelectorAll('.flyer-element').forEach(el => {
             el.classList.remove('hover:border-amber-500/50', 'hover:bg-amber-500/10', 'border', 'border-transparent');

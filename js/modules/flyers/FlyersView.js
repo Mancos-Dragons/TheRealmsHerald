@@ -117,62 +117,74 @@ export default class FlyersView {
             wrapper.style.top = `${el.y}px`;
             wrapper.dataset.id = el.id;
 
+            const scale = el.scale || 1;
+
+            // Control bar (visible)
+            const controls = document.createElement('div');
+            controls.className = 'flyer-controls absolute -top-8 left-1/2 transform -translate-x-1/2 flex items-center justify-center gap-2 opacity-60 group-hover:opacity-100 transition-opacity z-50 bg-[#222] rounded-full px-3 py-1 shadow-lg pointer-events-auto border border-amber-600/30 whitespace-nowrap';
+
+            // Minus button
+            const btnMinus = document.createElement('button');
+            btnMinus.className = 'text-amber-500 hover:text-white bg-transparent outline-none';
+            btnMinus.innerHTML = '<i class="ph ph-minus text-sm font-bold pointer-events-none"></i>';
+            btnMinus.onclick = (e) => {
+                e.stopPropagation();
+                const newScale = Math.max(0.2, scale - 0.1);
+                canvas.dispatchEvent(new CustomEvent('resize-flyer-element', { detail: { id: el.id, scale: newScale } }));
+            };
+
+            // Scale Label
+            const scaleLabel = document.createElement('span');
+            scaleLabel.className = 'text-gray-300 text-xs font-mono select-none';
+            scaleLabel.innerText = `${scale.toFixed(1)}x`;
+
+            // Plus button
+            const btnPlus = document.createElement('button');
+            btnPlus.className = 'text-amber-500 hover:text-white bg-transparent outline-none';
+            btnPlus.innerHTML = '<i class="ph ph-plus text-sm font-bold pointer-events-none"></i>';
+            btnPlus.onclick = (e) => {
+                e.stopPropagation();
+                const newScale = Math.min(5, scale + 0.1);
+                canvas.dispatchEvent(new CustomEvent('resize-flyer-element', { detail: { id: el.id, scale: newScale } }));
+            };
+
+            // Divider
+            const divider = document.createElement('div');
+            divider.className = 'w-px h-4 bg-gray-600 mx-1';
+
             // Delete button
             const delBtn = document.createElement('button');
-            delBtn.className = 'absolute -top-3 -right-3 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-50 shadow-md hover:bg-red-500 pointer-events-auto btn-del';
-            delBtn.innerHTML = '<i class="ph ph-x text-xs font-bold pointer-events-none"></i>';
+            delBtn.className = 'text-red-500 hover:text-red-400 bg-transparent outline-none btn-del';
+            delBtn.innerHTML = '<i class="ph ph-trash text-sm font-bold pointer-events-none"></i>';
             delBtn.onclick = (e) => {
-                e.stopPropagation(); // prevent dragging
-                // Fire custom event to be handled by controller
+                e.stopPropagation();
                 canvas.dispatchEvent(new CustomEvent('remove-flyer-element', { detail: { id: el.id } }));
             };
-            wrapper.appendChild(delBtn);
 
-            // Size cycle button
-            const sizeBtn = document.createElement('button');
-            sizeBtn.className = 'absolute -bottom-3 -right-3 bg-[#222] text-amber-500 rounded-full w-auto px-2 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-50 shadow-md hover:bg-[#333] hover:text-amber-400 pointer-events-auto text-xs font-bold font-sans border border-amber-600/30 whitespace-nowrap btn-size';
-
-            // Map of widths for toggling
-            const widths = [
-                { class: 'w-1/4', label: '25%', fontClass: 'text-2xl' },
-                { class: 'w-1/2', label: '50%', fontClass: 'text-4xl' },
-                { class: 'w-3/4', label: '75%', fontClass: 'text-6xl' },
-                { class: 'w-full', label: '100%', fontClass: 'text-7xl' }
-            ];
-
-            const currentWidthClass = el.widthClass || 'w-1/2';
-            const currentIndex = widths.findIndex(w => w.class === currentWidthClass) !== -1 ? widths.findIndex(w => w.class === currentWidthClass) : 1;
-            const nextIndex = (currentIndex + 1) % widths.length;
-
-            sizeBtn.innerHTML = `<i class="ph ph-arrows-out-line mr-1 pointer-events-none"></i> <span class="pointer-events-none">${widths[currentIndex].label}</span>`;
-            sizeBtn.onclick = (e) => {
-                e.stopPropagation(); // prevent dragging
-                canvas.dispatchEvent(new CustomEvent('resize-flyer-element', { detail: { id: el.id, widthClass: widths[nextIndex].class } }));
-            };
-            wrapper.appendChild(sizeBtn);
+            controls.appendChild(btnMinus);
+            controls.appendChild(scaleLabel);
+            controls.appendChild(btnPlus);
+            controls.appendChild(divider);
+            controls.appendChild(delBtn);
+            wrapper.appendChild(controls);
 
             // Container for scalable content
             const contentContainer = document.createElement('div');
-            // Tailwind width class directly applied to content container
-            contentContainer.className = `pointer-events-none ${currentWidthClass}`;
-
-            // We need wrapper to stretch based on content. But if content is percentage based, percentage of what?
-            // The canvas is the relative parent. So the wrapper needs the width class, or wrapper needs width: currentWidthClass.
-            // Wait, wrapper is position absolute. If wrapper gets w-1/4, it will be 25% of canvas width.
-            wrapper.classList.add(currentWidthClass);
-            contentContainer.className = 'pointer-events-none w-full';
+            contentContainer.className = 'pointer-events-none';
 
             if (el.type === 'text') {
                 const textDiv = document.createElement('div');
-                // Use the mapped font class for scaling the text size automatically
-                textDiv.className = `medieval-font text-black leading-tight whitespace-pre-wrap w-full break-words ${widths[currentIndex].fontClass}`;
+                textDiv.className = 'medieval-font text-black leading-tight whitespace-pre-wrap';
                 textDiv.style.textShadow = '0 1px 1px rgba(255,255,255,0.5)';
+                textDiv.style.fontSize = `${scale * 24}px`; // Base font size is 24px
                 textDiv.innerHTML = this.escapeHTML(el.content).replace(/\n/g, '<br>');
                 contentContainer.appendChild(textDiv);
             } else if (el.type === 'image') {
                 const img = document.createElement('img');
                 img.src = el.src;
-                img.className = 'w-full h-auto object-contain mix-blend-multiply';
+                img.className = 'object-contain mix-blend-multiply';
+                img.style.width = `${scale * 250}px`; // Base size is 250px
+                img.style.height = 'auto'; // Maintain aspect ratio
                 contentContainer.appendChild(img);
             }
 
