@@ -61,14 +61,14 @@ Sincronización con el "Diario del Bardo" para auto-rellenar fechas.
 
 6. Escriba Real (Documentos y Decretos)
 
-Descripción detallada: Generador de props visuales. Crea decretos reales, cartas selladas, contratos y carteles de recompensa con un acabado profesional y tipografías clásicas.
+Descripción detallada: Generador de props visuales oficiales. Crea decretos reales, cartas selladas, contratos y testamentos con un acabado formal y tipografías clásicas.
 Funcionalidades:
 
 Editor de sellos de cera personalizados.
 
 Generador de firmas automáticas.
 
-Plantillas de "Wanted Posters" que extraen la imagen y datos del módulo de NPCs.
+Plantillas de pergamino impecable o envejecido.
 
 7. Círculos de Poder (Facciones)
 
@@ -178,7 +178,31 @@ Consola de comandos para modificar el estado global de la app.
 
 Importador/Exportador de esquemas JSON personalizados.
 
-Logs de depuración para probar interconexiones entre módulos.
+17. Pregonero Visual (Flyers y Publicidad Callejera)
+
+Descripción detallada: Herramienta de diseño para documentos informales, "no oficiales" y de bajo presupuesto. Ideal para anuncios de taberna, carteles de "Gato Perdido", panfletos de rebelión o invitaciones a torneos locales.
+Funcionalidades:
+
+Canvas de Estilo Libre: Colocación de elementos (texto, iconos, imágenes) sin la rigidez de un documento real.
+
+Personalización Estética: Ajuste de color de fondo, texturas (papel manchado de cerveza, madera, tela, piedra) y filtros de "desgaste".
+
+Librería de "Clutter": Inserción de elementos gráficos como manchas de sangre, marcas de jarras, dagas clavadas o tachuelas.
+
+Capa de Ilustración: Capacidad de subir imágenes o usar una galería de bocetos rápidos estilo carboncillo.
+
+18. Ecos de la Naturaleza (Atmósfera y Clima)
+
+Descripción detallada: Generador de contexto sensorial y meteorológico. Ayuda al DM a describir no solo lo que ven los jugadores, sino lo que sienten, huelen y oyen en cada región.
+Funcionalidades:
+
+Simulador de Clima Dinámico: Genera condiciones climáticas basadas en el bioma y la estación del año.
+
+Banco de Sensaciones: Proporciona "bullets" descriptivos de olores (ej. "pino húmedo y resina"), sonidos (ej. "el crujir de hojas secas bajo botas") y sensaciones térmicas.
+
+Impacto Mecánico: Calcula penalizadores o bonificadores por clima (visibilidad reducida por niebla, agotamiento por calor).
+
+Integración Cronológica: El clima evoluciona automáticamente según el paso de las horas en la "Línea de Tiempo".
 
 🌐 Funcionalidades Globales del Sistema (Core)
 
@@ -191,26 +215,26 @@ Capacidades:
 
 Snapshots de Campaña: Guardado de estados en momentos específicos de la narrativa.
 
-Carga Dinámica: Al cambiar de campaña, el DataService limpia la memoria y carga el nuevo set de datos JSON.
+Carga Dinámica: Al cargar una campaña, el sistema restaura todos los registros y estados de las 18 herramientas.
 
-Portabilidad: Exportación/Importación de la campaña completa en un único archivo comprimido para respaldos o compartir con otros DMs.
+Portabilidad: Exportación a JSON único para transferencia de datos.
 
 B. Registro de Hechos (Action & Event Log)
 
-Descripción: Un sistema de auditoría narrativa que registra automáticamente "acciones definitivas". Este log sirve como la base de datos de eventos para módulos como el Diario del Bardo o las Crónicas del Tiempo.
+Descripción: Un sistema de auditoría narrativa que registra automáticamente "acciones definitivas". Este log sirve como la base de datos de eventos para la interconexión de herramientas.
 Capacidades:
 
-Auto-Logging: Cada vez que una herramienta realiza una acción de "salida" (ej. Exportar PDF en Newspaper, Finalizar Encuentro en Forja, Revelar Secreto), se genera una entrada con timestamp diegético.
+Auto-Logging: Registro de exportaciones de PDF, creación de ítems o resolución de encuentros.
 
-Categorización de Impacto: Las acciones se marcan como "Menor", "Mayor" o "Crítica" (Butterfly Effect).
+Categorización de Impacto: Define si un evento es local o global.
 
-Trazabilidad: Permite al DM ver qué acción disparó un cambio en la opinión pública o una reacción de facción.
+Persistencia de Log: Los registros se guardan en el archivo de campaña para que el mundo tenga memoria histórica real.
 
 C. Sincronización Inter-Módulos (Live State Sync)
 
-Descripción: Utiliza el EventBus para asegurar que un cambio en una herramienta se refleje inmediatamente en las demás sin necesidad de recargar la aplicación.
+Descripción: Utiliza el EventBus para asegurar que un cambio en una herramienta se refleje inmediatamente en las demás.
 Capacidades:
 
-Reacción en Cadena: Un cambio de fecha en Crónicas del Tiempo puede disparar eventos de "caducidad" en Susurros de Taberna (rumores viejos desaparecen).
+Actualización Reactiva: Si creas un flyer en el Pregonero Visual sobre un torneo, el módulo de Rumores puede empezar a generar chismes sobre los participantes automáticamente.
 
-Notificaciones Internas: Sistema de avisos visuales discretos cuando una herramienta tiene nueva información disponible basada en acciones de otra (ej. "Nueva noticia sugerida en La Voz del Conejo basada en tu último encuentro").
+Notificaciones de Contexto: Avisos al DM sobre posibles conexiones narrativas entre herramientas.
