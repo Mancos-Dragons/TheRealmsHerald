@@ -1,5 +1,94 @@
 {
   "es": {
+    "conf": {
+      "aesthetics": "Estética",
+      "chrono": "Cronología",
+      "date": {
+        "base": "Fecha de Inicio",
+        "curr": "Fecha Actual"
+      },
+      "font": "Tipografía",
+      "freq": "Frecuencia (días)",
+      "identity": "Identidad",
+      "manual": "Edición Manual",
+      "name": "Nombre",
+      "paper": "Papel",
+      "price": "Precio",
+      "sub": "Subtítulo"
+    },
+    "lbl": {
+      "decree": {
+        "auth": "Firma / Autoridad",
+        "body": "Mandato / Ley",
+        "image": "Sello / Emblema",
+        "title": "Decreto Oficial"
+      },
+      "wanted": {
+        "desc": "Descripción de Crímenes",
+        "image": "Retrato",
+        "name": "Nombre del Prófugo",
+        "reward": "Recompensa"
+      }
+    },
+    "news": {
+      "ad": {
+        "banner": "Banner (Ancho completo)",
+        "box": {
+          "l": "Caja Grande",
+          "m": "Caja Mediana",
+          "s": "Caja Pequeña"
+        },
+        "format": "Formato de Anuncio"
+      },
+      "ai": {
+        "prompt": "Tema o Contexto del Artículo",
+        "title": "Generador IA",
+        "generate": "Generar con IA"
+      },
+      "body": "Cuerpo de la Noticia",
+      "body.placeholder": "Escribe los detalles aquí...",
+      "btn": {
+        "add": "Añadir Artículo",
+        "generate": "Generar Artículo",
+        "load": "Cargar",
+        "new": "Nuevo",
+        "pdf": "PDF",
+        "save": "Guardar",
+        "save_edit": "Guardar Cambios"
+      },
+      "editor": {
+        "title": "Editor de Prensa"
+      },
+      "headline": "Titular",
+      "headline.placeholder": "¡Gran escándalo en la corte!",
+      "image": "Imagen (URL)",
+      "page": "Página Destino",
+      "settings": {
+        "title": "Ajustes del Periódico"
+      },
+      "size": {
+        "brief": "Breve (Span 3)",
+        "col": "Columna (Span 4)",
+        "cover": "Portada Principal (Span 12)",
+        "feat": "Destacado (Span 8)",
+        "std": "Estándar (Span 6)"
+      },
+      "special": {
+        "decree": "Decreto Oficial",
+        "format": "Formato Especial",
+        "reward": "Extra / Recompensa",
+        "seal": "Icono de Sello",
+        "seal.img": "Imagen de Sello",
+        "wanted": "Cartel de Se Busca",
+        "wanted.title": "¡Se Busca!"
+      },
+      "type": "Tipo de Contenido",
+      "type": {
+        "ad": "Anuncio",
+        "news": "Noticia",
+        "special": "Especial"
+      }
+    },
     "flyers": {
       "title": "Pregonero Visual",
       "subtitle": "Editor de Flyers",
@@ -95,6 +184,95 @@
     }
   },
   "en": {
+    "conf": {
+      "aesthetics": "Aesthetics",
+      "chrono": "Chronology",
+      "date": {
+        "base": "Base Date",
+        "curr": "Current Date"
+      },
+      "font": "Typography",
+      "freq": "Frequency (days)",
+      "identity": "Identity",
+      "manual": "Manual Edition",
+      "name": "Name",
+      "paper": "Paper",
+      "price": "Price",
+      "sub": "Subtitle"
+    },
+    "lbl": {
+      "decree": {
+        "auth": "Signature / Authority",
+        "body": "Mandate / Law",
+        "image": "Seal / Emblem",
+        "title": "Official Decree"
+      },
+      "wanted": {
+        "desc": "Crime Description",
+        "image": "Portrait",
+        "name": "Fugitive Name",
+        "reward": "Reward"
+      }
+    },
+    "news": {
+      "ad": {
+        "banner": "Banner (Full width)",
+        "box": {
+          "l": "Large Box",
+          "m": "Medium Box",
+          "s": "Small Box"
+        },
+        "format": "Ad Format"
+      },
+      "ai": {
+        "prompt": "Article Topic or Context",
+        "title": "AI Generator",
+        "generate": "Generate with AI"
+      },
+      "body": "News Body",
+      "body.placeholder": "Write the details here...",
+      "btn": {
+        "add": "Add Article",
+        "generate": "Generate Article",
+        "load": "Load",
+        "new": "New",
+        "pdf": "PDF",
+        "save": "Save",
+        "save_edit": "Save Changes"
+      },
+      "editor": {
+        "title": "Press Editor"
+      },
+      "headline": "Headline",
+      "headline.placeholder": "Great scandal at court!",
+      "image": "Image (URL)",
+      "page": "Target Page",
+      "settings": {
+        "title": "Newspaper Settings"
+      },
+      "size": {
+        "brief": "Brief (Span 3)",
+        "col": "Column (Span 4)",
+        "cover": "Main Cover (Span 12)",
+        "feat": "Featured (Span 8)",
+        "std": "Standard (Span 6)"
+      },
+      "special": {
+        "decree": "Official Decree",
+        "format": "Special Format",
+        "reward": "Extra / Reward",
+        "seal": "Seal Icon",
+        "seal.img": "Seal Image",
+        "wanted": "Wanted Poster",
+        "wanted.title": "Wanted!"
+      },
+      "type": "Content Type",
+      "type": {
+        "ad": "Ad",
+        "news": "News",
+        "special": "Special"
+      }
+    },
     "flyers": {
       "title": "Visual Town Crier",
       "subtitle": "Flyers Editor",

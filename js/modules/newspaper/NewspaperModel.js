@@ -17,7 +17,8 @@ export default class NewspaperModel {
             baseDate: new Date().toISOString().split('T')[0],
             currentDate: new Date().toISOString().split('T')[0],
             frequency: 7,
-            manualEdition: 0
+            manualEdition: 0,
+            censorship: "none"
         };
         
         this.STORAGE_KEY = 'trh_newspaper_data';
