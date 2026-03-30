@@ -21,14 +21,9 @@ export default class FlyersController {
     }
 
     async init() {
-        this.loadStyles();
         this.view.renderWorkspace(this.model.getConfig());
         this.view.renderCanvas(this.model);
         this.attachEvents();
-
-        // Attach global drag listeners once
-        document.addEventListener('mousemove', this.onMouseMove);
-        document.addEventListener('mouseup', this.onMouseUp);
 
         console.log("📣 Controlador de Pregonero: Listo.");
     }
@@ -44,6 +39,14 @@ export default class FlyersController {
     }
 
     attachEvents() {
+        this.loadStyles();
+
+        // Ensure global listeners are active
+        document.removeEventListener('mousemove', this.onMouseMove);
+        document.removeEventListener('mouseup', this.onMouseUp);
+        document.addEventListener('mousemove', this.onMouseMove);
+        document.addEventListener('mouseup', this.onMouseUp);
+
         const form = document.getElementById('flyers-editor-form');
         if (form) {
             form.addEventListener('change', (e) => {
@@ -99,18 +102,17 @@ export default class FlyersController {
 
         const canvas = document.getElementById('flyer-canvas');
         if (canvas) {
-            // Remove old listeners to avoid duplicates
-            const newCanvas = canvas.cloneNode(true);
-            canvas.parentNode.replaceChild(newCanvas, canvas);
-
-            newCanvas.addEventListener('remove-flyer-element', (e) => {
-                this.model.removeElement(e.detail.id);
-                this.view.renderCanvas(this.model);
-            });
-            newCanvas.addEventListener('resize-flyer-element', (e) => {
-                this.model.updateElement(e.detail.id, { scale: e.detail.scale });
-                this.view.renderCanvas(this.model);
-            });
+            if (canvas.dataset.eventsAttached !== 'true') {
+                canvas.addEventListener('remove-flyer-element', (e) => {
+                    this.model.removeElement(e.detail.id);
+                    this.view.renderCanvas(this.model);
+                });
+                canvas.addEventListener('resize-flyer-element', (e) => {
+                    this.model.updateElement(e.detail.id, { scale: e.detail.scale });
+                    this.view.renderCanvas(this.model);
+                });
+                canvas.dataset.eventsAttached = 'true';
+            }
         }
 
         const btnExportPdf = document.getElementById('btn-export-pdf');

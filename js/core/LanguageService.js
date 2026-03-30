@@ -264,15 +264,23 @@ export const LanguageService = {
             const response = await fetch('./data/locales.json');
             const externalData = await response.json();
             
-            for (const lang in externalData) {
-                if (!this.dictionary[lang]) this.dictionary[lang] = {};
-                if (externalData[lang].tools) {
-                    for (const toolKey in externalData[lang].tools) {
-                        const tool = externalData[lang].tools[toolKey];
-                        this.dictionary[lang][`tools.${toolKey}.title`] = tool.title;
-                        this.dictionary[lang][`tools.${toolKey}.desc`] = tool.desc;
+            const flatten = (obj, prefix = '') => {
+                let res = {};
+                for (let k in obj) {
+                    const key = prefix ? `${prefix}.${k}` : k;
+                    if (typeof obj[k] === 'object' && obj[k] !== null && !Array.isArray(obj[k])) {
+                        Object.assign(res, flatten(obj[k], key));
+                    } else {
+                        res[key] = obj[k];
                     }
                 }
+                return res;
+            };
+
+            for (const lang in externalData) {
+                if (!this.dictionary[lang]) this.dictionary[lang] = {};
+                const flatData = flatten(externalData[lang]);
+                this.dictionary[lang] = { ...this.dictionary[lang], ...flatData };
             }
             console.log("🌍 Idiomas externos cargados.");
         } catch (e) {
