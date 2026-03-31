@@ -3,6 +3,7 @@ import NewspaperView from './NewspaperView.js';
 import { AIService } from '../../services/AIService.js';
 import { DataService } from '../../services/DataService.js';
 import { ModalService } from '../../core/ModalService.js';
+import { EventBus } from '../../core/EventBus.js';
 
 export default class NewspaperController {
     constructor(container) {
@@ -450,8 +451,20 @@ ${jsonFormat}`;
 
         if (type === 'special') {
             this.model.addSpecialItem(data);
+            EventBus.emit('journal_entry_added', {
+                module: 'newspaper',
+                title: `Documento Especial: ${data.headline || 'Sin título'}`,
+                details: data.body ? data.body.substring(0, 100) + '...' : '',
+                metadata: { type: data.type, format: data.specialFormat }
+            });
         } else {
             this.model.addNewsItem(page, data);
+            EventBus.emit('journal_entry_added', {
+                module: 'newspaper',
+                title: `Prensa: ${data.headline || 'Sin título'}`,
+                details: data.body ? data.body.substring(0, 100) + '...' : '',
+                metadata: { type: data.type, size: data.size, page: page }
+            });
         }
 
         this.view.resetForm();

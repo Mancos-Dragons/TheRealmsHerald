@@ -25,7 +25,8 @@ export default class HomeController {
             { id: 'encounters', icon: 'ph-swords', locked: true },
             { id: 'items', icon: 'ph-backpack', locked: true },
             { id: 'flyers', icon: 'ph-megaphone', locked: false },
-            { id: 'weather', icon: 'ph-cloud-sun', locked: true }
+            { id: 'weather', icon: 'ph-cloud-sun', locked: true },
+            { id: 'campaigns', icon: 'ph-books', locked: false }
         ];
     }
 

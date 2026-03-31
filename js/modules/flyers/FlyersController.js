@@ -1,6 +1,7 @@
 import FlyersModel from './FlyersModel.js';
 import FlyersView from './FlyersView.js';
 import { ModalService } from '../../core/ModalService.js';
+import { EventBus } from '../../core/EventBus.js';
 
 export default class FlyersController {
     constructor(container) {
@@ -118,7 +119,15 @@ export default class FlyersController {
 
         const btnExportPdf = document.getElementById('btn-export-pdf');
         if (btnExportPdf) {
-            btnExportPdf.addEventListener('click', () => this.exportPDF());
+            btnExportPdf.addEventListener('click', () => {
+                EventBus.emit('journal_entry_added', {
+                    module: 'flyers',
+                    title: 'Pregonero: Flyer Exportado',
+                    details: 'Se ha exportado un flyer o cartel.',
+                    metadata: { elementsCount: this.model.getElements().length }
+                });
+                this.exportPDF();
+            });
         }
 
         this.attachDragEvents();

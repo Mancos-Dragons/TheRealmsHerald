@@ -45,6 +45,16 @@ export const DataService = {
         }
     },
 
+    remove(key) {
+        try {
+            localStorage.removeItem(key);
+            return true;
+        } catch (e) {
+            console.error("Error eliminando datos:", e);
+            return false;
+        }
+    },
+
     // --- MÉTODOS DE CONFIGURACIÓN GLOBAL ---
 
     getGlobal() {

@@ -1,6 +1,7 @@
 import { EventBus } from './core/EventBus.js';
 import { DataService } from './services/DataService.js';
 import { LanguageService } from './core/LanguageService.js';
+import CampaignsModel from './modules/campaigns/CampaignsModel.js';
 
 class AppOrchestrator {
     constructor() {
@@ -14,6 +15,7 @@ class AppOrchestrator {
             'rumors': () => import('./modules/rumors/RumorsController.js'),
             'documents': () => import('./modules/documents/DocumentsController.js'),
             'flyers': () => import('./modules/flyers/FlyersController.js'),
+            'campaigns': () => import('./modules/campaigns/CampaignsController.js'),
         };
         
         this.init();
@@ -23,6 +25,11 @@ class AppOrchestrator {
         console.log("📜 The Realm's Herald: Iniciando sistemas...");
         try {
             await DataService.init();
+
+            const campaignsModel = new CampaignsModel();
+            EventBus.on('journal_entry_added', (entry) => {
+                campaignsModel.addJournalEntry(entry);
+            });
             
             await LanguageService.loadResources();
             
@@ -62,6 +69,8 @@ class AppOrchestrator {
                     this.currentModule.view.renderWorkspace(this.currentModule.model.getConfig());
                     this.currentModule.view.renderCanvas(this.currentModule.model);
                     this.currentModule.attachEvents();
+                } else if (this.currentModuleKey === 'campaigns') {
+                    this.currentModule.view.render();
                 }
             }
         }
