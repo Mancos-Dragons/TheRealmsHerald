@@ -1,5 +1,6 @@
 import RumorsModel from './RumorsModel.js';
 import RumorsView from './RumorsView.js';
+import { EventBus } from '../../core/EventBus.js';
 
 export default class RumorsController {
     constructor(container) {
@@ -25,6 +26,12 @@ export default class RumorsController {
                 try {
                     const result = await this.model.generateRumor(townName, npcName, npcRole);
                     this.view.updateResult(result);
+                    EventBus.emit('journal_entry_added', {
+                        module: 'rumors',
+                        title: `Rumor en ${townName || 'Pueblo'}`,
+                        details: result.rumor,
+                        metadata: { npc: npcName, role: npcRole, hook: result.hook }
+                    });
                 } catch (error) {
                     console.error("RumorsController: Error generating rumor", error);
                 } finally {

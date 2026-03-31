@@ -1,6 +1,7 @@
 import DocumentsModel from './DocumentsModel.js';
 import DocumentsView from './DocumentsView.js';
 import { ModalService } from '../../core/ModalService.js';
+import { EventBus } from '../../core/EventBus.js';
 
 export default class DocumentsController {
     constructor(container) {
@@ -50,7 +51,16 @@ export default class DocumentsController {
 
         const btnExport = document.getElementById('btn-export-pdf');
         if (btnExport) {
-            btnExport.addEventListener('click', () => this.exportPDF());
+            btnExport.addEventListener('click', () => {
+                const config = this.model.getConfig();
+                EventBus.emit('journal_entry_added', {
+                    module: 'documents',
+                    title: `Documento: ${config.title || 'Sin título'}`,
+                    details: config.body ? config.body.substring(0, 100) + '...' : '',
+                    metadata: { type: config.type, signature: config.signature }
+                });
+                this.exportPDF();
+            });
         }
 
         // Handle file uploads for custom textures and seals

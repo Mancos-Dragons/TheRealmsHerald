@@ -180,7 +180,20 @@
       "weather": {
         "title": "Ecos de la Naturaleza",
         "desc": "Generador de contexto sensorial y meteorológico."
+      },
+      "campaigns": {
+        "title": "Gestor de Campañas",
+        "desc": "Guarda y carga el estado de todas tus herramientas."
       }
+    },
+    "campaigns": {
+      "title": "Gestor de Campañas",
+      "subtitle": "Importa y exporta el estado completo de tus creaciones.",
+      "actions": {
+        "title": "Acciones de Campaña"
+      },
+      "export": "Exportar Campaña",
+      "import": "Importar Campaña"
     }
   },
   "en": {
@@ -364,7 +377,20 @@
       "weather": {
         "title": "Echoes of Nature",
         "desc": "Sensory and weather context generator."
+      },
+      "campaigns": {
+        "title": "Campaign Manager",
+        "desc": "Save and load the state of all your tools."
       }
+    },
+    "campaigns": {
+      "title": "Campaign Manager",
+      "subtitle": "Import and export the complete state of your creations.",
+      "actions": {
+        "title": "Campaign Actions"
+      },
+      "export": "Export Campaign",
+      "import": "Import Campaign"
     }
   }
 }
