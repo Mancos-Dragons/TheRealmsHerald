@@ -3,7 +3,7 @@ import assert from 'node:assert';
 import RumorsModel from './RumorsModel.js';
 import { AIService } from '../../services/AIService.js';
 import { LanguageService } from '../../core/LanguageService.js';
-import { RUMOR_TEMPLATES, PLOT_HOOKS, DEFAULTS } from './RumorsData.js';
+import { DEFAULTS } from './RumorsData.js';
 
 test('RumorsModel - fallback to procedural generation when AIService is not configured', async (t) => {
     // Mock the AIService
@@ -23,24 +23,20 @@ test('RumorsModel - fallback to procedural generation when AIService is not conf
     assert.ok(result.rumor);
     assert.ok(result.hook);
 
-    // Assert that the generated rumor is based on one of the templates
-    let foundTemplate = false;
-    for (const template of RUMOR_TEMPLATES.es) {
-        // Simple regex to match replaced template roughly, or just check that template starts matching
-        const baseTemplate = template
-            .replace(/{townName}/g, 'Townsville')
-            .replace(/{npcName}/g, 'Bob')
-            .replace(/{npcRole}/g, 'Baker');
+    // Assert that the generated rumor contains the provided values
+    assert.ok(result.rumor.includes('Townsville'), 'Rumor should include the town name');
+    assert.ok(result.rumor.includes('Bob'), 'Rumor should include the NPC name');
+    assert.ok(result.rumor.includes('Baker'), 'Rumor should include the NPC role');
 
-        if (result.rumor === baseTemplate) {
-            foundTemplate = true;
+    // Assert that the generated hook is one of the plot hooks
+    let foundHook = false;
+    for (const hook of model.grammar.es.hooks) {
+        if (result.hook === hook) {
+            foundHook = true;
             break;
         }
     }
-    assert.strictEqual(foundTemplate, true, 'Rumor should match a procedural template');
-
-    // Assert that the generated hook is one of the plot hooks
-    assert.ok(PLOT_HOOKS.es.includes(result.hook), 'Hook should match a procedural plot hook');
+    assert.strictEqual(foundHook, true, 'Hook should match a procedural plot hook');
 
     // Restore mocks
     AIService.isConfigured = originalIsConfigured;
