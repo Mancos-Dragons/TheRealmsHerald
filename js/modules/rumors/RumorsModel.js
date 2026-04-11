@@ -1,15 +1,80 @@
 import { AIService } from '../../services/AIService.js';
 import { LanguageService } from '../../core/LanguageService.js';
-import { RUMOR_TEMPLATES, PLOT_HOOKS, DEFAULTS } from './RumorsData.js';
 
 export default class RumorsModel {
     constructor() {
-        this.defaultTown = DEFAULTS.town;
-        this.defaultNpcName = DEFAULTS.npcName;
-        this.defaultNpcRole = DEFAULTS.npcRole;
+        this.defaultTown = { es: "Pueblo Viejo", en: "Old Town" };
+        this.defaultNpcName = { es: "Desconocido", en: "Unknown" };
+        this.defaultNpcRole = { es: "Viajero", en: "Traveler" };
 
-        this.templates = RUMOR_TEMPLATES;
-        this.plotHooks = PLOT_HOOKS;
+        this.grammar = {
+            es: {
+                intros: [
+                    "Se dice que",
+                    "Algunos murmuran que",
+                    "Anoche hubo ruidos extraños y se cree que",
+                    "Dicen las malas lenguas que",
+                    "Se rumorea en la taberna que"
+                ],
+                subjects: [
+                    "{npcName}, nuestro {npcRole},",
+                    "ese forastero, {npcName} ({npcRole}),",
+                    "{npcName}, el {npcRole},"
+                ],
+                actions: [
+                    "fue visto haciendo tratos oscuros",
+                    "está fabricando venenos en secreto",
+                    "hizo un pacto con un ser del inframundo",
+                    "sabe dónde está el tesoro perdido de la ciudad",
+                    "está invocando fuerzas que no comprende"
+                ],
+                locations: [
+                    " cerca del bosque viejo a medianoche.",
+                    " en las catacumbas debajo de {townName}.",
+                    " justo a las afueras de {townName}.",
+                    " en un callejón oscuro de {townName}.",
+                    "."
+                ],
+                hooks: [
+                    "Los aventureros podrían investigar el lugar mencionado a medianoche para confirmar la historia.",
+                    "El PNJ tiene un mapa codificado que alguien dejó caer; si los aventureros lo descifran, encontrarán el tesoro.",
+                    "Alguien más está buscando al PNJ para cobrar una deuda de sangre. Los aventureros pueden intervenir o ayudar."
+                ]
+            },
+            en: {
+                intros: [
+                    "It is said that",
+                    "Some whisper that",
+                    "Last night there were strange noises and it's believed that",
+                    "Rumor has it that",
+                    "They say in the tavern that"
+                ],
+                subjects: [
+                    "{npcName}, our {npcRole},",
+                    "that stranger, {npcName} (the {npcRole}),",
+                    "{npcName}, the {npcRole},"
+                ],
+                actions: [
+                    "was seen making dark deals",
+                    "is secretly brewing poisons",
+                    "made a pact with an underworld being",
+                    "knows where the lost city treasure is",
+                    "is summoning forces they don't understand"
+                ],
+                locations: [
+                    " near the old forest at midnight.",
+                    " in the catacombs beneath {townName}.",
+                    " just outside of {townName}.",
+                    " in a dark alley of {townName}.",
+                    "."
+                ],
+                hooks: [
+                    "The adventurers could investigate the mentioned place at midnight to confirm the story.",
+                    "The NPC has a coded map someone dropped; if the adventurers decipher it, they will find the treasure.",
+                    "Someone else is looking for the NPC to collect a blood debt. The adventurers can intervene or help."
+                ]
+            }
+        };
     }
 
     async generateRumor(townName, npcName, npcRole) {
@@ -31,8 +96,8 @@ export default class RumorsModel {
                 try {
                     // Extract JSON if wrapped in markdown
                     let jsonText = aiResponse;
-                    if (jsonText.startsWith('```json')) {
-                        jsonText = jsonText.replace(/^```json/m, '').replace(/```$/m, '').trim();
+                    if (jsonText.startsWith('\`\`\`json')) {
+                        jsonText = jsonText.replace(/^\`\`\`json/m, '').replace(/\`\`\`$/m, '').trim();
                     }
                     const parsed = JSON.parse(jsonText);
                     if (parsed.rumor && parsed.hook) {
@@ -45,18 +110,20 @@ export default class RumorsModel {
         }
 
         // Fallback procedural generation
-        const temps = this.templates[lang] || this.templates['es'];
-        const hooks = this.plotHooks[lang] || this.plotHooks['es'];
+        const g = this.grammar[lang] || this.grammar['es'];
 
-        const templateIndex = Math.floor(Math.random() * temps.length);
-        const hookIndex = Math.floor(Math.random() * hooks.length);
+        const intro = g.intros[Math.floor(Math.random() * g.intros.length)];
+        const subject = g.subjects[Math.floor(Math.random() * g.subjects.length)];
+        const action = g.actions[Math.floor(Math.random() * g.actions.length)];
+        const location = g.locations[Math.floor(Math.random() * g.locations.length)];
 
-        let rumorText = temps[templateIndex];
+        const hookText = g.hooks[Math.floor(Math.random() * g.hooks.length)];
+
+        let rumorText = `${intro} ${subject} ${action}${location}`;
+
         rumorText = rumorText.replace(/{townName}/g, town);
         rumorText = rumorText.replace(/{npcName}/g, name);
         rumorText = rumorText.replace(/{npcRole}/g, role);
-
-        const hookText = hooks[hookIndex];
 
         return {
             rumor: rumorText,
