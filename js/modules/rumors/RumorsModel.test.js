@@ -3,7 +3,6 @@ import assert from 'node:assert';
 import RumorsModel from './RumorsModel.js';
 import { AIService } from '../../services/AIService.js';
 import { LanguageService } from '../../core/LanguageService.js';
-import { RUMOR_TEMPLATES, PLOT_HOOKS, DEFAULTS } from './RumorsData.js';
 
 test('RumorsModel - fallback to procedural generation when AIService is not configured', async (t) => {
     // Mock the AIService
@@ -23,24 +22,14 @@ test('RumorsModel - fallback to procedural generation when AIService is not conf
     assert.ok(result.rumor);
     assert.ok(result.hook);
 
-    // Assert that the generated rumor is based on one of the templates
-    let foundTemplate = false;
-    for (const template of RUMOR_TEMPLATES.es) {
-        // Simple regex to match replaced template roughly, or just check that template starts matching
-        const baseTemplate = template
-            .replace(/{townName}/g, 'Townsville')
-            .replace(/{npcName}/g, 'Bob')
-            .replace(/{npcRole}/g, 'Baker');
-
-        if (result.rumor === baseTemplate) {
-            foundTemplate = true;
-            break;
-        }
-    }
-    assert.strictEqual(foundTemplate, true, 'Rumor should match a procedural template');
+    // Verify it contains the provided values
+    // Note: The townName might not be in the final rumor if a location without '{townName}' is chosen,
+    // so we only strictly check for npcName and npcRole, which are in all 'subjects' variants.
+    assert.ok(result.rumor.includes('Bob'), 'Should contain NPC name');
+    assert.ok(result.rumor.includes('Baker'), 'Should contain NPC role');
 
     // Assert that the generated hook is one of the plot hooks
-    assert.ok(PLOT_HOOKS.es.includes(result.hook), 'Hook should match a procedural plot hook');
+    assert.ok(model.grammar.es.hooks.includes(result.hook), 'Hook should match a procedural plot hook');
 
     // Restore mocks
     AIService.isConfigured = originalIsConfigured;
@@ -64,11 +53,13 @@ test('RumorsModel - uses defaults when arguments are empty', async (t) => {
     assert.ok(result.rumor);
     assert.ok(result.hook);
 
-    const expectedTown = DEFAULTS.town.es;
-    const expectedNpc = DEFAULTS.npcName.es;
-    const expectedRole = DEFAULTS.npcRole.es;
+    const expectedTown = model.defaultTown.es;
+    const expectedNpc = model.defaultNpcName.es;
+    const expectedRole = model.defaultNpcRole.es;
 
-    assert.ok(result.rumor.includes(expectedTown) || result.rumor.includes(expectedNpc) || result.rumor.includes(expectedRole));
+    // Ensure it falls back to defaults for the required fields
+    assert.ok(result.rumor.includes(expectedNpc), 'Should fallback to default NPC name');
+    assert.ok(result.rumor.includes(expectedRole), 'Should fallback to default NPC role');
 
     // Restore mocks
     AIService.isConfigured = originalIsConfigured;
