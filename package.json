@@ -4,7 +4,7 @@
   "description": "Herramientas web para DMs, escritores y constructores de mundos.",
   "type": "module",
   "scripts": {
-    "test": "node --test js/services/*.test.js"
+    "test": "node --test \"js/**/*.test.js\""
   },
   "repository": {
     "type": "git",
