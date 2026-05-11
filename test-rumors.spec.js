@@ -33,5 +33,9 @@ test('Rumors Module Generates Rumor', async ({ page }) => {
   expect(rumorText).toContain('Testville');
   expect(rumorText).toContain('Bob');
   expect(rumorText).toContain('Baker');
+
+  expect(hookText).toContain('Testville');
+  expect(hookText).toContain('Bob');
+  expect(hookText).toContain('Baker');
   expect(hookText.length).toBeGreaterThan(10);
 });
