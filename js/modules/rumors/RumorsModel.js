@@ -1,15 +1,74 @@
 import { AIService } from '../../services/AIService.js';
 import { LanguageService } from '../../core/LanguageService.js';
-import { RUMOR_TEMPLATES, PLOT_HOOKS, DEFAULTS } from './RumorsData.js';
 
 export default class RumorsModel {
     constructor() {
-        this.defaultTown = DEFAULTS.town;
-        this.defaultNpcName = DEFAULTS.npcName;
-        this.defaultNpcRole = DEFAULTS.npcRole;
+        this.defaultTown = { es: "Pueblo Viejo", en: "Old Town" };
+        this.defaultNpcName = { es: "Desconocido", en: "Unknown" };
+        this.defaultNpcRole = { es: "Viajero", en: "Traveler" };
 
-        this.templates = RUMOR_TEMPLATES;
-        this.plotHooks = PLOT_HOOKS;
+        this.grammar = {
+            es: {
+                intros: [
+                    "Se dice en las calles que",
+                    "Un pajarito me contó que",
+                    "Es un secreto a voces que",
+                    "Corre el rumor de que"
+                ],
+                subjects: [
+                    "{npcName}, nuestro querido {npcRole},",
+                    "{npcName}, el misterioso {npcRole},",
+                    "{npcName}, quien trabaja de {npcRole},"
+                ],
+                actions: [
+                    "estuvo desenterrando tumbas",
+                    "hizo un pacto con un demonio",
+                    "escondió un cofre lleno de oro",
+                    "fue visto tramando algo oscuro"
+                ],
+                locations: [
+                    "en las afueras de {townName}.",
+                    "debajo de la taberna de {townName}.",
+                    "en el cementerio de {townName}.",
+                    "cerca del viejo molino de {townName}."
+                ],
+                hooks: [
+                    "Los aventureros podrían investigar el lugar esta noche.",
+                    "La guardia local ofrece una recompensa por pruebas.",
+                    "Tal vez alguien debería confrontarle discretamente."
+                ]
+            },
+            en: {
+                intros: [
+                    "Word on the street is that",
+                    "A little bird told me that",
+                    "It's an open secret that",
+                    "Rumor has it that"
+                ],
+                subjects: [
+                    "{npcName}, our beloved {npcRole},",
+                    "{npcName}, the mysterious {npcRole},",
+                    "{npcName}, who works as a {npcRole},"
+                ],
+                actions: [
+                    "was digging up graves",
+                    "made a pact with a demon",
+                    "hid a chest full of gold",
+                    "was seen plotting something dark"
+                ],
+                locations: [
+                    "on the outskirts of {townName}.",
+                    "under the tavern in {townName}.",
+                    "in the graveyard of {townName}.",
+                    "near the old mill of {townName}."
+                ],
+                hooks: [
+                    "The adventurers might want to investigate the area tonight.",
+                    "The local guard is offering a reward for proof.",
+                    "Perhaps someone should confront them discreetly."
+                ]
+            }
+        };
     }
 
     async generateRumor(townName, npcName, npcRole) {
@@ -45,21 +104,18 @@ export default class RumorsModel {
         }
 
         // Fallback procedural generation
-        const temps = this.templates[lang] || this.templates['es'];
-        const hooks = this.plotHooks[lang] || this.plotHooks['es'];
+        const langData = this.grammar[lang] || this.grammar['es'];
+        const randomPick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-        const templateIndex = Math.floor(Math.random() * temps.length);
-        const hookIndex = Math.floor(Math.random() * hooks.length);
-
-        let rumorText = temps[templateIndex];
+        let rumorText = `${randomPick(langData.intros)} ${randomPick(langData.subjects)} ${randomPick(langData.actions)} ${randomPick(langData.locations)}`;
         rumorText = rumorText.replace(/{townName}/g, town);
         rumorText = rumorText.replace(/{npcName}/g, name);
         rumorText = rumorText.replace(/{npcRole}/g, role);
 
-        const hookText = hooks[hookIndex];
+        const hookText = randomPick(langData.hooks);
 
         return {
-            rumor: rumorText,
+            rumor: rumorText.trim(),
             hook: hookText
         };
     }
