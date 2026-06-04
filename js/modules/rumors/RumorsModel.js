@@ -1,23 +1,88 @@
 import { AIService } from '../../services/AIService.js';
 import { LanguageService } from '../../core/LanguageService.js';
-import { RUMOR_TEMPLATES, PLOT_HOOKS, DEFAULTS } from './RumorsData.js';
 
 export default class RumorsModel {
     constructor() {
-        this.defaultTown = DEFAULTS.town;
-        this.defaultNpcName = DEFAULTS.npcName;
-        this.defaultNpcRole = DEFAULTS.npcRole;
+        this.defaults = {
+            town: { es: "Pueblo Viejo", en: "Old Town" },
+            npcName: { es: "Desconocido", en: "Unknown" },
+            npcRole: { es: "Viajero", en: "Traveler" }
+        };
 
-        this.templates = RUMOR_TEMPLATES;
-        this.plotHooks = PLOT_HOOKS;
+        this.grammar = {
+            es: {
+                intros: [
+                    "Se dice que ",
+                    "Algunos murmuran que ",
+                    "Corren rumores de que ",
+                    "Anoche hubo rumores de que "
+                ],
+                subjects: [
+                    "{npcName}, el {npcRole}, ",
+                    "{npcName} (nuestro {npcRole}) ",
+                    "el forastero llamado {npcName}, quien actúa como {npcRole}, "
+                ],
+                actions: [
+                    "fue visto haciendo tratos oscuros ",
+                    "está invocando fuerzas que no comprende ",
+                    "está fabricando venenos para un asesino a sueldo ",
+                    "hizo un pacto con un demonio de encrucijada ",
+                    "es en realidad un espía disfrazado "
+                ],
+                locations: [
+                    "cerca del bosque viejo de {townName}.",
+                    "en las calles sombrías de {townName}.",
+                    "a las afueras de {townName}.",
+                    "en el cementerio de {townName}."
+                ],
+                hooks: [
+                    "Los PJs pueden investigar el bosque para encontrar pistas.",
+                    "El PNJ pedirá ayuda a los PJs de forma encubierta.",
+                    "La guardia local de {townName} pagará por información.",
+                    "Una secta secreta está vigilando a {npcName}."
+                ]
+            },
+            en: {
+                intros: [
+                    "It is said that ",
+                    "Some whisper that ",
+                    "Rumor has it that ",
+                    "Last night there were rumors that "
+                ],
+                subjects: [
+                    "{npcName}, the {npcRole}, ",
+                    "{npcName} (our {npcRole}) ",
+                    "the stranger named {npcName}, acting as {npcRole}, "
+                ],
+                actions: [
+                    "was seen making dark deals ",
+                    "is summoning forces they don't understand ",
+                    "is brewing poisons for an assassin ",
+                    "made a pact with a crossroads demon ",
+                    "is actually a spy in disguise "
+                ],
+                locations: [
+                    "near the old forest of {townName}.",
+                    "in the shadowy streets of {townName}.",
+                    "on the outskirts of {townName}.",
+                    "in the graveyard of {townName}."
+                ],
+                hooks: [
+                    "The PCs can investigate the forest to find evidence.",
+                    "The NPC will ask the PCs for help covertly.",
+                    "The local guard of {townName} will pay for information.",
+                    "A secret cult is watching {npcName}."
+                ]
+            }
+        };
     }
 
     async generateRumor(townName, npcName, npcRole) {
         const lang = LanguageService.currentLang || 'es';
 
-        const town = townName || this.defaultTown[lang];
-        const name = npcName || this.defaultNpcName[lang];
-        const role = npcRole || this.defaultNpcRole[lang];
+        const town = townName || this.defaults.town[lang];
+        const name = npcName || this.defaults.npcName[lang];
+        const role = npcRole || this.defaults.npcRole[lang];
 
         if (AIService.isConfigured()) {
             const systemPrompt = `Eres un experto Dungeon Master para juegos de rol de mesa. Genera un rumor o chisme intrigante sobre un PNJ en una ciudad de fantasía, y también proporciona un breve "Gancho de Aventura" (DM Notes) basado en ese rumor.
@@ -45,18 +110,24 @@ export default class RumorsModel {
         }
 
         // Fallback procedural generation
-        const temps = this.templates[lang] || this.templates['es'];
-        const hooks = this.plotHooks[lang] || this.plotHooks['es'];
+        const langData = this.grammar[lang] || this.grammar['es'];
 
-        const templateIndex = Math.floor(Math.random() * temps.length);
-        const hookIndex = Math.floor(Math.random() * hooks.length);
+        const randomEl = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-        let rumorText = temps[templateIndex];
-        rumorText = rumorText.replace(/{townName}/g, town);
-        rumorText = rumorText.replace(/{npcName}/g, name);
-        rumorText = rumorText.replace(/{npcRole}/g, role);
+        let rumorText = randomEl(langData.intros) +
+                        randomEl(langData.subjects) +
+                        randomEl(langData.actions) +
+                        randomEl(langData.locations);
 
-        const hookText = hooks[hookIndex];
+        let hookText = randomEl(langData.hooks);
+
+        rumorText = rumorText.replace(/{townName}/g, town)
+                             .replace(/{npcName}/g, name)
+                             .replace(/{npcRole}/g, role);
+
+        hookText = hookText.replace(/{townName}/g, town)
+                           .replace(/{npcName}/g, name)
+                           .replace(/{npcRole}/g, role);
 
         return {
             rumor: rumorText,
