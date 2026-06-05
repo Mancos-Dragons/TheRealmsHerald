@@ -1,15 +1,86 @@
 import { AIService } from '../../services/AIService.js';
 import { LanguageService } from '../../core/LanguageService.js';
-import { RUMOR_TEMPLATES, PLOT_HOOKS, DEFAULTS } from './RumorsData.js';
 
 export default class RumorsModel {
     constructor() {
-        this.defaultTown = DEFAULTS.town;
-        this.defaultNpcName = DEFAULTS.npcName;
-        this.defaultNpcRole = DEFAULTS.npcRole;
+        this.defaultTown = { es: "Pueblo Viejo", en: "Old Town" };
+        this.defaultNpcName = { es: "Desconocido", en: "Unknown" };
+        this.defaultNpcRole = { es: "Viajero", en: "Traveler" };
 
-        this.templates = RUMOR_TEMPLATES;
-        this.plotHooks = PLOT_HOOKS;
+        this.grammar = {
+            es: {
+                intros: [
+                    "Se dice en {townName} que",
+                    "Corre el rumor por {townName} de que",
+                    "Las malas lenguas en {townName} aseguran que",
+                    "Un viajero que llegó a {townName} jura que",
+                    "En la taberna de {townName} se susurra que"
+                ],
+                subjects: [
+                    "{npcName}, el {npcRole},",
+                    "{npcName}, quien trabaja como {npcRole},",
+                    "el mismísimo {npcName}, conocido como {npcRole},",
+                    "alguien que se parece a {npcName}, el {npcRole},"
+                ],
+                actions: [
+                    "fue visto haciendo tratos oscuros",
+                    "desenterró un artefacto extraño",
+                    "hizo un pacto con un ser de las sombras",
+                    "encontró un mapa del tesoro manchado de sangre",
+                    "estaba invocando fuerzas que no comprende"
+                ],
+                locations: [
+                    "cerca del bosque viejo a medianoche.",
+                    "en el cementerio abandonado.",
+                    "en las ruinas a las afueras.",
+                    "escondido en una cueva secreta.",
+                    "en los oscuros callejones traseros."
+                ],
+                hooks: [
+                    "Gancho de Aventura: Si los jugadores investigan el área, encontrarán huellas misteriosas que llevan a una cueva oculta.",
+                    "Gancho de Aventura: El PNJ negará todo rotundamente y se pondrá a la defensiva si se le presiona, pero su diario contiene pistas vitales.",
+                    "Gancho de Aventura: Esto es solo un malentendido creado por un rival del PNJ para arruinar su reputación. El rival ofrecerá oro si los aventureros lo confirman.",
+                    "Gancho de Aventura: Los rumores son ciertos. El PNJ está bajo los efectos de un encantamiento y necesita ser rescatado o detenido antes del próximo eclipse.",
+                    "Gancho de Aventura: El PNJ fue contratado en secreto por el alcalde para investigar la corrupción local, y el rumor es una trampa."
+                ]
+            },
+            en: {
+                intros: [
+                    "It is said in {townName} that",
+                    "Rumor has it in {townName} that",
+                    "Whispers in {townName} claim that",
+                    "A traveler arriving in {townName} swears that",
+                    "In the tavern of {townName} people whisper that"
+                ],
+                subjects: [
+                    "{npcName}, the {npcRole},",
+                    "{npcName}, who works as the {npcRole},",
+                    "the infamous {npcName}, known as the {npcRole},",
+                    "someone looking just like {npcName}, the {npcRole},"
+                ],
+                actions: [
+                    "was seen making shady deals",
+                    "unearthed a strange artifact",
+                    "made a pact with a shadowy being",
+                    "found a blood-stained treasure map",
+                    "was summoning forces they do not understand"
+                ],
+                locations: [
+                    "near the old forest at midnight.",
+                    "in the abandoned graveyard.",
+                    "in the ruins on the outskirts.",
+                    "hidden in a secret cave.",
+                    "in the dark back alleys."
+                ],
+                hooks: [
+                    "Plot Hook: If the players investigate the area, they will find mysterious footprints leading to a hidden cave.",
+                    "Plot Hook: The NPC will strongly deny everything and become defensive if pressed, but their diary contains vital clues.",
+                    "Plot Hook: This is just a misunderstanding created by a rival of the NPC to ruin their reputation. The rival will offer gold if the adventurers confirm it.",
+                    "Plot Hook: The rumors are true. The NPC is under an enchantment and needs to be rescued or stopped before the next eclipse.",
+                    "Plot Hook: The NPC was secretly hired by the mayor to investigate local corruption, and the rumor is a trap."
+                ]
+            }
+        };
     }
 
     async generateRumor(townName, npcName, npcRole) {
@@ -31,8 +102,8 @@ export default class RumorsModel {
                 try {
                     // Extract JSON if wrapped in markdown
                     let jsonText = aiResponse;
-                    if (jsonText.startsWith('```json')) {
-                        jsonText = jsonText.replace(/^```json/m, '').replace(/```$/m, '').trim();
+                    if (jsonText.startsWith('\`\`\`json')) {
+                        jsonText = jsonText.replace(/^\`\`\`json/m, '').replace(/\`\`\`$/m, '').trim();
                     }
                     const parsed = JSON.parse(jsonText);
                     if (parsed.rumor && parsed.hook) {
@@ -45,22 +116,22 @@ export default class RumorsModel {
         }
 
         // Fallback procedural generation
-        const temps = this.templates[lang] || this.templates['es'];
-        const hooks = this.plotHooks[lang] || this.plotHooks['es'];
+        const g = this.grammar[lang] || this.grammar['es'];
 
-        const templateIndex = Math.floor(Math.random() * temps.length);
-        const hookIndex = Math.floor(Math.random() * hooks.length);
+        const intro = g.intros[Math.floor(Math.random() * g.intros.length)];
+        const subject = g.subjects[Math.floor(Math.random() * g.subjects.length)];
+        const action = g.actions[Math.floor(Math.random() * g.actions.length)];
+        const location = g.locations[Math.floor(Math.random() * g.locations.length)];
+        const hook = g.hooks[Math.floor(Math.random() * g.hooks.length)];
 
-        let rumorText = temps[templateIndex];
+        let rumorText = `${intro} ${subject} ${action} ${location}`;
         rumorText = rumorText.replace(/{townName}/g, town);
         rumorText = rumorText.replace(/{npcName}/g, name);
         rumorText = rumorText.replace(/{npcRole}/g, role);
 
-        const hookText = hooks[hookIndex];
-
         return {
             rumor: rumorText,
-            hook: hookText
+            hook: hook
         };
     }
 }
