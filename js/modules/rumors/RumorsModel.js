@@ -1,15 +1,84 @@
 import { AIService } from '../../services/AIService.js';
 import { LanguageService } from '../../core/LanguageService.js';
-import { RUMOR_TEMPLATES, PLOT_HOOKS, DEFAULTS } from './RumorsData.js';
 
 export default class RumorsModel {
     constructor() {
-        this.defaultTown = DEFAULTS.town;
-        this.defaultNpcName = DEFAULTS.npcName;
-        this.defaultNpcRole = DEFAULTS.npcRole;
+        this.defaultTown = { es: "Pueblo Viejo", en: "Old Town" };
+        this.defaultNpcName = { es: "Desconocido", en: "Unknown" };
+        this.defaultNpcRole = { es: "Viajero", en: "Traveler" };
 
-        this.templates = RUMOR_TEMPLATES;
-        this.plotHooks = PLOT_HOOKS;
+        this.grammar = {
+            es: {
+                intros: [
+                    "Se dice que",
+                    "Algunos murmuran que",
+                    "Dicen las malas lenguas que",
+                    "Hay rumores de que",
+                    "Nadie confía en que"
+                ],
+                subjects: [
+                    "{npcName}, el {npcRole}",
+                    "el misterioso {npcRole} llamado {npcName}",
+                    "aquel {npcRole} de nombre {npcName}"
+                ],
+                actions: [
+                    "fue visto haciendo tratos oscuros",
+                    "sabe dónde está un tesoro perdido",
+                    "está invocando fuerzas que no comprende",
+                    "no es quien dice ser y es un espía",
+                    "está fabricando venenos"
+                ],
+                locations: [
+                    "cerca del bosque viejo de {townName}.",
+                    "en las catacumbas debajo de {townName}.",
+                    "a las afueras de {townName}.",
+                    "en el cementerio de {townName}.",
+                    "en los rincones más oscuros de {townName}."
+                ],
+                hooks: [
+                    "El PNJ ofrece una recompensa a quien le consiga un artefacto raro.",
+                    "El PNJ está siendo chantajeado y busca ayuda discretamente.",
+                    "El PNJ planea abandonar la ciudad esta noche y alguien quiere detenerlo.",
+                    "La guardia local sospecha del PNJ y pide a los jugadores que lo investiguen.",
+                    "El PNJ tiene un mapa cosido en el forro de su abrigo."
+                ]
+            },
+            en: {
+                intros: [
+                    "It is said that",
+                    "Some whisper that",
+                    "Rumor has it that",
+                    "There are rumors that",
+                    "Nobody trusts that"
+                ],
+                subjects: [
+                    "{npcName}, the {npcRole}",
+                    "the mysterious {npcRole} named {npcName}",
+                    "that {npcRole} by the name of {npcName}"
+                ],
+                actions: [
+                    "was seen making dark deals",
+                    "knows where a lost treasure is",
+                    "is summoning forces they do not understand",
+                    "is not who they claim to be and is a spy",
+                    "is crafting poisons"
+                ],
+                locations: [
+                    "near the old forest of {townName}.",
+                    "in the catacombs beneath {townName}.",
+                    "on the outskirts of {townName}.",
+                    "in the cemetery of {townName}.",
+                    "in the darkest corners of {townName}."
+                ],
+                hooks: [
+                    "The NPC is offering a reward to anyone who can fetch a rare artifact.",
+                    "The NPC is being blackmailed and is quietly looking for help.",
+                    "The NPC is planning to leave town tonight and someone wants to stop them.",
+                    "The local guard suspects the NPC and asks the players to investigate.",
+                    "The NPC has a map sewn into the lining of their coat."
+                ]
+            }
+        };
     }
 
     async generateRumor(townName, npcName, npcRole) {
@@ -45,18 +114,19 @@ export default class RumorsModel {
         }
 
         // Fallback procedural generation
-        const temps = this.templates[lang] || this.templates['es'];
-        const hooks = this.plotHooks[lang] || this.plotHooks['es'];
+        const grammar = this.grammar[lang] || this.grammar['es'];
 
-        const templateIndex = Math.floor(Math.random() * temps.length);
-        const hookIndex = Math.floor(Math.random() * hooks.length);
+        const intro = grammar.intros[Math.floor(Math.random() * grammar.intros.length)];
+        const subject = grammar.subjects[Math.floor(Math.random() * grammar.subjects.length)];
+        const action = grammar.actions[Math.floor(Math.random() * grammar.actions.length)];
+        const location = grammar.locations[Math.floor(Math.random() * grammar.locations.length)];
 
-        let rumorText = temps[templateIndex];
+        let rumorText = `${intro} ${subject} ${action} ${location}`;
         rumorText = rumorText.replace(/{townName}/g, town);
         rumorText = rumorText.replace(/{npcName}/g, name);
         rumorText = rumorText.replace(/{npcRole}/g, role);
 
-        const hookText = hooks[hookIndex];
+        const hookText = grammar.hooks[Math.floor(Math.random() * grammar.hooks.length)];
 
         return {
             rumor: rumorText,
