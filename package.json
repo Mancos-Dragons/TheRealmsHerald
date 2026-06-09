@@ -18,6 +18,6 @@
   },
   "homepage": "https://github.com/Mancos-Dragons/TheRealmsHerald#readme",
   "devDependencies": {
-    "@playwright/test": "^1.58.2"
+    "@playwright/test": "^1.60.0"
   }
 }
