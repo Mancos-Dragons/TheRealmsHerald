@@ -3,7 +3,6 @@ import assert from 'node:assert';
 import RumorsModel from './RumorsModel.js';
 import { AIService } from '../../services/AIService.js';
 import { LanguageService } from '../../core/LanguageService.js';
-import { RUMOR_TEMPLATES, PLOT_HOOKS, DEFAULTS } from './RumorsData.js';
 
 test('RumorsModel - fallback to procedural generation when AIService is not configured', async (t) => {
     // Mock the AIService
@@ -17,30 +16,25 @@ test('RumorsModel - fallback to procedural generation when AIService is not conf
     const model = new RumorsModel();
 
     // Call generateRumor
-    const result = await model.generateRumor('Townsville', 'Bob', 'Baker');
+    const townName = 'Townsville';
+    const npcName = 'Bob';
+    const npcRole = 'Baker';
+    const result = await model.generateRumor(townName, npcName, npcRole);
 
     // Assert that result has rumor and hook properties
     assert.ok(result.rumor);
     assert.ok(result.hook);
 
-    // Assert that the generated rumor is based on one of the templates
-    let foundTemplate = false;
-    for (const template of RUMOR_TEMPLATES.es) {
-        // Simple regex to match replaced template roughly, or just check that template starts matching
-        const baseTemplate = template
-            .replace(/{townName}/g, 'Townsville')
-            .replace(/{npcName}/g, 'Bob')
-            .replace(/{npcRole}/g, 'Baker');
+    // Assert that the generated rumor incorporates the provided parameters
+    assert.strictEqual(result.rumor.includes(townName), true, 'Rumor should include town name');
+    assert.strictEqual(result.rumor.includes(npcName), true, 'Rumor should include npc name');
+    assert.strictEqual(result.rumor.includes(npcRole), true, 'Rumor should include npc role');
 
-        if (result.rumor === baseTemplate) {
-            foundTemplate = true;
-            break;
-        }
-    }
-    assert.strictEqual(foundTemplate, true, 'Rumor should match a procedural template');
-
-    // Assert that the generated hook is one of the plot hooks
-    assert.ok(PLOT_HOOKS.es.includes(result.hook), 'Hook should match a procedural plot hook');
+    // Assert that the generated hook also correctly substitutes placeholders if it has them
+    // (though in this case only npcName and townName might be there)
+    // We check that raw variables like {npcName} are NOT present in the final output
+    assert.strictEqual(result.hook.includes('{npcName}'), false, 'Hook should not contain unresolved placeholders');
+    assert.strictEqual(result.hook.includes('{townName}'), false, 'Hook should not contain unresolved placeholders');
 
     // Restore mocks
     AIService.isConfigured = originalIsConfigured;
@@ -64,11 +58,11 @@ test('RumorsModel - uses defaults when arguments are empty', async (t) => {
     assert.ok(result.rumor);
     assert.ok(result.hook);
 
-    const expectedTown = DEFAULTS.town.es;
-    const expectedNpc = DEFAULTS.npcName.es;
-    const expectedRole = DEFAULTS.npcRole.es;
+    const expectedTown = model.defaultTown.es;
+    const expectedNpc = model.defaultNpcName.es;
+    const expectedRole = model.defaultNpcRole.es;
 
-    assert.ok(result.rumor.includes(expectedTown) || result.rumor.includes(expectedNpc) || result.rumor.includes(expectedRole));
+    assert.ok(result.rumor.includes(expectedTown) && result.rumor.includes(expectedNpc) && result.rumor.includes(expectedRole));
 
     // Restore mocks
     AIService.isConfigured = originalIsConfigured;
