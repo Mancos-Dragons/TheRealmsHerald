@@ -1,15 +1,80 @@
 import { AIService } from '../../services/AIService.js';
 import { LanguageService } from '../../core/LanguageService.js';
-import { RUMOR_TEMPLATES, PLOT_HOOKS, DEFAULTS } from './RumorsData.js';
 
 export default class RumorsModel {
     constructor() {
-        this.defaultTown = DEFAULTS.town;
-        this.defaultNpcName = DEFAULTS.npcName;
-        this.defaultNpcRole = DEFAULTS.npcRole;
+        this.defaultTown = { es: "Pueblo Viejo", en: "Old Town" };
+        this.defaultNpcName = { es: "Desconocido", en: "Unknown" };
+        this.defaultNpcRole = { es: "Viajero", en: "Traveler" };
 
-        this.templates = RUMOR_TEMPLATES;
-        this.plotHooks = PLOT_HOOKS;
+        this.grammar = {
+            es: {
+                intros: [
+                    "Se dice que",
+                    "Algunos murmuran que",
+                    "Dicen las malas lenguas que",
+                    "Es un secreto a voces que",
+                    "Un mercader forastero jura que"
+                ],
+                subjects: [
+                    "{npcName}, el {npcRole} de {townName},",
+                    "el misterioso {npcName}, nuestro {npcRole} en {townName},",
+                    "{npcName}, que trabaja de {npcRole} en {townName},"
+                ],
+                actions: [
+                    "fue visto haciendo tratos oscuros",
+                    "sabe dónde está el tesoro perdido",
+                    "está invocando fuerzas que no comprende",
+                    "hizo un pacto con un demonio",
+                    "habla fluidamente el idioma de los muertos"
+                ],
+                locations: [
+                    "cerca del bosque viejo a medianoche.",
+                    "en el viejo cementerio.",
+                    "en la taberna local.",
+                    "a las afueras de la muralla.",
+                    "en las ruinas cercanas."
+                ],
+                hooks: [
+                    "Gancho de Aventura: Si los jugadores investigan el área, encontrarán huellas misteriosas que llevan a una cueva oculta.",
+                    "Gancho de Aventura: El PNJ negará todo rotundamente y se pondrá a la defensiva si se le presiona, pero su diario contiene pistas vitales.",
+                    "Gancho de Aventura: Esto es solo un malentendido creado por un rival del PNJ para arruinar su reputación. El rival ofrecerá oro si los aventureros lo confirman."
+                ]
+            },
+            en: {
+                intros: [
+                    "They say",
+                    "Some whisper that",
+                    "Rumor has it that",
+                    "It is a poorly kept secret that",
+                    "A foreign merchant swears that"
+                ],
+                subjects: [
+                    "{npcName}, the {npcRole} from {townName},",
+                    "the mysterious {npcName}, our {npcRole} in {townName},",
+                    "{npcName}, working as {npcRole} in {townName},"
+                ],
+                actions: [
+                    "was seen making dark deals",
+                    "knows where the lost treasure is",
+                    "is summoning forces they don't understand",
+                    "made a pact with a demon",
+                    "speaks the language of the dead fluently"
+                ],
+                locations: [
+                    "near the old forest at midnight.",
+                    "in the old graveyard.",
+                    "at the local tavern.",
+                    "just outside the walls.",
+                    "in the nearby ruins."
+                ],
+                hooks: [
+                    "Plot Hook: If the players investigate the area, they will find mysterious footprints leading to a hidden cave.",
+                    "Plot Hook: The NPC will strongly deny everything and become defensive if pressed, but their diary contains vital clues.",
+                    "Plot Hook: This is just a misunderstanding created by a rival of the NPC to ruin their reputation. The rival will offer gold if the adventurers confirm it."
+                ]
+            }
+        };
     }
 
     async generateRumor(townName, npcName, npcRole) {
@@ -45,18 +110,18 @@ export default class RumorsModel {
         }
 
         // Fallback procedural generation
-        const temps = this.templates[lang] || this.templates['es'];
-        const hooks = this.plotHooks[lang] || this.plotHooks['es'];
+        const grammar = this.grammar[lang] || this.grammar['es'];
 
-        const templateIndex = Math.floor(Math.random() * temps.length);
-        const hookIndex = Math.floor(Math.random() * hooks.length);
+        const intro = grammar.intros[Math.floor(Math.random() * grammar.intros.length)];
+        const subject = grammar.subjects[Math.floor(Math.random() * grammar.subjects.length)];
+        const action = grammar.actions[Math.floor(Math.random() * grammar.actions.length)];
+        const location = grammar.locations[Math.floor(Math.random() * grammar.locations.length)];
+        const hookText = grammar.hooks[Math.floor(Math.random() * grammar.hooks.length)];
 
-        let rumorText = temps[templateIndex];
+        let rumorText = `${intro} ${subject} ${action} ${location}`;
         rumorText = rumorText.replace(/{townName}/g, town);
         rumorText = rumorText.replace(/{npcName}/g, name);
         rumorText = rumorText.replace(/{npcRole}/g, role);
-
-        const hookText = hooks[hookIndex];
 
         return {
             rumor: rumorText,
