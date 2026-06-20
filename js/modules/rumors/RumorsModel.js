@@ -1,15 +1,98 @@
 import { AIService } from '../../services/AIService.js';
 import { LanguageService } from '../../core/LanguageService.js';
-import { RUMOR_TEMPLATES, PLOT_HOOKS, DEFAULTS } from './RumorsData.js';
 
 export default class RumorsModel {
     constructor() {
-        this.defaultTown = DEFAULTS.town;
-        this.defaultNpcName = DEFAULTS.npcName;
-        this.defaultNpcRole = DEFAULTS.npcRole;
+        this.defaultTown = { es: "Pueblo Viejo", en: "Old Town" };
+        this.defaultNpcName = { es: "Desconocido", en: "Unknown" };
+        this.defaultNpcRole = { es: "Viajero", en: "Traveler" };
 
-        this.templates = RUMOR_TEMPLATES;
-        this.plotHooks = PLOT_HOOKS;
+        this.grammar = {
+            es: {
+                intros: [
+                    "Se dice que",
+                    "Algunos murmuran que",
+                    "Anoche hubo ruidos extraños y creen que",
+                    "Dicen las malas lenguas que",
+                    "Nadie confía en que",
+                    "Hay fuertes rumores de que"
+                ],
+                subjects: [
+                    "{npcName}, el {npcRole} de {townName},",
+                    "aquel llamado {npcName}, nuestro {npcRole} local en {townName},",
+                    "el misterioso {npcName}, que trabaja como {npcRole} en {townName},",
+                    "{npcName}, conocido en {townName} por ser {npcRole},"
+                ],
+                actions: [
+                    "fue visto haciendo tratos oscuros",
+                    "sabe dónde está el tesoro perdido",
+                    "está invocando fuerzas que no comprende",
+                    "no es quien dice ser y es un espía",
+                    "fue visto desenterrando algo",
+                    "está fabricando venenos prohibidos",
+                    "hizo un pacto con un demonio",
+                    "es el heredero perdido de una nobleza caída",
+                    "habla con los árboles oscuros"
+                ],
+                locations: [
+                    "cerca del bosque viejo a medianoche.",
+                    "en las catacumbas olvidadas.",
+                    "en el viejo cementerio.",
+                    "cerca de la encrucijada.",
+                    "en las sombras del callejón.",
+                    "bajo las ruinas de la antigua torre."
+                ],
+                hooks: [
+                    "DM Note: Los jugadores pueden encontrar a {npcName} en {townName} y buscar pruebas de sus crímenes en su lugar de trabajo.",
+                    "DM Note: {npcName} de {townName} pedirá ayuda a los jugadores para limpiar su nombre, o podría emboscarlos si descubren la verdad.",
+                    "DM Note: Un rival de {npcName} en {townName} contrató a alguien para difundir este rumor y arruinar la reputación del {npcRole}.",
+                    "DM Note: Si los jugadores investigan a {npcName} en {townName}, descubrirán un mapa escondido entre sus pertenencias.",
+                    "DM Note: La guardia de {townName} ya está buscando a {npcName}. Los jugadores pueden entregarlo por una recompensa o ayudarlo a huir."
+                ]
+            },
+            en: {
+                intros: [
+                    "It is said that",
+                    "Some whisper that",
+                    "Last night there were strange noises and people believe that",
+                    "Rumor has it that",
+                    "No one trusts that",
+                    "There are strong rumors that"
+                ],
+                subjects: [
+                    "{npcName}, the {npcRole} of {townName},",
+                    "the one called {npcName}, our local {npcRole} in {townName},",
+                    "the mysterious {npcName}, who works as a {npcRole} in {townName},",
+                    "{npcName}, known in {townName} as a {npcRole},"
+                ],
+                actions: [
+                    "was seen making dark deals",
+                    "knows where the lost treasure is",
+                    "is summoning forces they don't understand",
+                    "is not who they claim to be and is a spy",
+                    "was seen digging something up",
+                    "is brewing forbidden poisons",
+                    "made a pact with a demon",
+                    "is the lost heir of a fallen nobility",
+                    "speaks to the dark trees"
+                ],
+                locations: [
+                    "near the old forest at midnight.",
+                    "in the forgotten catacombs.",
+                    "in the old graveyard.",
+                    "near the crossroads.",
+                    "in the shadows of the alley.",
+                    "under the ruins of the ancient tower."
+                ],
+                hooks: [
+                    "DM Note: The players can find {npcName} in {townName} and search for proof of their crimes at their workplace.",
+                    "DM Note: {npcName} from {townName} will ask the players for help to clear their name, or might ambush them if they learn the truth.",
+                    "DM Note: A rival of {npcName} in {townName} hired someone to spread this rumor to ruin the {npcRole}'s reputation.",
+                    "DM Note: If the players investigate {npcName} in {townName}, they will find a hidden map among their belongings.",
+                    "DM Note: The guard in {townName} is already looking for {npcName}. Players can turn them in for a bounty or help them flee."
+                ]
+            }
+        };
     }
 
     async generateRumor(townName, npcName, npcRole) {
@@ -45,22 +128,28 @@ export default class RumorsModel {
         }
 
         // Fallback procedural generation
-        const temps = this.templates[lang] || this.templates['es'];
-        const hooks = this.plotHooks[lang] || this.plotHooks['es'];
+        const grammarLang = this.grammar[lang] || this.grammar['es'];
 
-        const templateIndex = Math.floor(Math.random() * temps.length);
-        const hookIndex = Math.floor(Math.random() * hooks.length);
+        const intro = grammarLang.intros[Math.floor(Math.random() * grammarLang.intros.length)];
+        const subject = grammarLang.subjects[Math.floor(Math.random() * grammarLang.subjects.length)];
+        const action = grammarLang.actions[Math.floor(Math.random() * grammarLang.actions.length)];
+        const location = grammarLang.locations[Math.floor(Math.random() * grammarLang.locations.length)];
+        const hook = grammarLang.hooks[Math.floor(Math.random() * grammarLang.hooks.length)];
 
-        let rumorText = temps[templateIndex];
+        let rumorText = `${intro} ${subject} ${action} ${location}`;
+
         rumorText = rumorText.replace(/{townName}/g, town);
         rumorText = rumorText.replace(/{npcName}/g, name);
         rumorText = rumorText.replace(/{npcRole}/g, role);
 
-        const hookText = hooks[hookIndex];
+        let hookText = hook;
+        hookText = hookText.replace(/{townName}/g, town);
+        hookText = hookText.replace(/{npcName}/g, name);
+        hookText = hookText.replace(/{npcRole}/g, role);
 
         return {
-            rumor: rumorText,
-            hook: hookText
+            rumor: rumorText.trim(),
+            hook: hookText.trim()
         };
     }
 }
