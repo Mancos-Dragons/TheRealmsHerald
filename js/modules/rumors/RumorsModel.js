@@ -1,15 +1,74 @@
 import { AIService } from '../../services/AIService.js';
 import { LanguageService } from '../../core/LanguageService.js';
-import { RUMOR_TEMPLATES, PLOT_HOOKS, DEFAULTS } from './RumorsData.js';
 
 export default class RumorsModel {
     constructor() {
-        this.defaultTown = DEFAULTS.town;
-        this.defaultNpcName = DEFAULTS.npcName;
-        this.defaultNpcRole = DEFAULTS.npcRole;
+        this.defaultTown = { es: "Pueblo Viejo", en: "Old Town" };
+        this.defaultNpcName = { es: "Desconocido", en: "Unknown" };
+        this.defaultNpcRole = { es: "Viajero", en: "Traveler" };
 
-        this.templates = RUMOR_TEMPLATES;
-        this.plotHooks = PLOT_HOOKS;
+        this.grammar = {
+            es: {
+                intros: [
+                    "Se dice que ",
+                    "Algunos murmuran que ",
+                    "Anoche hubo ruidos extraños, creen que ",
+                    "Dicen las malas lenguas que "
+                ],
+                subjects: [
+                    "{npcName}, el {npcRole} de {townName}, ",
+                    "nuestro conocido {npcName}, el {npcRole} que vive en {townName}, "
+                ],
+                actions: [
+                    "fue visto haciendo tratos oscuros ",
+                    "sabe dónde está un tesoro perdido ",
+                    "está invocando fuerzas oscuras ",
+                    "se desvaneció entre las sombras "
+                ],
+                locations: [
+                    "cerca del bosque viejo a medianoche.",
+                    "en el viejo cementerio.",
+                    "en los callejones detrás de la taberna.",
+                    "en las ruinas a las afueras."
+                ],
+                hooks: [
+                    "Investiga el lugar a medianoche.",
+                    "Busca pistas en la casa del PNJ.",
+                    "Sigue al PNJ para ver con quién se encuentra.",
+                    "Habla con los guardias sobre movimientos sospechosos."
+                ]
+            },
+            en: {
+                intros: [
+                    "It is said that ",
+                    "Some whisper that ",
+                    "There were strange noises last night, they believe that ",
+                    "Rumor has it that "
+                ],
+                subjects: [
+                    "{npcName}, the {npcRole} of {townName}, ",
+                    "our known {npcName}, the {npcRole} who lives in {townName}, "
+                ],
+                actions: [
+                    "was seen making shady deals ",
+                    "knows where a lost treasure is ",
+                    "is summoning dark forces ",
+                    "vanished into the shadows "
+                ],
+                locations: [
+                    "near the old forest at midnight.",
+                    "at the old graveyard.",
+                    "in the alleys behind the tavern.",
+                    "at the ruins on the outskirts."
+                ],
+                hooks: [
+                    "Investigate the location at midnight.",
+                    "Search for clues in the NPC's house.",
+                    "Follow the NPC to see who they meet.",
+                    "Talk to the guards about suspicious movements."
+                ]
+            }
+        };
     }
 
     async generateRumor(townName, npcName, npcRole) {
@@ -45,18 +104,19 @@ export default class RumorsModel {
         }
 
         // Fallback procedural generation
-        const temps = this.templates[lang] || this.templates['es'];
-        const hooks = this.plotHooks[lang] || this.plotHooks['es'];
+        const grammar = this.grammar[lang] || this.grammar['es'];
 
-        const templateIndex = Math.floor(Math.random() * temps.length);
-        const hookIndex = Math.floor(Math.random() * hooks.length);
+        const intro = grammar.intros[Math.floor(Math.random() * grammar.intros.length)];
+        const subject = grammar.subjects[Math.floor(Math.random() * grammar.subjects.length)];
+        const action = grammar.actions[Math.floor(Math.random() * grammar.actions.length)];
+        const location = grammar.locations[Math.floor(Math.random() * grammar.locations.length)];
 
-        let rumorText = temps[templateIndex];
+        let rumorText = `${intro}${subject}${action}${location}`;
         rumorText = rumorText.replace(/{townName}/g, town);
         rumorText = rumorText.replace(/{npcName}/g, name);
         rumorText = rumorText.replace(/{npcRole}/g, role);
 
-        const hookText = hooks[hookIndex];
+        const hookText = grammar.hooks[Math.floor(Math.random() * grammar.hooks.length)];
 
         return {
             rumor: rumorText,
