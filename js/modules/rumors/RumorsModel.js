@@ -1,15 +1,76 @@
 import { AIService } from '../../services/AIService.js';
 import { LanguageService } from '../../core/LanguageService.js';
-import { RUMOR_TEMPLATES, PLOT_HOOKS, DEFAULTS } from './RumorsData.js';
 
 export default class RumorsModel {
     constructor() {
-        this.defaultTown = DEFAULTS.town;
-        this.defaultNpcName = DEFAULTS.npcName;
-        this.defaultNpcRole = DEFAULTS.npcRole;
+        this.defaultTown = { es: "Pueblo Viejo", en: "Old Town" };
+        this.defaultNpcName = { es: "Desconocido", en: "Unknown" };
+        this.defaultNpcRole = { es: "Viajero", en: "Traveler" };
 
-        this.templates = RUMOR_TEMPLATES;
-        this.plotHooks = PLOT_HOOKS;
+        this.grammar = {
+            es: {
+                intros: [
+                    "Se dice que ",
+                    "Algunos murmuran que ",
+                    "Corren rumores de que ",
+                    "Un mercader forastero jura que "
+                ],
+                subjects: [
+                    "{npcName}, el {npcRole} de {townName}, ",
+                    "{npcName}, que trabaja de {npcRole} en {townName}, ",
+                    "nuestro {npcRole} {npcName} en {townName}, "
+                ],
+                actions: [
+                    "fue visto haciendo tratos oscuros ",
+                    "está invocando fuerzas extrañas ",
+                    "ha estado desenterrando cosas extrañas ",
+                    "tiene un pacto con un demonio de encrucijada "
+                ],
+                locations: [
+                    "cerca del bosque viejo a medianoche.",
+                    "en el viejo cementerio.",
+                    "en las afueras de la ciudad.",
+                    "en los rincones oscuros del mercado."
+                ],
+                hooks: [
+                    "Gancho de Aventura: Si los jugadores investigan el área, encontrarán huellas misteriosas.",
+                    "Gancho de Aventura: El PNJ negará todo rotundamente, pero su diario contiene pistas vitales.",
+                    "Gancho de Aventura: Esto es solo un malentendido creado por un rival del PNJ.",
+                    "Gancho de Aventura: Los rumores son ciertos y el PNJ necesita ser rescatado o detenido."
+                ]
+            },
+            en: {
+                intros: [
+                    "It is said that ",
+                    "Some murmur that ",
+                    "Rumors spread that ",
+                    "A foreign merchant swears that "
+                ],
+                subjects: [
+                    "{npcName}, the {npcRole} of {townName}, ",
+                    "{npcName}, working as {npcRole} in {townName}, ",
+                    "our {npcRole} {npcName} in {townName}, "
+                ],
+                actions: [
+                    "was seen making dark deals ",
+                    "is summoning strange forces ",
+                    "has been digging up strange things ",
+                    "has a pact with a crossroads demon "
+                ],
+                locations: [
+                    "near the old forest at midnight.",
+                    "in the old cemetery.",
+                    "on the outskirts of the city.",
+                    "in the dark corners of the market."
+                ],
+                hooks: [
+                    "Plot Hook: If the players investigate the area, they will find mysterious footprints.",
+                    "Plot Hook: The NPC will strongly deny everything, but their diary contains vital clues.",
+                    "Plot Hook: This is just a misunderstanding created by a rival of the NPC.",
+                    "Plot Hook: The rumors are true and the NPC needs to be rescued or stopped."
+                ]
+            }
+        };
     }
 
     async generateRumor(townName, npcName, npcRole) {
@@ -45,18 +106,20 @@ export default class RumorsModel {
         }
 
         // Fallback procedural generation
-        const temps = this.templates[lang] || this.templates['es'];
-        const hooks = this.plotHooks[lang] || this.plotHooks['es'];
+        const grammar = this.grammar[lang] || this.grammar['es'];
 
-        const templateIndex = Math.floor(Math.random() * temps.length);
-        const hookIndex = Math.floor(Math.random() * hooks.length);
+        const pickRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-        let rumorText = temps[templateIndex];
+        let rumorText = pickRandom(grammar.intros) +
+                        pickRandom(grammar.subjects) +
+                        pickRandom(grammar.actions) +
+                        pickRandom(grammar.locations);
+
         rumorText = rumorText.replace(/{townName}/g, town);
         rumorText = rumorText.replace(/{npcName}/g, name);
         rumorText = rumorText.replace(/{npcRole}/g, role);
 
-        const hookText = hooks[hookIndex];
+        const hookText = pickRandom(grammar.hooks);
 
         return {
             rumor: rumorText,
