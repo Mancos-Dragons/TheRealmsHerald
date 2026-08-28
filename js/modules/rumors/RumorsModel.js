@@ -1,6 +1,11 @@
 import { AIService } from '../../services/AIService.js';
 import { LanguageService } from '../../core/LanguageService.js';
-import { RUMOR_TEMPLATES, PLOT_HOOKS, DEFAULTS } from './RumorsData.js';
+
+const DEFAULTS = {
+    town: { es: "Pueblo Viejo", en: "Old Town" },
+    npcName: { es: "Desconocido", en: "Unknown" },
+    npcRole: { es: "Viajero", en: "Traveler" }
+};
 
 export default class RumorsModel {
     constructor() {
@@ -8,8 +13,78 @@ export default class RumorsModel {
         this.defaultNpcName = DEFAULTS.npcName;
         this.defaultNpcRole = DEFAULTS.npcRole;
 
-        this.templates = RUMOR_TEMPLATES;
-        this.plotHooks = PLOT_HOOKS;
+        this.grammar = {
+            es: {
+                intros: [
+                    "Se dice que",
+                    "Algunos murmuran que",
+                    "Dicen las malas lenguas en la taberna que",
+                    "Un guardia asegura que",
+                    "Se rumorea por ahí que"
+                ],
+                subjects: [
+                    "{npcName}, el {npcRole} de {townName},",
+                    "aquel que conocemos como {npcName}, el {npcRole} de {townName},",
+                    "nuestro misterioso {npcName} (el {npcRole} de {townName})"
+                ],
+                actions: [
+                    "fue visto haciendo tratos oscuros cerca del bosque a medianoche.",
+                    "sabe dónde está el tesoro perdido, pero tiene demasiado miedo para hablar.",
+                    "está invocando fuerzas que no comprende.",
+                    "no es quien dice ser y en realidad es un espía.",
+                    "desenterró algo extraño en el viejo cementerio.",
+                    "es en realidad un dragón que tomó forma humana.",
+                    "está fabricando venenos para un asesino a sueldo."
+                ],
+                hookIntros: [
+                    "Gancho: Los jugadores podrían investigar y descubrir que",
+                    "DM Note: Si los jugadores confrontan al PNJ, se revelará que",
+                    "Idea: Este rumor es falso, pero alguien lo esparció porque"
+                ],
+                hookActions: [
+                    "hay un culto secreto operando en las sombras.",
+                    "el PNJ necesita ayuda desesperadamente pero no puede pedirla.",
+                    "todo es una trampa planeada por un enemigo de los jugadores.",
+                    "el tesoro maldito ya fue encontrado y está corrompiendo al pueblo.",
+                    "hay un portal a otro plano escondido bajo su casa."
+                ]
+            },
+            en: {
+                intros: [
+                    "It is said that",
+                    "Some whisper that",
+                    "Rumor has it in the tavern that",
+                    "A guard swears that",
+                    "Word on the street is that"
+                ],
+                subjects: [
+                    "{npcName}, the {npcRole} of {townName},",
+                    "the one known as {npcName}, the {npcRole} of {townName},",
+                    "our mysterious {npcName} (the {npcRole} of {townName})"
+                ],
+                actions: [
+                    "was seen making dark deals near the forest at midnight.",
+                    "knows where the lost treasure is, but is too afraid to speak.",
+                    "is summoning forces they do not understand.",
+                    "is not who they claim to be and is actually a spy.",
+                    "dug up something strange in the old graveyard.",
+                    "is actually a dragon in human form.",
+                    "is brewing poisons for a hired assassin."
+                ],
+                hookIntros: [
+                    "Hook: The players could investigate and find out that",
+                    "DM Note: If the players confront the NPC, it will be revealed that",
+                    "Idea: This rumor is false, but someone spread it because"
+                ],
+                hookActions: [
+                    "there is a secret cult operating in the shadows.",
+                    "the NPC desperately needs help but cannot ask for it.",
+                    "it is all a trap planned by an enemy of the players.",
+                    "the cursed treasure was already found and is corrupting the town.",
+                    "there is a portal to another plane hidden under their house."
+                ]
+            }
+        };
     }
 
     async generateRumor(townName, npcName, npcRole) {
@@ -45,18 +120,23 @@ export default class RumorsModel {
         }
 
         // Fallback procedural generation
-        const temps = this.templates[lang] || this.templates['es'];
-        const hooks = this.plotHooks[lang] || this.plotHooks['es'];
+        const grammar = this.grammar[lang] || this.grammar['es'];
 
-        const templateIndex = Math.floor(Math.random() * temps.length);
-        const hookIndex = Math.floor(Math.random() * hooks.length);
+        const getRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-        let rumorText = temps[templateIndex];
+        let intro = getRandom(grammar.intros);
+        let subject = getRandom(grammar.subjects);
+        let action = getRandom(grammar.actions);
+
+        let hookIntro = getRandom(grammar.hookIntros);
+        let hookAction = getRandom(grammar.hookActions);
+
+        let rumorText = `${intro} ${subject} ${action}`;
         rumorText = rumorText.replace(/{townName}/g, town);
         rumorText = rumorText.replace(/{npcName}/g, name);
         rumorText = rumorText.replace(/{npcRole}/g, role);
 
-        const hookText = hooks[hookIndex];
+        const hookText = `${hookIntro} ${hookAction}`;
 
         return {
             rumor: rumorText,
